@@ -1,0 +1,15 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+policy_types:
+  igs.policies.validate.SwarmManager:
+    derived_from: tosca.policies.Root
+    targets: [ igs.nodes.Swarm.Manager ]
+    triggers:
+        igs.triggers.validate.SwarmManager:
+            description: A trigger for validation
+            event: validation_trigger_SwarmManager
+            target_filter:
+                node: igs.nodes.Swarm.Manager
+            action:
+                - call_operation: Validation.validate
+

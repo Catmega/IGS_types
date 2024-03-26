@@ -1,0 +1,51 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../IGSBlockStorage/NodeType.tosca
+  - ../IGSContainerRuntime/NodeType.tosca
+  - ../IGSOSInstance/NodeType.tosca
+node_types:
+  igs.nodes.abstract.ClusterNode:
+    derived_from: tosca.nodes.Compute
+    metadata:
+      targetNamespace: "igs.nodes.abstract"
+      abstract: "false"
+      final: "false"
+    attributes:
+
+      #######################################################################
+      ### override tosca.nodes.Compute, to retrieve value from dependency ###
+      private_address: #inherited attr
+        type: string
+        default: { get_attribute: [SELF, runtimeHost, ansible_host_ip ] } 
+      public_address: #inherited attr
+        type: string
+        default: { get_attribute: [SELF, runtimeHost, public_address ] } 
+      #######################################################################
+
+      username:
+        type: string
+        default: { get_attribute: [SELF, runtimeHost, ansible_user ] } 
+      name: # the name to catgorize hosts in ansible inverntory list. [localhost,remote_host]
+        type: string
+        default: { get_attribute: [SELF, runtimeHost, ansible_host_name ] } 
+      # tier:  # can be replaced with "labels" in Swarm
+      #   type: string
+      #   default: { get_attribute: [SELF, runtimeHost, tier ] } 
+
+    properties:
+      node_lables:
+        type: string
+    # capabilities:
+    #   runtimeHost:
+    #     occurrences: [ 1, UNBOUNDED ]
+    #     valid_source_types: [igs.nodes.abstract.BlockStorage, igs.nodes.abstract.ContainerRuntime]
+    #     type: tosca.capabilities.Container
+    requirements:
+      - runtimeHost:
+          capability: tosca.capabilities.Compute
+          node: igs.nodes.abstract.ContainerRuntime
+          relationship: tosca.relationships.HostedOn
+      - host:
+          capability: tosca.capabilities.Node
+          node: igs.nodes.abstract.OSInstance
+          relationship: tosca.relationships.HostedOn

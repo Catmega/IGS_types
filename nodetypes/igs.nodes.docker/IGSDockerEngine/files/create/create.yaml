@@ -1,0 +1,107 @@
+---
+- name: add remote machine
+  hosts: localhost
+  become: yes
+  vars:
+      host_ip: "{{ ANSIBLE_HOST_IP }}"
+  tasks:
+    - name: Add targets 
+      add_host:
+        name: "{{ ANSIBLE_HOST_NAME }}"
+        ansible_host: "{{ ANSIBLE_HOST_IP }}"
+        ansible_user: "{{ ANSIBLE_USER }}"
+      when: 
+        - host_ip != "localhost"
+
+
+    # - name: check the output to see if the hosts are added 
+    #   debug:
+    #     var: hostvars
+- name: create
+  hosts: 
+    - "{{ ANSIBLE_HOST_NAME }}"
+  gather_facts: true
+  become: true
+  become_method: sudo
+
+  tasks:
+    # - name: use this task to check if your os belong to the Debian family
+    #   debug:
+    #     msg: ansible_os_family == "{{ ansible_os_family }}"
+    - name: remove apt key
+      ansible.builtin.file:
+        path: /etc/apt/keyrings/docker.gpg
+        state: absent
+
+    - name: remove apt list
+      ansible.builtin.file:
+        path: /etc/apt/sources.list.d/docker.list
+        state: absent
+
+    - name: Update and upgrade apt packages
+      apt:
+        upgrade: yes
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+
+    - name: Install required packages
+      apt:
+        pkg:
+          - python3-apt
+
+      when: ansible_os_family == "Debian"
+
+    # - name: Install required packages
+    #   apt:
+    #     pkg:
+    #       - docker-compose-plugin
+    #   when: ansible_os_family == "Debian"
+
+    - name: Install required packages
+      apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - software-properties-common
+      when: ansible_os_family == "Debian"
+
+
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/{{ ansible_distribution|lower }}/gpg
+        # id: 0EBFCD8  
+        state: present
+      when: ansible_os_family == "Debian"
+
+
+    - name: Add Docker repository
+      apt_repository:
+        filename: docker
+        repo: deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }} stable
+        update_cache: true
+      when: ansible_os_family == "Debian"
+
+    - name: Install docker-ce
+      apt:
+        name: docker-ce
+      when: ansible_os_family == "Debian"
+    - name: Start and enable docker service
+      service:
+        name: docker
+        enabled: true
+        state: started
+    - name: Install required packages
+      apt:
+        pkg:
+          - docker-compose-plugin
+      when: ansible_os_family == "Debian"
+
+    - name: Install packages for ansible to operate docker
+      ansible.builtin.pip:
+        name:
+          - docker
+          - docker-compose

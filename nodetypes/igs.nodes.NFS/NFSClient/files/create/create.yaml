@@ -1,0 +1,62 @@
+---
+- name: add remote machine
+  hosts: localhost
+  become: yes
+  vars:
+      host_ip: "{{ ANSIBLE_HOST_IP }}"
+  tasks:
+
+    - name: Add targets 
+      add_host:
+        name: "{{ ANSIBLE_HOST_NAME }}"
+        ansible_host: "{{ ANSIBLE_HOST_IP }}"
+        ansible_user: "{{ ANSIBLE_USER }}"
+      when: 
+        - host_ip != "localhost"
+
+- name: create
+  hosts: 
+    - "{{ ANSIBLE_HOST_NAME }}"
+  gather_facts: true
+  become: true
+  become_method: sudo
+
+ 
+  tasks:
+  #   # - name: use this task to check if your os belong to the Debian family
+  #   #   debug:
+  #   #     msg: ansible_os_family == "{{ ansible_os_family }}"
+
+    - name: Update and upgrade apt packages
+      apt:
+        upgrade: yes
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+
+    - name: Install required packages
+      apt:
+        pkg:
+          - nfs-common
+      when: ansible_os_family == "Debian"
+    - name: Ensure group "nobody" exists
+      group:
+        name: nobody
+        state: present
+    - name: Creates mount directory 
+      ansible.builtin.file:
+        path: "{{ CLIENT_MNT_PATH }}"
+        state: directory
+        owner: 777
+        group: nobody
+        mode: u=rwx,g=rwx,o=rwx
+        recurse: yes # Recursively change ownership and mode
+
+    - name: Add this mount dir to fstab and mount 
+      mount:
+        path: "{{ CLIENT_MNT_PATH }}"
+        state: mounted
+        opts: rw,soft,nolock
+        fstype: nfs4
+        src: "{{ SERVER_IP }}:{{SERVER_MNT_PATH}}"
+

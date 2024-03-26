@@ -1,0 +1,31 @@
+
+- name: docker playbook
+  hosts: all
+  gather_facts: false
+
+  tasks:
+        
+    - name: Deploy stack
+      community.docker.docker_stack:
+        state: present
+        name: alfstack
+        compose:
+          - version: '3'
+            services:
+              proxy:
+                image: alfresco/alfresco-acs-nginx:3.4.2
+                deploy:
+                  placement:
+                    constraints:
+                      - "{{ item }}"
+                environment:
+                  DISABLE_PROMETHEUS: "true"
+                  DISABLE_SYNCSERVICE: "true"
+                  DISABLE_ADW: "true"
+                  DISABLE_CONTROL_CENTER: "true"
+                  ENABLE_CONTENT_APP: "true"
+                ports:
+                  - "8080:8080"
+      loop:
+        "{{ LABELS }}"
+        

@@ -1,0 +1,44 @@
+# ---
+# - name: add remote machine
+#   hosts: localhost
+#   become: yes
+#   vars:
+#       host_ip: "{{ ANSIBLE_HOST_IP }}"
+#   tasks:
+#     - name: Add targets 
+#       add_host:
+#         name: "{{ ANSIBLE_HOST_NAME }}"
+#         ansible_host: "{{ ANSIBLE_HOST_IP }}"
+#         ansible_user: "{{ ANSIBLE_USER }}"
+#       when: 
+#         - host_ip != "localhost"
+
+# "{{ ANSIBLE_HOST_NAME }}"
+
+- name: create
+  hosts: all
+  gather_facts: true
+  become: true
+  become_method: sudo
+  vars:
+    ansible_become_pass: "passw0rd"
+  tasks:
+    # - name: Display Inventory Information
+    #   command: ansible-inventory --list
+    #   register: inventory_info
+
+    # - name: Debug Inventory Information
+    #   fail:
+    #     var: inventory_info.stdout_lines
+    - name: to output the running host's ip address 
+      fail:
+        msg: "This machine is {{ ansible_ssh_host }}" 
+       
+    # - name: to output the OS family type 
+    #   fail:
+    #     msg: your machines's os familly is "{{ ansible_os_family }}"
+    #     # "{{ ansible_ssh_host }}" and "{{ ansible_os_family }}" are ansible inner params
+
+# "{{hostvars[inventory_hostname]['ansible_default_ipv4']['address']}}"
+
+# /home/ubuntu/opera-root/git-project/ma-jingyue2023/templates/igs_types/nodetypes/igs.nodes.docker/IGSDockerEngine/files/test/test.yaml

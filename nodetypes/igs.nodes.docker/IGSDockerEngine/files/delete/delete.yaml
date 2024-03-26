@@ -1,0 +1,68 @@
+---
+- name: add remote machine
+  hosts: localhost
+  become: yes
+  vars:
+      host_ip: "{{ ANSIBLE_HOST_IP }}"
+  tasks:
+    - name: Add targets 
+      add_host:
+        name: "{{ ANSIBLE_HOST_NAME }}"
+        ansible_host: "{{ ANSIBLE_HOST_IP }}"
+        ansible_user: "{{ ANSIBLE_USER }}"
+      when: 
+        - host_ip != "localhost"
+
+
+    - name: check the output to see if the hosts are added 
+      debug:
+        var: hostvars
+- name: create
+  hosts: 
+    - "{{ ANSIBLE_HOST_NAME }}"
+  gather_facts: true
+  become: true
+  become_method: sudo
+
+  tasks:
+    # - name: use this task to check if your os belong to the Debian family
+    #   debug:
+    #     msg: ansible_os_family == "{{ ansible_os_family }}"
+    - name: Update and upgrade apt packages
+      apt:
+        upgrade: yes
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: remove and clean apt pkgs
+      apt:
+        pkg:
+          - docker-ce
+          - docker-ce-cli 
+          - containerd.io 
+          - docker-buildx-plugin 
+          - docker-compose-plugin 
+          - docker-ce-rootless-extras
+        state: absent
+        purge: yes
+        autoremove: yes
+
+    - name: remove images
+      ansible.builtin.file:
+        path: /var/lib/docker
+        state: absent
+
+    - name: remove containers
+      ansible.builtin.file:
+        path: /var/lib/containerd
+        state: absent
+
+    # - name: remove apt key
+    #   ansible.builtin.file:
+    #     path: /etc/apt/keyrings/docker.gpg
+    #     state: absent
+
+    # - name: remove apt key
+    #   ansible.builtin.file:
+    #     path: /etc/apt/sources.list.d/docker.list
+    #     state: absent

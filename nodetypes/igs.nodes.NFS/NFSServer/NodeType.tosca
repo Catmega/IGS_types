@@ -1,0 +1,89 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../../igs.nodes.abstract/IGSBlockStorage/NodeType.tosca
+  - ../../igs.nodes.abstract/IGSOSInstance/NodeType.tosca
+node_types:
+  igs.nodes.NFS.NFSServer:
+    derived_from: igs.nodes.abstract.BlockStorage
+    metadata:
+      targetNamespace: "igs.nodes.NFS"
+      abstract: "false"
+      final: "false"
+
+    attributes:
+      clients_ips:
+        type: list
+        entry_schema:
+          type: string 
+        # required: true  
+      server_ip:
+        type: string
+        default: { get_attribute: [SELF, host, private_address]}
+    properties:
+      server_mnt_path:
+        type: string
+        required: true         
+    requirements:
+      - host:
+          capability: tosca.capabilities.Compute
+          # node: igs.nodes.abstract.CloudPlatform
+          node: igs.nodes.abstract.OSInstance
+          relationship: tosca.relationships.HostedOn
+          occurrences: [ 1, 1 ]
+    interfaces:
+      Standard:
+        type: tosca.interfaces.node.lifecycle.Standard
+        operations:
+          create:
+            inputs:
+
+              ANSIBLE_HOST_IP:
+                type: string
+                required: true
+                default: { get_attribute: [SELF, host, private_address ] }
+              ANSIBLE_USER:
+                type: string
+                required: true
+                default: { get_attribute: [SELF, host, username ] }
+              ANSIBLE_HOST_NAME:
+                type: string
+                required: true
+                default: { get_attribute: [SELF, host, name ] } 
+              SERVER_MNT_PATH:
+                type: string
+                required: true
+                default: { get_property: [SELF, server_mnt_path ] } 
+              CLIENTS_IPS:
+                type: string
+                required: true
+                default: { get_attribute: [SELF, clients_ips ] }                 
+          #  implementation:
+          #    primary: files/create/create.yaml #create
+            
+
+          delete:
+            inputs:
+
+              ANSIBLE_HOST_IP:
+                type: string
+                required: true
+                default: { get_attribute: [SELF, host, private_address ] }
+              ANSIBLE_USER:
+                type: string
+                required: true
+                default: { get_attribute: [SELF, host, username ] }
+              ANSIBLE_HOST_NAME:
+                type: string
+                required: true
+                default: { get_attribute: [SELF, host, name ] } 
+
+            # implementation:
+            #   primary: files/delete/delete.yaml #delete
+          
+    artifacts:
+      create:
+        type: igs.artifacts.Ansible
+        file: files/create/create.yaml
+      delete:
+        type: igs.artifacts.Ansible
+        file: files/delete/delete.yaml

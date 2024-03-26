@@ -1,0 +1,75 @@
+---
+- name: add remote machine
+  hosts: localhost
+  become: yes
+  vars:
+      host_ip: "{{ ANSIBLE_HOST_IP }}"
+  tasks:
+    - name: Add targets 
+      add_host:
+        name: "{{ ANSIBLE_HOST_NAME }}"
+        ansible_host: "{{ ANSIBLE_HOST_IP }}"
+        ansible_user: "{{ ANSIBLE_USER }}"
+      when: 
+        - host_ip != "localhost"
+
+
+- name: create
+  hosts: 
+    - "{{ ANSIBLE_HOST_NAME }}"
+  gather_facts: true
+  become: true
+  become_method: sudo
+
+    # clientIPs: "{{ CLIENTS_IPS }}"
+    # clientIPs:
+    #   - 192.168.221.163
+    #   - 192.168.221.133
+  tasks:
+    # - name: use this task to check if your os belong to the Debian family
+    #   debug:
+    #     msg: ansible_os_family == "{{ ansible_os_family }}"
+
+
+    - name: Update and upgrade apt packages
+      apt:
+        upgrade: yes
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+
+    - name: Install required packages
+      apt:
+        pkg:
+          - nfs-kernel-server
+
+      when: ansible_os_family == "Debian"
+
+    - name: Create directory= mkdir -p
+      ansible.builtin.file:
+        path: "{{ SERVER_MNT_PATH }}"
+        state: directory
+        recurse: yes
+        owner: nobody
+        group: nogroup
+        mode: '777'
+
+    - name: Add new Line
+      ansible.builtin.lineinfile:
+        state: present
+        dest: /etc/exports
+        line: "{{ SERVER_MNT_PATH }} {{ item }}(rw,sync,no_subtree_check,no_root_squash)"
+        # https://github.com/docker-library/postgres/issues/361
+        insertafter: EOF
+      loop:
+        "{{ CLIENTS_IPS }}"
+
+    - name: export1 - 
+      shell:
+        cmd: "sudo exportfs -a"
+        
+
+    - name: export2 - Restart nfs-kernel-server service
+      ansible.builtin.service:
+        name: nfs-kernel-server
+        state: restarted

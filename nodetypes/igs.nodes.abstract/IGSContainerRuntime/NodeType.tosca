@@ -1,0 +1,46 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../IGSContainerApplication/NodeType.tosca
+  - ../IGSOSInstance/NodeType.tosca
+  - ../../igs.nodes/Workstation/NodeType.tosca
+node_types:
+  igs.nodes.abstract.ContainerRuntime:
+    derived_from: tosca.nodes.Container.Runtime
+    metadata:
+      targetNamespace: "igs.nodes.abstract"
+      abstract: "false"
+      final: "false"
+    attributes:
+      ansible_host_ip:
+        type: string
+        default: { get_attribute: [SELF, host, private_address ] }
+      ansible_user:
+        type: string
+        default: { get_attribute: [SELF, host, username ] }
+      ansible_host_name:
+        type: string
+        default: { get_attribute: [SELF, host, name ] } 
+      tier:
+        type: string
+        default: { get_attribute: [SELF, host, tier ] } 
+
+      public_address: 
+        type: string
+        default: { get_attribute: [SELF, host, public_address ] } 
+      host_name:
+        type: string
+        default: { get_attribute: [SELF, host, host_name ] } 
+    properties:
+      name:
+        type: string
+        required: false
+    capabilities:
+      host:
+        occurrences: [ 1, UNBOUNDED ]
+        valid_source_types: [ igs.nodes.abstract.ContainerApplication ]
+        type: tosca.capabilities.Compute
+    requirements:
+      - host:
+          capability: tosca.capabilities.Node
+          node: igs.nodes.abstract.OSInstance
+          relationship: tosca.relationships.HostedOn

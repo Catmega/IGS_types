@@ -1,0 +1,52 @@
+---
+- name: add hosts to Ansible 
+  hosts: localhost
+  gather_facts: true  
+
+  tasks:
+
+    # - name: Execute shell script
+    #   ansible.builtin.shell: "/home/ubuntu/opera-root/git-project/ma-jingyue2023/templates/igs_types/nodetypes/igs.nodes.Swarm/igs.nodes.Swarm.Manager/files/validate/validation_test.sh"
+    #   register: validation_output
+   
+    # - name: Append output to a local file
+    #   delegate_to: localhost
+    #   ansible.builtin.shell: echo "\n{{ validation_output.stdout }}" >> /home/ubuntu/opera-root/git-project/ma-jingyue2023/templates/igs_types/validation.log
+
+    - name: write a banner
+      delegate_to: localhost
+      ansible.builtin.shell: echo "*********Validating Swarm Manager on machine $(hostname -I | awk '{ print $1 }')*********" >> /home/ubuntu/opera-root/git-project/ma-jingyue2023/templates/igs_types/validation.log
+
+        
+    - name: execute docker info
+      ansible.builtin.shell: docker info
+      register: docker_info
+
+    - name: check if swarm is active on this node
+      set_fact:
+        is_swarm_instance: "{{ 'Swarm: active' in docker_info.stdout }}"
+
+    - name: if the node is NOT part of a Swarm, write msg back to a file in the controller node
+      delegate_to: localhost
+      ansible.builtin.shell: echo " Failure! This node is not a Swarm instance" >> /home/ubuntu/opera-root/git-project/ma-jingyue2023/templates/igs_types/validation.log
+      when: not is_swarm_instance
+
+    - name: Skip the rest tasks if not a Swarm instance
+      ansible.builtin.meta: end_play
+      when: not is_swarm_instance
+
+    - name: check the Swarm role for this node
+      set_fact:
+        is_swarm_manager: "{{ 'Swarm: active' in docker_info.stdout and 'Is Manager: true' in docker_info.stdout }}"
+
+    - name: if the node is Swarm manager, write msg back to a file in the controller node
+      delegate_to: localhost
+      ansible.builtin.shell: echo " Success! This node has been initialized as Swarm Manager" >> /home/ubuntu/opera-root/git-project/ma-jingyue2023/templates/igs_types/validation.log
+      when: is_swarm_manager
+
+
+    - name: if the node is NOT Swarm manager, write msg back to a file in the controller node
+      delegate_to: localhost
+      ansible.builtin.shell: echo " Failure! This node is NOT initialized as Swarm Manager" >> /home/ubuntu/opera-root/git-project/ma-jingyue2023/templates/igs_types/validation.log
+      when: not is_swarm_manager
+    

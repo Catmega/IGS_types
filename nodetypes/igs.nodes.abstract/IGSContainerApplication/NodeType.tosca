@@ -1,0 +1,63 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../IGSContainerRuntime/NodeType.tosca
+  - ../IGSOSInstance/NodeType.tosca
+node_types:
+  igs.nodes.abstract.ContainerApplication:
+    derived_from: tosca.nodes.Container.Application
+    metadata:
+      targetNamespace: "igs.nodes.abstract"
+      abstract: "false"
+      final: "false"
+    # attributes:
+    #   ansible_host_ip:
+    #     type: string
+    #     default: { get_attribute: [SELF, host, ansible_host_ip ] }
+    #   ansible_user:
+    #     type: string
+    #     default: { get_attribute: [SELF, host, ansible_user ] }
+    #   ansible_host_name:
+    #     type: string
+    #     default: { get_attribute: [SELF, host, ansible_host_name ] } 
+    properties:
+      group:
+        type: string
+        required: true
+        constraints:
+          - valid_values: [ frontend, backend ]
+      labels:
+        type: list
+        entry_schema:
+          type: string 
+      networkName:
+        type: string
+        default: { get_attribute: [SELF, network, name ] }
+
+      client_mnt_path:
+        type: string
+        required: false
+        default: { get_property: [SELF, storage, client_mnt_path ] } 
+      volume_dir:
+        type: string
+        required: false
+        default: { get_property: [SELF, storage, name ] }
+      container_data_dir:
+        type: string
+        required: false
+
+    requirements:
+      - runtime:
+          node: igs.nodes.abstract.ContainerRuntime
+          capability: tosca.capabilities.Compute
+          relationship: tosca.relationships.HostedOn
+      - host:
+          capability: tosca.capabilities.Node
+          node: igs.nodes.abstract.OSInstance
+          relationship: tosca.relationships.HostedOn
+      - network:
+          capability: tosca.capabilities.Endpoint
+          relationship: tosca.relationships.ConnectsTo         
+      - storage:
+          capability: tosca.capabilities.Storage
+          relationship: tosca.relationships.ConnectsTo    
+

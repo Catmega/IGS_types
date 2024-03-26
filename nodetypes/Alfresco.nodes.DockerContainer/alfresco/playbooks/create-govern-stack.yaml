@@ -1,0 +1,77 @@
+---
+- name: add hosts to Ansible 
+  hosts: localhost
+  gather_facts: true  
+  vars:
+      host_ip: "{{ ANSIBLE_HOST_IP }}"
+      container_group: "{{ CONTAINER_GROUP }}"
+      host_tier: "{{ HOST_TIER }}"
+  tasks:
+    - name: Add host 
+      add_host:
+        name: "{{ ANSIBLE_HOST_NAME }}"
+        ansible_host: "{{ ANSIBLE_HOST_IP }}"
+        ansible_user: "{{ ANSIBLE_USER }}"
+      when: 
+        - host_ip != "localhost"
+
+- name: docker playbook
+  vars:
+    host_ip: "{{ ANSIBLE_HOST_IP }}"
+  hosts: 
+    - "{{ ANSIBLE_HOST_NAME }}"
+  gather_facts: false
+
+  tasks:
+        
+    - name: Deploy stack
+      community.docker.docker_stack:
+        state: present
+        name: alfstack
+        compose:
+          - version: '3'
+            services:
+              alfresco:
+                image: docker.io/alfresco/alfresco-governance-repository-community:7.4.0-M3
+                deploy:
+                  placement:
+                    constraints:
+                      - "{{ item }}"
+                environment:
+                  JAVA_TOOL_OPTIONS: >-
+                    -Dencryption.keystore.type=JCEKS
+                    -Dencryption.cipherAlgorithm=DESede/CBC/PKCS5Padding
+                    -Dencryption.keyAlgorithm=DESede
+                    -Dencryption.keystore.location=/usr/local/tomcat/shared/classes/alfresco/extension/keystore/keystore
+                    -Dmetadata-keystore.password=mp6yc0UD9e
+                    -Dmetadata-keystore.aliases=metadata
+                    -Dmetadata-keystore.metadata.password=oKIWzVdEdA
+                    -Dmetadata-keystore.metadata.algorithm=DESede
+                  JAVA_OPTS: >-
+                    -Ddb.driver=org.postgresql.Driver
+                    -Ddb.username=alfresco
+                    -Ddb.password=alfresco
+                    -Ddb.url=jdbc:postgresql://postgres:5432/alfresco
+                    -Dsolr.host=solr6
+                    -Dsolr.port=8983
+                    -Dsolr.http.connection.timeout=1000
+                    -Dsolr.secureComms=secret
+                    -Dsolr.sharedSecret=secret
+                    -Dsolr.base.url=/solr
+                    -Dindex.subsystem.name=solr6
+                    -Dshare.host=127.0.0.1
+                    -Dshare.port=8080
+                    -Dalfresco.host=localhost
+                    -Dalfresco.port=8080
+                    -Dcsrf.filter.enabled=false
+                    -Daos.baseUrlOverwrite=http://localhost:8080/alfresco/aos
+                    -Dmessaging.broker.url="failover:(nio://activemq:61616)?timeout=3000&jms.useCompression=true"
+                    -Ddeployment.method=DOCKER_COMPOSE
+                    -DlocalTransform.core-aio.url=http://transform-core-aio:8090/
+                    -XX:MinRAMPercentage=50
+                    -XX:MaxRAMPercentage=80
+                volumes:
+                  - "{{ CLIENT_MNT_DIR }}/{{VOLUME_DIR}}:{{ CONTAINER_DATA_DIR }}"
+           
+      loop:
+        "{{ LABELS }}"

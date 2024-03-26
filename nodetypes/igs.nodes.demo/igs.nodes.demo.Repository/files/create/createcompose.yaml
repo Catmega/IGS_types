@@ -1,0 +1,44 @@
+- name: Run Tomcat Docker Container with Default Webapp
+  hosts: localhost
+  gather_facts: no
+  tasks:      
+    # - name: Build Docker Image
+    #   community.docker.docker_image:
+    #     name: igs-repository-spring
+    #     source: build
+    #     tag: latest
+    #     build:
+    #       path: "."
+    - name: Deploy stack from a compose file
+      community.docker.docker_stack:
+        state: present
+        name: mystack
+        compose:
+          - ./docker-compose.yaml
+
+    # - name: Deploy stack
+    #   community.docker.docker_stack:
+    #     state: present
+    #     name: igsstack
+    #     compose:
+    #       - version: '3'
+    #         services:
+    #           igsrepository:
+    #             image: igs-repository:latest
+    #             # ports:
+    #             #   - "8080:8080"
+                  
+    #           igsportal:
+    #             image: igs-portal:latest
+    #             # ports:
+    #             #   - "8081:8080"
+
+    #           nginx:
+    #             image: nginx:latest
+    #             ports:
+    #               - "80:80"
+    #             volumes:
+    #               - ./nginxconf/nginx.conf:/etc/nginx/nginx.conf
+    #             depends_on:
+    #               - igsrepository
+    #               - igsportal

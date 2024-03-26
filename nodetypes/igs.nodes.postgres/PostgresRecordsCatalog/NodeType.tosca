@@ -1,0 +1,26 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../PostgresDatabase/NodeType.tosca
+  - ../../igs.nodes.abstract/IGSComponent/NodeType.tosca
+node_types:
+  igs.nodes.postgres.PostgresRecordsCatalog:
+    derived_from: igs.nodes.postgres.PostgresDatabase
+    metadata:
+      targetNamespace: "igs.nodes.postgres"
+      abstract: "false"
+      final: "false"
+
+     
+    requirements:
+      - endpoint:
+          capability: tosca.capabilities.Endpoint.Database
+          node: igs.nodes.postgres.PostgresDatabase
+          relationship: tosca.relationships.HostedOn
+          occurrences: [ 1, 1 ]
+
+    capabilities:
+      recordsCatalog:
+        occurrences: [ 1,1 ]
+        valid_source_types: [ igs.nodes.abstract.Component]
+        type: tosca.capabilities.Endpoint.Database
+

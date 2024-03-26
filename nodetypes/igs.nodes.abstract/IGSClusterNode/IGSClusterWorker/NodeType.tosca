@@ -1,0 +1,32 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../NodeType.tosca
+  - ../../IGSContainerRuntime/NodeType.tosca
+  - ../../../../capabilitytypes/igs.capabilities/ClusterManager/CapabilityType.tosca
+  - ../IGSClusterManager/NodeType.tosca
+node_types:
+  igs.nodes.abstract.ClusterWorker:
+    derived_from: igs.nodes.abstract.ClusterNode
+    metadata:
+      targetNamespace: "igs.nodes.abstract"
+      abstract: "false"
+      final: "false"
+    attributes:
+      manager_ip:
+        type: string
+        default: { get_attribute: [ SELF, manager, public_address ] }
+      join_token:
+        type: string
+        default: { get_attribute: [ SELF, manager, join_token ] }
+      network_name:
+        type: string
+        default: { get_attribute: [ SELF, manager, network_name ] }
+    requirements:
+      - runtimeHost:
+          capability: tosca.capabilities.Compute
+          node: igs.nodes.abstract.ContainerRuntime
+          relationship: tosca.relationships.HostedOn
+      - manager:
+          capability: tosca.capabilities.Compute
+          node: igs.nodes.abstract.ClusterManager
+          relationship: tosca.relationships.DependsOn

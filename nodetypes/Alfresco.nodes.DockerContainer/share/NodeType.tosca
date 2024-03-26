@@ -1,0 +1,106 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:      
+  - ../../igs.nodes.docker/IGSDockerApplication/NodeType.tosca
+  - ../../igs.nodes.Component/IGSRepositoryService/NodeType.tosca
+  - ../../../capabilitytypes/igs.capabilities.container/RepositoryUI/CapabilityType.tosca
+node_types:
+  Alfresco.nodes.DockerContainer.Share:
+    derived_from: igs.nodes.docker.DockerApplication
+
+    properties:
+        mem_limit: 
+          type:  scalar-unit.size
+          default: 1g
+          constraints:
+            - less_or_equal: 1g
+     
+        min_ram_percentage:
+          type: integer
+          required: false
+          default: 50
+        max_ram_percentage:
+          type: integer
+          required: false
+          default: 80
+    
+        repo_host:
+          type: string
+          default: alfresco
+        repo_port:
+          type: string
+          default: 8080
+
+        alfresco_host:
+          type: string
+          default: localhost
+        alfresco_port:
+          type: string
+          default: 8080
+        alfresco_context:
+          type: string
+          default: alfresco
+        alfresco_protocol:
+          type: string
+          default: http
+
+    capabilities: 
+      containerApplication:
+        valid_source_types: [ igs.nodes.Component.RepositoryService ]
+        type: igs.capabilities.container.RepositoryServiceUI
+
+    interfaces:
+      Standard:
+        type: tosca.interfaces.node.lifecycle.Standard
+        operations:
+
+          create: 
+            inputs:
+
+              MEM_LIMIT:
+                type: integer
+                required: true
+                default: { get_property: [ SELF, mem_limit ] }
+              MAX_RAM_PERCENTAGE:
+                type: integer
+                required: true
+                default: { get_property: [ SELF, max_ram_percentage ] }
+              MIN_RAM_PERCENTAGE:
+                type: integer
+                required: true
+                default: { get_property: [ SELF, min_ram_percentage ] }
+              REPO_HOST:
+                type: string
+                required: true
+                default: { get_property: [ SELF, repo_host ] }
+              REPO_PORT:
+                type: string
+                required: true
+                default: { get_property: [ SELF, repo_port ] }
+              
+              ALFRESCO_HOST:
+                type: string
+                required: true
+                default: { get_property: [ SELF, alfresco_host ] }
+              ALFRESCO_PORT:
+                type: string
+                required: true
+                default: { get_property: [ SELF, alfresco_port ] }
+              ALFRESCO_CONTEXT:
+                type: string
+                required: true
+                default: { get_property: [ SELF, alfresco_context ] }
+              ALFRESCO_PROTOCOL:
+                type: string
+                required: true
+                default: { get_property: [ SELF, alfresco_protocol ] }
+              CONTAINER_GROUP:
+                type: string
+                required: true
+                default: { get_property: [ SELF, group] }
+              LABELS:
+                type: string
+                required: true
+                default: { get_property: [ SELF, labels] }
+            implementation:
+              primary: playbooks/test.yaml 
+      

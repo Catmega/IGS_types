@@ -1,0 +1,49 @@
+---
+- name: add remote machine
+  hosts: localhost
+  become: yes
+  vars:
+      host_ip: "{{ ANSIBLE_HOST_IP }}"
+  tasks:
+    - name: Add targets 
+      add_host:
+        name: "{{ ANSIBLE_HOST_NAME }}"
+        ansible_host: "{{ ANSIBLE_HOST_IP }}"
+        ansible_user: "{{ ANSIBLE_USER }}"
+      when: 
+        - host_ip != "localhost"
+
+- name: create
+  hosts: 
+    - localhost
+  gather_facts: false
+
+  # vars:
+
+  #   SERVER_MNT_PATH: /mnt/nfsdir
+  #   SERVER_IP:  129.69.209.200
+  #   VOLUME_NAME: nfs_test
+  tasks:
+
+    - name: Creates sub-mount directory
+      ansible.builtin.file:
+        path: "{{CLIENT_MNT_PATH}}/{{VOLUME_DIR}}"
+        state: directory
+        owner: 777
+        group: nobody
+        mode: u=rwx,g=rwx,o=rwx
+        recurse: yes
+########to create docker volume############3#  
+    # - name: Create NFS Volume in docker
+    #   docker_volume:
+    #     name: "{{ VOLUME_NAME }}"
+    #     driver_options:
+    #       type: "nfs"
+    #       o: "addr={{ SERVER_IP }},rw,nolock"
+    #       device: ":{{ SERVER_MNT_PATH }}"
+
+# docker volume create --driver local \
+#   --opt type=nfs \
+#   --opt o=addr=129.69.209.200,rw,nolock \
+#   --opt device=:/mnt/nfsdir \
+#   nfs-volume

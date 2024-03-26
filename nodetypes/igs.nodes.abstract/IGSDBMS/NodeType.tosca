@@ -1,0 +1,25 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  igs.nodes.abstract.DBMS:
+    derived_from: tosca.nodes.DBMS
+    metadata:
+      targetNamespace: "igs.nodes.abstract"
+      abstract: "false"
+      final: "false"
+    properties:
+      name:
+        type: string
+        required: false
+
+    requirements:
+      - host:
+         
+          capability: tosca.capabilities.Compute
+          relationship: tosca.relationships.DependsOn
+          occurrences: [ 1, 1 ]
+    capabilities:
+      host:
+        occurrences: [ 1, UNBOUNDED ]
+        valid_source_types: [ igs.nodes.abstract.Database ]
+        type: tosca.capabilities.Compute

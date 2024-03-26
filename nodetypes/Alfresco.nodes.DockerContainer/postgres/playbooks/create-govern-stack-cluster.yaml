@@ -1,0 +1,94 @@
+---
+- name: add hosts to Ansible 
+  hosts: localhost
+  gather_facts: true  
+  vars:
+      host_ip: "{{ ANSIBLE_HOST_IP }}"
+      container_group: "{{ CONTAINER_GROUP }}"
+      host_tier: "{{ HOST_TIER }}"
+  tasks:
+    - name: Add host 
+      add_host:
+        name: "{{ANSIBLE_HOST_NAME}}"
+        ansible_host: "{{ ANSIBLE_HOST_IP }}"
+        ansible_user: "{{ ANSIBLE_USER }}"
+      when: 
+        - host_ip != "localhost"
+- hosts: 
+    # - target_machine
+    - "{{ ANSIBLE_HOST_NAME }}"
+  gather_facts: false
+
+  tasks:
+
+    # - name: Make the location
+    #   file:
+    #     path: /tmp/playing-opera/hello
+    #     recurse: true
+    #     state: directory
+
+    # - name: Ansible was here
+    #   copy:
+    #     dest: /tmp/playing-opera/hello/hello.txt
+    #     content: "{{ POSTGRES_USER }}"
+
+    - name: Deploy stack
+      community.docker.docker_stack:
+        state: present
+        name: alfstack
+        compose:
+          - version: '3'
+            services:
+              postgres:
+                hostname: 'primary'
+                image: crunchydata/crunchy-postgres:centos7-10.3-1.8.2
+                environment:
+                  - PGHOST=/tmp
+                  - MAX_CONNECTIONS=300
+                  - MAX_WAL_SENDERS=5
+                  - PG_MODE=primary
+                  - PG_PRIMARY_USER=alfresco
+                  - PG_PRIMARY_PASSWORD=alfresco
+                  - PG_DATABASE=alfresco
+                  - PG_USER=alfresco
+                  - PG_PASSWORD=alfresco
+                  - PG_ROOT_PASSWORD=alfresco
+                  - PG_PRIMARY_PORT=5432
+                # volumes:
+                #   - pg-primary-vol:/pgdata
+                ports:
+                  - '5432'
+                # networks:
+                #   - crunchynet
+                deploy:
+                  placement:
+                    constraints:
+                      - node.labels.DBtype == primary
+                      - node.role == worker
+              replica:
+                image: crunchydata/crunchy-postgres:centos7-10.3-1.8.2
+                environment:
+                  - PGHOST=/tmp
+                  - MAX_CONNECTIONS=300
+                  - MAX_WAL_SENDERS=5
+                  - PG_MODE=replica
+                  - PG_PRIMARY_HOST=primary
+                  - PG_PRIMARY_PORT=5432
+                  - PG_PRIMARY_USER=alfresco
+                  - PG_PRIMARY_PASSWORD=alfresco
+                  - PG_DATABASE=alfresco
+                  - PG_USER=alfresco
+                  - PG_PASSWORD=alfresco
+                  - PG_ROOT_PASSWORD=alfresco
+                # volumes:
+                #   - pg-replica-vol:/pgdata
+                ports:
+                  - '5432'
+                # networks:
+                #   - crunchynet
+                deploy:
+                  placement:
+                    constraints:
+                      - node.labels.DBtype != primary
+                      - node.role == worker
+

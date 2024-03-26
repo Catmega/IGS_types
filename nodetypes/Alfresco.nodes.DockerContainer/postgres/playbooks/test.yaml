@@ -1,0 +1,47 @@
+
+- hosts: all
+  gather_facts: false
+
+  tasks:
+
+    # - name: Make the location
+    #   file:
+    #     path: /tmp/playing-opera/hello
+    #     recurse: true
+    #     state: directory
+
+    # - name: Ansible was here
+    #   copy:
+    #     dest: /tmp/playing-opera/hello/hello.txt
+    #     content: "{{ POSTGRES_USER }}"
+
+    - name: Deploy stack
+      community.docker.docker_stack:
+        state: present
+        name: alfstack
+        compose:
+          - version: '3'
+            services:
+              postgres:
+                image: postgres:14.4
+                deploy:
+                  placement:
+                    constraints:
+                      - "{{ item }}"
+                deploy:
+                  placement:
+                    constraints:
+                      - node.labels.isNfsClient==true
+                environment:
+                  - POSTGRES_PASSWORD=alfresco
+                  - POSTGRES_USER=alfresco
+                  - POSTGRES_DB=alfresco
+                command: postgres -c max_connections=300 -c log_min_messages=LOG
+                ports:
+                  - "5432:5432"
+                volumes:
+                  - "{{ CLIENT_MNT_DIR }}/{{VOLUME_DIR}}:{{ CONTAINER_DATA_DIR }}"
+              
+      loop:
+        "{{ LABELS }}"
+

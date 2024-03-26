@@ -1,0 +1,83 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+imports:
+  - ../../igs.nodes.abstract/IGSContainerRuntime/NodeType.tosca
+  - ../../igs.nodes.docker/IGSDockerApplication/NodeType.tosca
+  - ../../../artifacttypes/igs.artifacts/Ansible/ArtifactType.tosca
+  - ../../../capabilitytypes/igs.capabilities.container/DockerRuntime/CapabilityType.tosca
+  - ../../../interfacetypes/igs.interfaces.node.lifecycle/Validation/InterfaceType.tosca
+
+node_types:
+  igs.nodes.docker.DockerEngine:
+    derived_from: igs.nodes.abstract.ContainerRuntime
+    metadata:
+      targetNamespace: "igs.nodes.docker"
+      abstract: "false"
+      final: "false"
+    attributes:
+      port:
+        type: integer
+        default: { get_attribute: [ SELF, docker, port ] }
+
+    capabilities:
+      host:
+        occurrences: [ 1, UNBOUNDED ]
+        valid_source_types: [ igs.nodes.docker.DockerApplication, tosca.nodes.Compute ] #Compute node should be replaced with clusterNode
+        type: igs.capabilities.container.DockerRuntime
+    interfaces:
+      Standard:
+        type: tosca.interfaces.node.lifecycle.Standard
+        operations:
+          create:
+            inputs:
+
+              ANSIBLE_HOST_IP:
+                type: string
+                required: true
+                default: { get_attribute: [SELF, ansible_host_ip  ] }
+              ANSIBLE_USER:
+                type: string
+                required: true
+                default: { get_attribute: [SELF, ansible_user ] }
+              ANSIBLE_HOST_NAME:
+                type: string
+                required: true
+                default: { get_attribute: [SELF, ansible_host_name ] } 
+
+            # implementation:
+            #   primary: files/create/create.yaml #create
+            #   timeout: 0
+
+          delete:
+            inputs:
+
+              ANSIBLE_HOST_IP:
+                type: string
+                required: true
+                default: { get_attribute: [SELF, ansible_host_ip ] }
+              ANSIBLE_USER:
+                type: string
+                required: true
+                default: { get_attribute: [SELF, ansible_user ] }
+              ANSIBLE_HOST_NAME:
+                type: string
+                required: true
+                default: { get_attribute: [SELF, ansible_host_name ] } 
+
+            # implementation:
+            #   primary: files/delete/delete.yaml #delete
+            #   timeout: 0
+      Validation:
+        type: igs.interfaces.node.lifecycle.Validation 
+        operations:
+          validate: files/validate/validate.yaml 
+    artifacts:
+      create:
+        type: igs.artifacts.Ansible
+        file: files/create/create.yaml
+      delete:
+        type: igs.artifacts.Ansible
+        file: files/delete/delete.yaml
+      validate:
+        type: igs.artifacts.Ansible
+        file: files/validate/validate.yaml 

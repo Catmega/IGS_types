@@ -1,0 +1,52 @@
+---
+- name: add hosts to Ansible 
+  hosts: localhost
+  gather_facts: true  
+  vars:
+      host_ip: "{{ ANSIBLE_HOST_IP }}"
+      container_group: "{{ CONTAINER_GROUP }}"
+      host_tier: "{{ HOST_TIER }}"
+  tasks:
+    - name: Add host 
+      add_host:
+        name: "{{ ANSIBLE_HOST_NAME }}"
+        ansible_host: "{{ ANSIBLE_HOST_IP }}"
+        ansible_user: "{{ ANSIBLE_USER }}"
+      when: 
+        - host_ip != "localhost"
+
+- name: docker playbook
+  vars:
+    host_ip: "{{ ANSIBLE_HOST_IP }}"
+  hosts: 
+    - "{{ ANSIBLE_HOST_NAME }}"
+  gather_facts: false
+
+  tasks:
+
+        
+    - name: Deploy stack
+      community.docker.docker_stack:
+        state: present
+        name: alfstack
+        compose:
+          - version: '3'
+            services:
+              share:
+                image: docker.io/alfresco/alfresco-governance-share-community:7.4.0-M3
+                deploy:
+                  placement:
+                    constraints:
+                      - "{{ item }}"
+                environment:
+                  REPO_HOST: "alfresco"
+                  REPO_PORT: "8080"
+                  JAVA_OPTS: >-
+                    -XX:MinRAMPercentage=50
+                    -XX:MaxRAMPercentage=80
+                    -Dalfresco.host=localhost
+                    -Dalfresco.port=8080
+                    -Dalfresco.context=alfresco
+                    -Dalfresco.protocol=http
+      loop:
+        "{{ LABELS }}"

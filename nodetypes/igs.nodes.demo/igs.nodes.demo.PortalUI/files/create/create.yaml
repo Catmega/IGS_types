@@ -1,0 +1,25 @@
+- name: Run Tomcat Docker Container with Default Webapp
+  hosts: all
+  gather_facts: no
+
+  tasks:
+    - name: Build Docker Image of igs-portal
+      community.docker.docker_image:
+        name: igs-portal
+        source: build
+        tag: latest
+        build:
+          path: "."
+      ##### strange error when running with xopera ###############
+      # "msg": "An unexpected Docker error occurred: 500 Server Error for http+docker://localhost/v1.44/build?t=igs-portal%3Alatest&q=False&nocache=False&rm=True&forcerm=True&pull=False: Internal Server Error (\"Cannot locate specified Dockerfile: Dockerfile\")"
+      ######################################################################
+    
+    - name: Deploy stack - portal
+      community.docker.docker_stack:
+        state: present
+        name: igsstack
+        compose:
+          - version: '3'
+            services:
+              igsportal:
+                image: igs-portal:latest

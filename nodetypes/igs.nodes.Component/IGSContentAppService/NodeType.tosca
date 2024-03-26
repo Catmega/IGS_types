@@ -1,0 +1,26 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../../igs.nodes.abstract/IGSComponent/NodeType.tosca
+  - ../../../capabilitytypes/igs.capabilities.container/ContentApp/CapabilityType.tosca
+  - ../../igs.nodes.abstract/IGSContainerApplication/NodeType.tosca
+
+node_types:
+  igs.nodes.Component.ContentAppService:
+    derived_from: igs.nodes.abstract.Component
+    metadata:
+      targetNamespace: "igs.nodes.Component"
+      abstract: "false"
+      final: "false"
+    requirements:
+
+      - containerApplication:
+          capability: igs.capabilities.container.ContentApp
+          node: igs.nodes.abstract.ContainerApplication
+          relationship: tosca.relationships.DependsOn
+          occurrences: [ 1, 1 ]
+    capabilities:
+      contentAppService:
+        occurrences: [ 1, UNBOUNDED ]
+        valid_source_types: [ igs.nodes.abstract.Component ]
+        type: tosca.capabilities.Compute
+

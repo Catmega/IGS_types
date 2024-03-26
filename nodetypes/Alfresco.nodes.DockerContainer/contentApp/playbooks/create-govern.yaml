@@ -1,0 +1,94 @@
+---
+- name: add hosts to Ansible 
+  hosts: localhost
+  gather_facts: true  
+  vars:
+      host_ip: "{{ ANSIBLE_HOST_IP }}"
+      container_group: "{{ CONTAINER_GROUP }}"
+      host_tier: "{{ HOST_TIER }}"
+  tasks:
+    - name: Check if this node is going to be hosted on the correct tier vm
+      fail:
+        msg: "ContentApp is an {{ CONTAINER_GROUP }} node, but it's hosted on a machine defined for {{ HOST_TIER }}"
+      when: container_group != host_tier
+    - name: Add host 
+      add_host:
+        name: "{{ ANSIBLE_HOST_NAME }}"
+        ansible_host: "{{ ANSIBLE_HOST_IP }}"
+        ansible_user: "{{ ANSIBLE_USER }}"
+      when: 
+        - host_ip != "localhost"
+
+    # - name: Add host 
+    #   add_host:
+    #     name: target_machine
+    #     ansible_host: localhost
+    #   when: 
+    #     - host_ip == "localhost"
+
+#     # - name: Add localhost 
+#     #   set_fact:
+        
+#     #     target_machine: localhost
+#     #   when: 
+#     #     - host_ip == "localhost"
+#     # - name: set localhost
+#     #   set_fact:
+#     #     target_machine : localhost
+#     #   when: 
+#     #     - host_ip == "localhost"
+
+    # - name: Add localhost 
+    #   add_host:
+    #     hostname: localhost
+    #     groups: target_machine
+    #   when: 
+    #     - host_ip == "localhost"
+
+
+#     #     # "Failed to connect to the host via ssh: ssh: Could not resolve hostname target_machine: Temporary failure in name resolution
+# # ansible-playbook -i inventory.ini create.yaml
+
+- name: docker playbook
+  vars:
+    host_ip: "{{ ANSIBLE_HOST_IP }}"
+  hosts: 
+    # - 127.0.0.1
+    # - "{{ target_machine if host_ip!='localhost' else 'localhost' }}"
+    # - target_machine | default('localhost')
+    # - "{{ target_machine | default('localhost') }}"
+    # - target_machine
+    # - target_machine:&all
+    - "{{ ANSIBLE_HOST_NAME }}"
+  gather_facts: false
+
+  tasks:
+    # - name: set connection as local
+    #   set_fact:
+    #     ansible_connection: "local"
+    #   when: host_ip == "localhost"
+
+    # - name: create overlay network that accross diff machines
+    #   docker_network:
+    #     name: alfresco_remote
+    #     driver: overlay
+
+
+    - name: content-app docker compose
+      community.docker.docker_compose:
+        project_name: alfresco
+        definition:
+          version: '2'
+          services:
+            content-app:
+              image: alfresco/alfresco-content-app:3.1.0
+              mem_limit: 128m
+              environment:
+                APP_BASE_SHARE_URL: "http://localhost:8080/aca/#/preview/s"
+              networks:
+                - remote_network
+
+          networks:
+            remote_network:
+              external: true
+              driver: overlay

@@ -1,0 +1,83 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:      
+  - ../../igs.nodes.docker/IGSDockerApplication/NodeType.tosca
+  - ../../../capabilitytypes/igs.capabilities.container/Transform/CapabilityType.tosca
+  - ../../igs.nodes.Component/IGSTransformServices/NodeType.tosca
+node_types:
+  Alfresco.nodes.DockerContainer.TransformCore:
+    derived_from: igs.nodes.docker.DockerApplication
+ 
+    properties:
+        
+        mem_limit: 
+          type:  scalar-unit.size
+          default: 1536m
+          constraints:
+            - less_or_equal: 1536m
+     
+        min_ram_percentage:
+          type: integer
+          required: false
+          default: 50
+        max_ram_percentage:
+          type: integer
+          required: false
+          default: 80
+        container_port:
+          type: string
+          default: 8090
+        host_port:
+          type: string
+          default: 8090
+
+    capabilities: 
+      containerApplication:
+        valid_source_types: [ igs.nodes.Component.TransformService ]
+        type: igs.capabilities.container.Transform
+
+    interfaces:
+      Standard:
+        type: tosca.interfaces.node.lifecycle.Standard
+        operations:
+          create: 
+            inputs:
+              MEM_LIMIT:
+                type: integer
+                required: true
+                default: { get_property: [ SELF, mem_limit ] }
+              MAX_RAM_PERCENTAGE:
+                type: integer
+                required: true
+                default: { get_property: [ SELF, max_ram_percentage ] }
+              MIN_RAM_PERCENTAGE:
+                type: integer
+                required: true
+                default: { get_property: [ SELF, min_ram_percentage ] }
+              CONTAINER_PORT:
+                type: string
+                required: true
+                default: { get_property: [ SELF, container_port ] }
+              HOST_PORT:
+                type: string
+                required: true
+                default: { get_property: [ SELF, host_port ] }
+              CONTAINER_GROUP:
+                type: string
+                required: true
+                default: { get_property: [ SELF, group] }
+              LABELS:
+                type: string
+                required: true
+                default: { get_property: [ SELF, labels] }
+            implementation:
+              primary: playbooks/test.yaml 
+    requirements: 
+      - frontend:
+          capability: tosca.capabilities.Compute
+          node: igs.nodes.abstract.ContainerApplication
+          relationship: tosca.relationships.DependsOn
+          occurrences: [ 1, 1 ]
+
+
+
+  

@@ -1,0 +1,15 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+policy_types:
+  igs.policies.validate.DockerEngine:
+    derived_from: tosca.policies.Root
+    targets: [ igs.nodes.docker.DockerEngine ]
+    triggers:
+        igs.triggers.validate.DockerEngine:
+            description: A trigger for validation
+            event: validation_trigger_DockerEngine
+            target_filter:
+                node: igs.nodes.docker.DockerEngine
+            action:
+                - call_operation: Validation.validate
+

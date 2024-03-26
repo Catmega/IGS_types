@@ -1,0 +1,29 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+data_types:
+  igs.datatypes.Channel:
+    derived_from: tosca.datatypes.Root
+    metadata:
+      targetNamespace: "igs.datatypes"
+      abstract: "false"
+      final: "false"
+    properties:
+      port:
+        type: integer
+        required: false
+        default: 2377
+      commu_method:
+        type: string
+        default: httpAPI
+        constraints:
+          - valid_values: [ httpAPI, ssh ]
+      timeout:
+        type: integer
+        required: false
+        default: 600
+      # source_addr:
+      #   type: string
+      #   required: false
+      # target_addr:
+      #   type: string
+      #   required: false

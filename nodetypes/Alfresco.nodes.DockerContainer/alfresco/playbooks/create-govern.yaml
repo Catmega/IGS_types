@@ -1,0 +1,90 @@
+---
+- name: add hosts to Ansible 
+  hosts: localhost
+  gather_facts: true  
+  vars:
+      host_ip: "{{ ANSIBLE_HOST_IP }}"
+      container_group: "{{ CONTAINER_GROUP }}"
+      host_tier: "{{ HOST_TIER }}"
+  tasks:
+    - name: Check if this node is going to be hosted on the correct tier vm
+      fail:
+        msg: "Alfresco is an {{ CONTAINER_GROUP }} node, but it's hosted on a machine defined for {{ HOST_TIER }}"
+      when: container_group != host_tier
+    - name: Add host 
+      add_host:
+        name: "{{ ANSIBLE_HOST_NAME }}"
+        ansible_host: "{{ ANSIBLE_HOST_IP }}"
+        ansible_user: "{{ ANSIBLE_USER }}"
+      when: 
+        - host_ip != "localhost"
+
+- name: docker playbook
+  vars:
+    host_ip: "{{ ANSIBLE_HOST_IP }}"
+  hosts: 
+    - "{{ ANSIBLE_HOST_NAME }}"
+  gather_facts: false
+
+  tasks:
+        
+    - name: docker compose alfresco
+      community.docker.docker_compose:
+        project_name: alfresco
+        definition:
+          version: '2'
+          services:
+            alfresco:
+              image: docker.io/alfresco/alfresco-governance-repository-community:7.4.0-M3
+              mem_limit: 1900m
+              environment:
+                JAVA_TOOL_OPTIONS: >-
+                  -Dencryption.keystore.type=JCEKS
+                  -Dencryption.cipherAlgorithm=DESede/CBC/PKCS5Padding
+                  -Dencryption.keyAlgorithm=DESede
+                  -Dencryption.keystore.location=/usr/local/tomcat/shared/classes/alfresco/extension/keystore/keystore
+                  -Dmetadata-keystore.password=mp6yc0UD9e
+                  -Dmetadata-keystore.aliases=metadata
+                  -Dmetadata-keystore.metadata.password=oKIWzVdEdA
+                  -Dmetadata-keystore.metadata.algorithm=DESede
+                JAVA_OPTS: >-
+                  -Ddb.driver=org.postgresql.Driver
+                  -Ddb.username=alfresco
+                  -Ddb.password=alfresco
+                  -Ddb.url=jdbc:postgresql://postgres:5432/alfresco
+                  -Dsolr.host=solr6
+                  -Dsolr.port=8983
+                  -Dsolr.http.connection.timeout=1000
+                  -Dsolr.secureComms=secret
+                  -Dsolr.sharedSecret=secret
+                  -Dsolr.base.url=/solr
+                  -Dindex.subsystem.name=solr6
+                  -Dshare.host=127.0.0.1
+                  -Dshare.port=8080
+                  -Dalfresco.host=localhost
+                  -Dalfresco.port=8080
+                  -Dcsrf.filter.enabled=false
+                  -Daos.baseUrlOverwrite=http://localhost:8080/alfresco/aos
+                  -Dmessaging.broker.url="failover:(nio://activemq:61616)?timeout=3000&jms.useCompression=true"
+                  -Ddeployment.method=DOCKER_COMPOSE
+                  -DlocalTransform.core-aio.url=http://transform-core-aio:8090/
+                  -XX:MinRAMPercentage=50
+                  -XX:MaxRAMPercentage=80
+              networks:
+                - remote_network
+              volumes:
+                # - /mount/nfs/alfdata:/usr/local/tomcat/alf_data # inside of container, nobody nogroup
+                # - /mount/share/alfdata:/usr/local/tomcat/alf_data
+      
+                # - /mount/nfs/alfdata-volume:/usr/local/tomcat/alf_data #second machine, for testing ansible
+                - "{{ CLIENT_MNT_DIR }}/{{VOLUME_DIR}}:{{ CONTAINER_DATA_DIR }}"
+                  
+  
+
+# defined the volumes according to this:
+# https://github.com/Alfresco/alfresco-docker-installer/blob/master/generators/app/templates/7.0/docker-compose.yml
+
+          networks:
+            remote_network:
+              external: true
+              driver: overlay 

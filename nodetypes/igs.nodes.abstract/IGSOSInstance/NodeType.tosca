@@ -1,0 +1,28 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../IGSBlockStorage/NodeType.tosca
+node_types:
+  igs.nodes.abstract.OSInstance:
+    derived_from: tosca.nodes.Compute
+    metadata:
+      targetNamespace: "igs.nodes.abstract"
+      abstract: "false"
+      final: "false"
+    attributes:
+      username:
+        type: string
+      tier:
+        type: string
+      name:
+        type: string
+      host_name:
+        type: string
+#    properties:
+#      name:
+#        type: string
+#        required: false
+    capabilities:
+      host:
+        occurrences: [ 1, UNBOUNDED ]
+        valid_source_types: [igs.nodes.abstract.BlockStorage, igs.nodes.abstract.ContainerRuntime]
+        type: tosca.capabilities.Container

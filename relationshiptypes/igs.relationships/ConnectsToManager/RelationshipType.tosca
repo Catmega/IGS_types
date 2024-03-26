@@ -1,0 +1,67 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../../../datatypes/Channel/DataType.tosca
+
+relationship_types:
+  igs.relationships.ConnectsToManager:
+    derived_from: tosca.relationships.ConnectsTo
+    metadata:
+      targetNamespace: "igs.relationships"
+      abstract: "false"
+      final: "false"
+    properties:
+      channel:
+        type: igs.datatypes.Channel
+        required: false
+          # properties:
+          #   port:
+          #     type: integer
+          #     default: 2377
+          #   # source_addr:
+          #   #   type: string
+          #   #   default: { get_attribute: [SOURCE, private_address ] }
+          #   # target_addr:
+          #   #   type: string
+          #   #   default: { get_property: [ TARGET, manager_ip ] }
+          #   commu_method:
+          #     type: string
+          #     default: httpAPI
+
+
+    interfaces:
+      Configure:
+        type: tosca.interfaces.relationship.Configure
+        inputs:
+          ANSIBLE_HOST_IP:
+            type: string
+            required: true
+            default: { get_attribute: [SOURCE, private_address ] }
+          ANSIBLE_USER:
+            type: string
+            required: true
+            default: { get_attribute: [SOURCE, username ] }
+          ANSIBLE_HOST_NAME:
+            type: string
+            required: true
+            default: { get_attribute: [SOURCE, name ] } 
+          MANAGER_IP:
+            type: string
+            required: true
+            default: { get_attribute: [ TARGET, public_address ] }
+          COMM:
+            type: string
+            required: true
+            default: { get_property: [ SELF, channel] }
+          JOIN_TOKEN:
+            type: string
+            required: true
+            default: { get_attribute: [ TARGET, join_token ] }
+
+        # operations:
+        #   post_configure_target:
+        #     implementation:
+        #       primary: files/join-cluster/join-cluster.yaml
+    # artifacts:
+    #   join-cluster:
+    #     type: igs.artifacts.Ansible
+    #     file: files/join-cluster/join-cluster.yaml

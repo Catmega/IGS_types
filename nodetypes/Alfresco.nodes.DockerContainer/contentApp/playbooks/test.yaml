@@ -1,0 +1,29 @@
+
+---
+- name: docker playbook
+
+  hosts: all
+  gather_facts: false
+  connection: local
+  tasks:
+    # - name: to output the running host's ip address 
+    #   fail:
+    #     msg: "This machine is {{ ansible_ssh_host }}" 
+    - name: Deploy stack contentservice
+      community.docker.docker_stack:
+        state: present
+        name: alfstack
+        compose:
+          - version: '3'
+            services:
+              content-app:
+                image: alfresco/alfresco-content-app:3.1.0
+                deploy:
+                  placement:
+                    constraints:
+                      - "{{ item }}"
+                environment:
+                  APP_BASE_SHARE_URL: "http://localhost:8080/aca/#/preview/s"
+      loop:
+        "{{ LABELS }}"
+

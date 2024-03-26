@@ -1,0 +1,49 @@
+---
+- name: add hosts to Ansible 
+  hosts: localhost
+  gather_facts: true  
+  vars:
+      host_ip: "{{ ANSIBLE_HOST_IP }}"
+      container_group: "{{ CONTAINER_GROUP }}"
+      host_tier: "{{ HOST_TIER }}"
+
+  tasks:
+    # - name: Check if this node is going to be hosted on the correct tier vm
+    #   fail:
+    #     msg: "ContentApp is an {{ CONTAINER_GROUP }} node, but it's hosted on a machine defined for {{ HOST_TIER }}"
+    #   when: container_group != host_tier
+    - name: Add host 
+      add_host:
+        name: "{{ ANSIBLE_HOST_NAME }}"
+        ansible_host: "{{ ANSIBLE_HOST_IP }}"
+        ansible_user: "{{ ANSIBLE_USER }}"
+      when: 
+        - host_ip != "localhost"
+
+- name: docker playbook
+  vars:
+    host_ip: "{{ ANSIBLE_HOST_IP }}"
+  hosts: 
+    - "{{ ANSIBLE_HOST_NAME }}"
+  gather_facts: false
+
+  tasks:
+
+    - name: Deploy stack contentservice
+      community.docker.docker_stack:
+        state: present
+        name: alfstack
+        compose:
+          - version: '3'
+            services:
+              content-app:
+                image: alfresco/alfresco-content-app:3.1.0
+                deploy:
+                  placement:
+                    constraints:
+                      - "{{ item }}"
+                environment:
+                  APP_BASE_SHARE_URL: "http://localhost:8080/aca/#/preview/s"
+      loop:
+        "{{ LABELS }}"
+

@@ -1,0 +1,104 @@
+---
+- name: add hosts to Ansible 
+  hosts: localhost
+  gather_facts: true  
+  vars:
+      host_ip: "{{ ANSIBLE_HOST_IP }}"
+      container_group: "{{ CONTAINER_GROUP }}"
+      host_tier: "{{ HOST_TIER }}"
+  tasks:
+    - name: Check if this node is going to be hosted on the correct tier vm
+      fail:
+        msg: "Solr is an {{ CONTAINER_GROUP }} node, but it's hosted on a machine defined for {{ HOST_TIER }}"
+      when: container_group != host_tier
+    - name: Add host 
+      add_host:
+        name: "{{ ANSIBLE_HOST_NAME }}"
+        ansible_host: "{{ ANSIBLE_HOST_IP }}"
+        ansible_user: "{{ ANSIBLE_USER }}"
+      when: 
+        - host_ip != "localhost"
+    # - name: Add localhost 
+    #   set_fact:
+        
+    #     target_machine: localhost
+    #   when: 
+    #     - host_ip == "localhost"
+    # - name: set localhost
+    #   set_fact:
+    #     target_machine : localhost
+    #   when: 
+    #     - host_ip == "localhost"
+
+    # - name: Add localhost 
+    #   add_host:
+    #     hostname: localhost
+    #     groups: target_machine
+
+    # - name: Add host 
+    #   add_host:
+    #     name: target_machine
+    #     ansible_host: localhost
+    #   when: 
+    #     - host_ip == "localhost"
+
+    #   when: 
+    #     - host_ip == "localhost"
+    # - name: set connection as local
+    #   set_fact:
+    #     ansible_connection: "local"
+    #   when: host_ip == "localhost"
+    #     # "Failed to connect to the host via ssh: ssh: Could not resolve hostname target_machine: Temporary failure in name resolution
+# ansible-playbook -i inventory.ini create.yaml
+
+- name: docker playbook
+  # vars:
+  #   host_ip: "{{ ANSIBLE_HOST_IP }}"
+  hosts: 
+    # - 127.0.0.1
+    # - "{{ target_machine if host_ip!='localhost' else 'localhost' }}"
+    # - target_machine | default('localhost')
+    # - "{{ target_machine | default('localhost') }}"
+    # - target_machine
+    # - target_machine:&all
+    # - all[-1] 
+    # - target_machine 
+    - "{{ ANSIBLE_HOST_NAME }}"
+  gather_facts: true
+  # diff communication way
+# https://github.com/AlfrescoLabs/alfresco-solr-comm/tree/main/http
+  tasks:
+        
+    - name: solr docker compose
+      community.docker.docker_compose:
+        project_name: alfresco
+        definition:
+          version: '2'
+          services:
+            solr6:
+              image: docker.io/alfresco/alfresco-search-services:2.0.6
+              mem_limit: "{{ MEM_LIMIT }}"
+              environment:
+               
+                SOLR_ALFRESCO_HOST: "{{ SOLR_ALFRESCO_HOST }}"
+                SOLR_ALFRESCO_PORT: "{{ SOLR_ALFRESCO_PORT }}"
+            
+                SOLR_SOLR_HOST: "{{ SOLR_SOLR_HOST }}"
+                SOLR_SOLR_PORT: "{{ SOLR_SOLR_PORT }}"
+              
+                SOLR_CREATE_ALFRESCO_DEFAULTS: "{{ SOLR_CREATE_ALFRESCO_DEFAULTS }}"
+              
+                ALFRESCO_SECURE_COMMS: "secret"
+            
+                JAVA_TOOL_OPTIONS: >-
+                  -Dalfresco.secureComms.secret=secret
+              ports:
+                - "{{ CONTAINER_PORT }}:{{ HOST_PORT }}" # Browser port
+              networks:
+                - remote_network
+
+          networks:
+            remote_network:
+              external: true
+              driver: overlay
+              

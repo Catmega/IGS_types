@@ -1,0 +1,109 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../../igs.nodes.abstract/IGSOSInstance/NodeType.tosca
+  - ../igs.nodes.Swarm.Manager/NodeType.yaml
+  - ../../../capabilitytypes/igs.capabilities.container/DockerRuntime/CapabilityType.tosca
+  - ../../igs.nodes.docker/IGSDockerEngine/NodeType.tosca
+  - ../../igs.nodes.abstract/IGSClusterNode/IGSClusterManager/NodeType.tosca
+  - ../../igs.nodes.abstract/IGSClusterNode/IGSClusterWorker/NodeType.tosca
+  - ../../../relationshiptypes/igs.relationships/ConnectsToManager/RelationshipType.tosca
+  - ../../../interfacetypes/igs.interfaces.node.lifecycle/Validation/InterfaceType.tosca
+
+node_types:
+  igs.nodes.Swarm.Worker:
+    derived_from: igs.nodes.abstract.ClusterWorker
+    attributes:
+      ############### inherits from ClusterWorker ###############
+      # manager_ip:
+      #   type: string
+      #   required: true
+      #   default: { get_attribute: [ SELF, manager, public_address ] }
+      # join_token:
+      #   type: string
+      #   required: true
+      #   default: { get_attribute: [ SELF, manager, join_token ] }
+      # network_name:
+      #   type: string
+      #   default: { get_attribute: [ SELF, manager, network_name ] }
+      ###########################################################
+      
+      ########### OSInstance related, inherits from ClusterManager<-ClusterNode ##########
+      # private_address: #inherited attr
+      #   type: string
+      #   default: { get_attribute: [SELF, runtimeHost, ansible_host_ip ] } 
+      # public_address: #inherited attr
+      #   type: string
+      #   default: { get_attribute: [SELF, runtimeHost, public_address ] } 
+      # username:
+      #   type: string
+      #   default: { get_attribute: [SELF, runtimeHost, ansible_user ] } 
+      # name:
+      #   type: string
+      #   default: { get_attribute: [SELF, runtimeHost, ansible_host_name ] } 
+      ###########################################################
+      # tier: # can be replaced with "labels" in Swarm
+      #   type: string
+      #   default: { get_attribute: [SELF, runtimeHost, tier ] } 
+      host_name:
+        type: string
+        default: { get_attribute: [SELF, runtimeHost, host_name ] } 
+
+    ########### inherits from ClusterManager/ClusterNode ##########
+    # properties:
+    #   node_lables:
+    #     type: string
+    ######################################################################
+
+    requirements:
+
+      ######################################################################
+      ### override ClusterWorker<-ClusterNode's requirement-runtimeHost ####
+      - manager:
+          capability: tosca.capabilities.Compute
+          node: igs.nodes.Swarm.Manager
+          relationship: igs.relationships.ConnectsToManager # tosca.relationships.DependsOn
+      - runtimeHost:
+          capability: igs.capabilities.container.DockerRuntime
+          node: igs.nodes.docker.DockerEngine
+          relationship: tosca.relationships.HostedOn
+    interfaces:
+      Standard:
+        type: tosca.interfaces.node.lifecycle.Standard
+        operations:
+          create: 
+            inputs:
+              ANSIBLE_HOST_IP:
+                type: string
+                required: true
+                default: { get_attribute: [SELF, private_address ] }
+              ANSIBLE_USER:
+                type: string
+                required: true
+                default: { get_attribute: [SELF, username ] }
+              ANSIBLE_HOST_NAME:
+                type: string
+                required: true
+                default: { get_attribute: [SELF, name ] } 
+              MANAGER_IP:
+                type: string
+                required: true
+                default: { get_attribute: [ SELF, manager_ip ] }
+              JOIN_TOKEN:
+                type: string
+                required: true
+                default: { get_attribute: [ SELF, join_token ] }
+              HOST_NAME:
+                type: string
+                required: true
+                default: { get_attribute: [ SELF, host_name ] }      
+              NODE_LABELS:
+                type: string
+                required: false
+                default: { get_property: [ SELF, node_lables ] }  
+            # implementation:
+            #   primary: files/create/create.yaml 
+      Validation:
+        type: igs.interfaces.node.lifecycle.Validation 
+        operations:
+          validate: files/validate/validate.yaml 
+

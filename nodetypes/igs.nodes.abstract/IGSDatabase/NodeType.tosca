@@ -1,0 +1,30 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  igs.nodes.abstract.Database:
+    derived_from: tosca.nodes.Database
+    metadata:
+      targetNamespace: "igs.nodes.abstract"
+      abstract: "false"
+      final: "false"
+    properties:
+      username:
+        type: string
+        required: false
+      password:
+        type: string 
+        required: false 
+      db_name:
+        type: string 
+        required: false   
+    requirements:
+      - host:
+          # igs.nodes.abstract.DBMS
+          capability: tosca.capabilities.Compute
+          relationship: tosca.relationships.HostedOn
+          occurrences: [ 1, 1 ]
+
+    capabilities:
+      database_endpoint:
+        occurrences: [ 0, UNBOUNDED ]
+        type: tosca.capabilities.Endpoint.Database

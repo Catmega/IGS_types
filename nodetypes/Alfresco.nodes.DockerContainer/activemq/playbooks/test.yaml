@@ -1,0 +1,30 @@
+
+
+- name: docker playbook
+  hosts: all
+  gather_facts: false
+
+  tasks:
+
+        
+    - name: Deploy stack
+      community.docker.docker_stack:
+        state: present
+        name: alfstack
+        compose:
+          - version: '3'
+            services:
+              activemq:
+                image: alfresco/alfresco-activemq:5.17.1-jre11-rockylinux8
+                deploy:
+                  placement:
+                    constraints:
+                      - "{{ item }}"
+                ports:
+                  - "8161:8161" # Web Console
+                  - "5672:5672" # AMQP
+                  - "61616:61616" # OpenWire
+                  - "61613:61613" # STOMP
+      loop:
+        "{{ LABELS }}"
+

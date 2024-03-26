@@ -1,0 +1,14 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+capability_types:
+  igs.capabilities.BlockStorage:
+    derived_from: tosca.capabilities.Root
+    metadata:
+      targetNamespace: "igs.capabilities"
+      abstract: "false"
+      final: "false"
+    properties:
+      publish_ports:
+        type: list
+        required: false
+ 

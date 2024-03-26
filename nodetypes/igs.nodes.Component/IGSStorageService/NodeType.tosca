@@ -1,0 +1,19 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../../igs.nodes.abstract/IGSComponent/NodeType.tosca
+  - ../../igs.nodes.abstract/IGSBlockStorage/NodeType.tosca
+node_types:
+  igs.nodes.Component.StorageService:
+    derived_from: igs.nodes.abstract.Component
+    metadata:
+      targetNamespace: "igs.nodes.Component"
+      abstract: "false"
+      final: "false"
+    requirements:
+      - BlockStorage:
+
+          capability: tosca.capabilities.Compute
+          node: igs.nodes.abstract.BlockStorage
+          relationship: tosca.relationships.DependsOn
+
+          occurrences: [ 1, 1 ]

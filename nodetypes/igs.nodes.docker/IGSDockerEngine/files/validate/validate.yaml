@@ -1,0 +1,41 @@
+---
+- name: add hosts to Ansible 
+  hosts: all
+  gather_facts: true  
+
+  tasks:
+    # - name: Insert "validate" into a file
+    #   ansible.builtin.lineinfile:
+    #     path: /home/ubuntu/opera-root/git-project/ma-jingyue2023/templates/igs_types/example.txt
+    #     line: validate
+    #     create: yes
+
+    # - name: write a banner for this validation test
+    #   delegate_to: localhost
+    #   ansible.builtin.lineinfile:
+    #     path: /home/ubuntu/opera-root/git-project/ma-jingyue2023/templates/igs_types/validation.log
+    #     line: '########### Validating the Docker Enginee status ###########'
+    #     state: present
+
+    - name: write a banner
+      delegate_to: localhost
+      ansible.builtin.shell: echo "*********Validating Docker Engine on machine $(hostname -I | awk '{ print $1 }')*********" >> /home/ubuntu/opera-root/git-project/ma-jingyue2023/templates/igs_types/validation.log
+
+
+    - name: start hello-world Docker container to test if docker enginee is functioning well
+      community.docker.docker_container:
+        name: test_container
+        image: hello-world
+        state: started
+      register: container_result
+      ignore_errors: true 
+
+    - name: if failed, write msg back to a file in the controller node
+      delegate_to: localhost
+      ansible.builtin.shell: echo " Failure! Docker Enginee is NOT functioning well" >> /home/ubuntu/opera-root/git-project/ma-jingyue2023/templates/igs_types/validation.log
+      when: container_result is failed
+
+    - name: if succeed, write msg back to a file in the controller node
+      delegate_to: localhost
+      ansible.builtin.shell: echo " Success! Docker Enginee is functioning well" >> /home/ubuntu/opera-root/git-project/ma-jingyue2023/templates/igs_types/validation.log
+      when: container_result is not failed

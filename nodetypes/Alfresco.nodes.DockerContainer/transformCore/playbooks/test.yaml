@@ -1,0 +1,26 @@
+
+- name: docker playbook
+  hosts: all
+  gather_facts: false
+
+  tasks:
+
+    - name: Deploy stack
+      community.docker.docker_stack:
+        state: present
+        name: alfstack
+        compose:
+          - version: '3'
+            services:
+              transform-core-aio:
+                image: alfresco/alfresco-transform-core-aio:3.0.0
+                deploy:
+                  placement:
+                    constraints:
+                      - "{{ item }}"
+                environment:
+                  JAVA_OPTS: " -XX:MinRAMPercentage=50 -XX:MaxRAMPercentage=80"
+                ports:
+                  - "8090:8090"
+      loop:
+        "{{ LABELS }}"

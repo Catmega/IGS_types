@@ -1,0 +1,24 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../NodeType.tosca
+
+node_types:
+  igs.nodes.abstract.ClusterManager:
+    derived_from: igs.nodes.abstract.ClusterNode
+    metadata:
+      targetNamespace: "igs.nodes.abstract"
+      abstract: "false"
+      final: "false"
+    attributes:
+      network_name:
+        type: string
+        default: remote_network
+      join_token:
+        type: string
+        default: haha
+        description: the key for a node to joing an existing swarm cluster
+    properties:
+      num_nodes:
+        type: integer
+        description: number of nodes in the cluster
+        required: false

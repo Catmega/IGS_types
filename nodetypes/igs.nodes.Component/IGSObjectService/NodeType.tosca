@@ -1,0 +1,20 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../../igs.nodes.abstract/IGSComponent/NodeType.tosca
+  - ../../../capabilitytypes/igs.capabilities/FTSearchEngine/CapabilityType.tosca 
+  - ../../../relationshiptypes/igs.relationships/RequireFTSearchEngine/RelationshipType.tosca
+node_types:
+  igs.nodes.Component.ObejectService:
+    derived_from: igs.nodes.abstract.Component
+    metadata:
+      targetNamespace: "igs.nodes.Component"
+      abstract: "false"
+      final: "false"
+
+    requirements:
+      - FTSearchEngine:
+          capability: igs.capabilities.FTSearchEngine
+          node: igs.nodes.abstract.Component
+          relationship: igs.relationships.RequireFTSearchEngine
+
+          occurrences: [ 1, 1 ]

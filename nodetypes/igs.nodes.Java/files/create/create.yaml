@@ -1,0 +1,74 @@
+---
+- hosts: localhost
+  gather_facts: false
+
+  vars:
+    base_image: ubuntu:latest
+    container_name: container_with_java
+    image_namespace: igs
+    image_name: java
+    java_version: 8
+
+  tasks:
+
+    - name: Check for if this Docker image already exists
+      community.docker.docker_image_info:
+        name: '{{image_namespace}}/{{image_name}}:{{java_version}}'  
+      register: image_info
+
+    - name: End play if the image exists
+      meta: end_play
+      when: image_info.images | length > 0
+
+
+    - name: Start a container with os base image
+      community.docker.docker_container:
+        name: container_with_java
+        image: '{{base_image}}'
+        command: sleep infinity
+        state: started
+        detach: true
+
+    - name: Add the newly created container to the inventory.
+      add_host:
+        hostname: '{{ container_name }}'
+        ansible_connection: docker
+        ansible_python_interpreter: /usr/bin/python3
+
+    # - name: install Python to make ansible runnable in the container.
+    #   raw: >
+    #     apt-get update &&
+    #     apt-get install -y --no-install-recommends python3
+    #   changed_when: true
+    #   delegate_to: '{{ container_name }}'
+
+    - name: Install Java Runtime in the container
+      raw: |
+        apt-get update
+        apt-get install -y openjdk-'{{java_version}}'-jre
+      delegate_to: '{{container_name}}'
+
+  post_tasks:
+    # - name: Clean up the container's python.
+    #   shell: |
+    #     apt-get remove --purge -y python3
+    #     rm -rf /var/lib/apt/lists/*
+    #   changed_when: true
+    #   delegate_to: '{{ container_name }}'
+
+    - name: Commit the container.
+      command: >
+        docker commit
+        {{ container_name }} {{ image_namespace }}/{{ image_name }}:'{{java_version}}'
+      changed_when: true
+
+        # docker commit
+        # -c 'CMD {{ container_start_command }}'
+        # -c 'WORKDIR {{ container_working_dir }}'
+        # {{ container_name }} {{ image_namespace }}/{{ image_name }}:1
+        
+    - name: Remove the container.
+
+      docker_container:
+        name: '{{ container_name }}'
+        state: absent

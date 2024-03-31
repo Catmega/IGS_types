@@ -1,0 +1,23 @@
+- name: Run Tomcat Docker Container with Default Webapp
+  hosts: all
+  gather_facts: no
+  # http://192.168.221.163:8080/docs
+  tasks:
+          
+    - name: Deploy stack - postgres
+      community.docker.docker_stack:
+        state: present
+        name: igsstack
+        compose:
+          - version: '3'
+            services:
+              postgres:
+                image: postgres:14.4
+                environment:
+                  POSTGRES_DB: igsdatabase
+                  POSTGRES_USER: igs
+                  POSTGRES_PASSWORD: igs
+                ports:
+                  - "5432:5432"
+
+

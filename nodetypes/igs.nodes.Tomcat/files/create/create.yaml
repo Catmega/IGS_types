@@ -1,0 +1,121 @@
+---
+- hosts: localhost
+  gather_facts: false
+
+  vars:
+    base_image: igs/java:8
+    container_name: container_with_java_tomcat
+    image_namespace: igs
+    image_name: tomcat
+    tomcat_version: 9
+    java_version: 8
+    container_start_command: /usr/local/bin/start-tomcat.sh
+
+  pre_tasks:
+
+    - name: Check for if this Docker image already exists
+      community.docker.docker_image_info:
+        name: '{{image_namespace}}/{{image_name}}:{{tomcat_version}}' 
+      register: image_info
+
+    - name: End play if the image exists
+      meta: end_play
+      when: image_info.images | length > 0
+
+
+    - name: Start a container with java base image
+      community.docker.docker_container:
+        name: '{{container_name}}'
+        image: '{{base_image}}'
+        command: sleep infinity
+        state: started
+        detach: true
+
+    - name: Add the newly created container to the inventory.
+      add_host:
+        hostname: '{{ container_name }}'
+        ansible_connection: docker
+        ansible_python_interpreter: /usr/bin/python3
+
+    - name: install Python to make ansible runnable in the container.
+      raw: >
+        apt-get update &&
+        apt-get install -y --no-install-recommends python3
+      changed_when: true
+      delegate_to: '{{ container_name }}'
+
+    # - name: Install Tomcat Runtime in the container
+    #   raw: |
+    #     apt-get update
+    #     apt-get install -y tomcat'{{tomcat_version}}'
+    #   delegate_to: '{{container_name}}'
+
+  # roles:
+  #   - name: idealista.tomcat_role
+  #     delegate_to: '{{ container_name }}'
+  tasks:
+    # - name: Install Tomcat
+    #   apt:
+    #     name: tomcat9
+    #     state: present
+    #     update_cache: yes
+
+    - name: Install Tomcat Runtime in the container
+      raw: |
+        apt-get update
+        apt-get install -y tomcat'{{tomcat_version}}'
+      delegate_to: '{{container_name}}'
+
+    - name: Set CATALINA_HOME and CATALINA_BASE
+      lineinfile:
+        path: /etc/environment
+        line: "{{ item }}"
+        create: yes
+      loop:
+        - 'CATALINA_HOME=/usr/share/tomcat9'
+        - 'CATALINA_BASE=/var/lib/tomcat9'
+      delegate_to: '{{container_name}}'
+
+    - name: Create a custom start script for Tomcat
+      copy:
+        dest: "/usr/local/bin/start-tomcat.sh"
+        content: |
+          #!/bin/bash
+          export CATALINA_HOME=/usr/share/tomcat9
+          export CATALINA_BASE=/var/lib/tomcat9
+          $CATALINA_HOME/bin/catalina.sh run
+        mode: '0755'
+      delegate_to: '{{container_name}}'
+
+    # - name: Ensure Tomcat service is stopped
+    #   systemd:
+    #     name: tomcat9
+    #     state: stopped
+    #     enabled: no
+    #   delegate_to: '{{container_name}}'
+
+  post_tasks:
+    - name: Clean up the container's python.
+      shell: |
+        apt-get remove --purge -y python3
+        rm -rf /var/lib/apt/lists/*
+      changed_when: true
+      delegate_to: '{{ container_name }}'
+
+    - name: Commit the container.
+      command: >
+        docker commit
+        -c 'CMD {{ container_start_command }}'
+        {{ container_name }} {{ image_namespace }}/{{ image_name }}:'{{tomcat_version}}'
+      changed_when: true
+
+        # docker commit
+        # -c 'CMD {{ container_start_command }}'
+        # -c 'WORKDIR {{ container_working_dir }}'
+        # {{ container_name }} {{ image_namespace }}/{{ image_name }}:1
+        
+    - name: Remove the container.
+
+      docker_container:
+        name: '{{ container_name }}'
+        state: absent

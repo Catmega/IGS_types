@@ -32,18 +32,18 @@ relationship_types:
       Configure:
         type: tosca.interfaces.relationship.Configure
         inputs:
-          ANSIBLE_HOST_IP:
-            type: string
-            required: true
-            default: { get_attribute: [SOURCE, private_address ] }
-          ANSIBLE_USER:
-            type: string
-            required: true
-            default: { get_attribute: [SOURCE, username ] }
-          ANSIBLE_HOST_NAME:
-            type: string
-            required: true
-            default: { get_attribute: [SOURCE, name ] } 
+          # ANSIBLE_HOST_IP:
+          #   type: string
+          #   required: true
+          #   default: { get_attribute: [SOURCE, private_address ] }
+          # ANSIBLE_USER:
+          #   type: string
+          #   required: true
+          #   default: { get_attribute: [SOURCE, username ] }
+          # ANSIBLE_HOST_NAME:
+          #   type: string
+          #   required: true
+          #   default: { get_attribute: [SOURCE, name ] } 
           MANAGER_IP:
             type: string
             required: true
@@ -57,11 +57,11 @@ relationship_types:
             required: true
             default: { get_attribute: [ TARGET, join_token ] }
 
-        # operations:
-        #   post_configure_target:
-        #     implementation:
-        #       primary: files/join-cluster/join-cluster.yaml
-    # artifacts:
-    #   join-cluster:
-    #     type: igs.artifacts.Ansible
-    #     file: files/join-cluster/join-cluster.yaml
+        operations:
+          pre_configure_source:
+            implementation:
+              primary: files/join-cluster/join-cluster.yaml
+    artifacts:
+      join-cluster:
+        type: igs.artifacts.Ansible
+        file: files/join-cluster/join-cluster.yaml

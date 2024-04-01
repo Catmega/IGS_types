@@ -7,7 +7,6 @@ imports:
   - nodetypes/igs.nodes.abstract/IGSOSInstance/NodeType.tosca
   - relationshiptypes/igs.relationships/ConnectsToManager/RelationshipType.tosca
 topology_template:
-
   node_templates:
 
     workstation-1: # for frontend
@@ -29,33 +28,6 @@ topology_template:
         name: remote_host
         tier: backend
         host_name: pcss22task2vm4
-
-    swarm-manager: # for frontend
-      type: igs.nodes.Swarm.Manager
-      attributes:
-        network_name: remote_network
-        driver: overlay
-      #   private_address: localhost
-      #   public_address: 192.168.221.163
-      #   username: ubuntu
-      #   name: localhost
-      #   tier: frontend
-      #   host_name: ubu22vm03
-      properties:
-        node_lables: {tile: frontend, isNfsClient: "true"}
-      requirements:
-        - runtimeHost: docker-engine-1
-
-    swarm-worker-2: # for backend
-      type: igs.nodes.Swarm.Worker
-      properties:
-        node_lables: {tile: backend, isNfsClient: "false"}
-      requirements:
-        - manager:
-            node: swarm-manager
-            relationship: connectToManager_relationship
-        - runtimeHost: docker-engine-3
-
     workstation-3: # for nfs
       type: igs.nodes.abstract.OSInstance
       attributes:
@@ -65,6 +37,25 @@ topology_template:
         name: remote_host
         tier: backend
         host_name: igrepositopry
+
+    swarm-manager: # for frontend
+      type: igs.nodes.Swarm.Manager
+      properties:
+        node_lables: {tile: frontend, isNfsClient: "true"}
+      requirements:
+        - runtimeHost: docker-engine-1
+        - host: workstation-1
+    swarm-worker-2: # for backend
+      type: igs.nodes.Swarm.Worker
+      properties:
+        node_lables: {test: test}
+      requirements:
+        - manager:
+            node: swarm-manager
+            relationship: connectToManager_relationship
+        - runtimeHost: docker-engine-3
+        - host: workstation-3
+
 
 
 

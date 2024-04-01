@@ -10,15 +10,25 @@ node_types:
       abstract: "false"
       final: "false"
     attributes:
-      network_name:
-        type: string
-        default: remote_network
+      # network_name:
+      #   type: string
+      #   default: remote_network
+      ########## inherits from igs.nodes.abstract.ClusterNode ###########
+      # host_name:
+      #   type: string
+      #   default: { get_attribute: [SELF, runtimeHost, host_name ] } 
+      ####################################################################
       join_token:
         type: string
         default: haha
-        description: the key for a node to joing an existing swarm cluster
-    properties:
-      num_nodes:
-        type: integer
-        description: number of nodes in the cluster
-        required: false
+        description: the key for a node to join an existing swarm cluster
+
+    # properties:
+    #   num_nodes:
+    #     type: integer
+    #     description: number of nodes in the cluster
+    #     required: false
+    ########## inherits from igs.nodes.abstract.ClusterNode ###########
+    #   node_lables:
+    #     type: string
+    ####################################################################

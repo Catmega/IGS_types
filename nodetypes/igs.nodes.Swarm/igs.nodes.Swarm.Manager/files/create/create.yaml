@@ -1,28 +1,8 @@
 ---
-- name: add hosts to Ansible 
-  hosts: localhost
-  gather_facts: true  
-  vars:
-      host_ip: "{{ ANSIBLE_HOST_IP }}"
-  tasks:
-    - name: Add host 
-      add_host:
-        name: "{{ ANSIBLE_HOST_NAME }}"
-        ansible_host: "{{ ANSIBLE_HOST_IP }}"
-        ansible_user: "{{ ANSIBLE_USER }}"
-      when: 
-        - host_ip != "localhost"
-
 - name: docker playbook
-  vars:
-    host_ip: "{{ ANSIBLE_HOST_IP }}"
-  hosts: 
-    - "{{ ANSIBLE_HOST_NAME }}"
+  hosts: all
+  gather_facts: false
 
-
-
-
-  gather_facts: false  
   tasks:
     - name: change permission
       command: sudo chmod 666 /var/run/docker.sock
@@ -38,12 +18,12 @@
         data:
           join_token: "{{ swarm_init_output.swarm_facts.JoinTokens.Worker }}"
 
-    - name: Create overlay network
-      docker_network:
-        name: "{{ NETWORK_NAME }}"
-        driver: "{{ NETWORK_DRIVER }}"
-        attachable: true
-        scope: "swarm"
+    # - name: Create overlay network
+    #   docker_network:
+    #     name: "{{ NETWORK_NAME }}"
+    #     driver: "{{ NETWORK_DRIVER }}"
+    #     attachable: true
+    #     scope: "swarm"
     - name: Merge node labels and new labels
       community.docker.docker_node:
         hostname: "{{ HOST_NAME }}"

@@ -12,8 +12,9 @@ imports:
 node_types:
   igs.nodes.Swarm.Worker:
     derived_from: igs.nodes.abstract.ClusterWorker
-    attributes:
-      ############### inherits from ClusterWorker ###############
+    ############### inherits from ClusterWorker /ClusterNode ###############
+    # attributes:
+      
       # manager_ip:
       #   type: string
       #   required: true
@@ -22,33 +23,23 @@ node_types:
       #   type: string
       #   required: true
       #   default: { get_attribute: [ SELF, manager, join_token ] }
-      # network_name:
+      # host_name:
       #   type: string
-      #   default: { get_attribute: [ SELF, manager, network_name ] }
-      ###########################################################
-      
-      ########### OSInstance related, inherits from ClusterManager<-ClusterNode ##########
-      # private_address: #inherited attr
-      #   type: string
-      #   default: { get_attribute: [SELF, runtimeHost, ansible_host_ip ] } 
+      #   default: { get_attribute: [SELF, runtimeHost, host_name ] } 
       # public_address: #inherited attr
       #   type: string
       #   default: { get_attribute: [SELF, runtimeHost, public_address ] } 
-      # username:
+      # public_address: #inherited attr
       #   type: string
-      #   default: { get_attribute: [SELF, runtimeHost, ansible_user ] } 
-      # name:
-      #   type: string
-      #   default: { get_attribute: [SELF, runtimeHost, ansible_host_name ] } 
+      #   default: { get_attribute: [SELF, runtimeHost, public_address ] } 
       ###########################################################
+
       # tier: # can be replaced with "labels" in Swarm
       #   type: string
       #   default: { get_attribute: [SELF, runtimeHost, tier ] } 
-      host_name:
-        type: string
-        default: { get_attribute: [SELF, runtimeHost, host_name ] } 
 
-    ########### inherits from ClusterManager/ClusterNode ##########
+
+    ########### inherits from ClusterWorker /ClusterNode ##########
     # properties:
     #   node_lables:
     #     type: string
@@ -70,20 +61,20 @@ node_types:
       Standard:
         type: tosca.interfaces.node.lifecycle.Standard
         operations:
-          create: 
+          configure: 
             inputs:
-              ANSIBLE_HOST_IP:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, private_address ] }
-              ANSIBLE_USER:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, username ] }
-              ANSIBLE_HOST_NAME:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, name ] } 
+              # ANSIBLE_HOST_IP:
+              #   type: string
+              #   required: true
+              #   default: { get_attribute: [SELF, private_address ] }
+              # ANSIBLE_USER:
+              #   type: string
+              #   required: true
+              #   default: { get_attribute: [SELF, username ] }
+              # ANSIBLE_HOST_NAME:
+              #   type: string
+              #   required: true
+              #   default: { get_attribute: [SELF, name ] } 
               MANAGER_IP:
                 type: string
                 required: true
@@ -100,8 +91,8 @@ node_types:
                 type: string
                 required: false
                 default: { get_property: [ SELF, node_lables ] }  
-            # implementation:
-            #   primary: files/create/create.yaml 
+            implementation:
+              primary: files/configure/configure.yaml 
       Validation:
         type: igs.interfaces.node.lifecycle.Validation 
         operations:

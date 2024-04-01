@@ -10,37 +10,34 @@ imports:
 node_types:
   igs.nodes.Swarm.Manager:
     derived_from: igs.nodes.abstract.ClusterManager
-    attributes:
-    ########### OSInstance related, inherits from ClusterWorker<-ClusterNode ##########
-      # private_address: #inherited attr
+    # # ########## OSInstance related, inherits from ClusterWorker<-ClusterNode 
+    # attributes:
+      # host_name:
       #   type: string
-      #   default: { get_attribute: [SELF, runtimeHost, ansible_runtimeHost_ip ] } 
-      # public_address: #inherited attr
+      #   default: { get_attribute: [SELF, runtimeHost, host_name ] } 
+    # #   public_address: #inherited attr
+    # #     type: string
+    # #     default: { get_attribute: [SELF, runtimeHost, public_address ] } 
+      # join_token:
       #   type: string
-      #   default: { get_attribute: [SELF, runtimeHost, public_address ] } 
-      # username:
-      #   type: string
-      #   default: { get_attribute: [SELF, runtimeHost, ansible_user ] } 
-      # name:
-      #   type: string
-      #   default: { get_attribute: [SELF, runtimeHost, ansible_runtimeHost_name ] } 
-    ####################################################################################
+      #   default: haha
+      #   description: the key for a node to joing an existing swarm cluster
+    ########## got removed######################################################
+    # #   private_address: #inherited attr
+    # #     type: string
+    # #     default: { get_attribute: [SELF, runtimeHost, ansible_runtimeHost_ip ] } 
+    # #   username:
+    # #     type: string
+    # #     default: { get_attribute: [SELF, runtimeHost, ansible_user ] } 
+    # #   name:
+    # #     type: string
+    # #     default: { get_attribute: [SELF, runtimeHost, ansible_runtimeHost_name ] } 
+    # # ###################################################################################
       # tier: # can be replaced with "labels" in Swarm
       #   type: string
       #   default: { get_attribute: [SELF, runtimeHost, tier ] } 
-      host_name:
-        type: string
-        default: { get_attribute: [SELF, runtimeHost, host_name ] } 
-      driver:
-        type: string
-        default: overlay
-      network_name:
-        type: string
-        default: remote_network
-      join_token:
-        type: string
-        default: haha
-        description: the key for a node to joing an existing swarm cluster
+
+
     ########### inherits from ClusterManager/ClusterNode ##########
     # properties:
     #   node_lables:
@@ -62,27 +59,27 @@ node_types:
         operations:
           create: 
             inputs:
-              ANSIBLE_HOST_IP:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, private_address ] }
-              ANSIBLE_USER:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, username ] }
-              ANSIBLE_HOST_NAME:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, name ] } 
+              # ANSIBLE_HOST_IP:
+              #   type: string
+              #   required: true
+              #   default: { get_attribute: [SELF, private_address ] }
+              # ANSIBLE_USER:
+              #   type: string
+              #   required: true
+              #   default: { get_attribute: [SELF, username ] }
+              # ANSIBLE_HOST_NAME:
+              #   type: string
+              #   required: true
+              #   default: { get_attribute: [SELF, name ] } 
 
-              NETWORK_NAME:
-                type: integer
-                required: true
-                default: { get_attribute: [ SELF, network_name ] }
-              NETWORK_DRIVER:
-                type: integer
-                required: true
-                default: { get_attribute: [ SELF, driver ] }
+              # NETWORK_NAME:
+              #   type: integer
+              #   required: true
+              #   default: { get_attribute: [ SELF, network_name ] }
+              # NETWORK_DRIVER:
+              #   type: integer
+              #   required: true
+              #   default: { get_attribute: [ SELF, driver ] }
               HOST_NAME:
                 type: string
                 required: true
@@ -91,8 +88,8 @@ node_types:
                 type: string
                 required: false
                 default: { get_property: [ SELF, node_lables ] }   
-            # implementation:
-            #   primary: files/create/create.yaml 
+            implementation:
+              primary: files/create/create.yaml 
       Validation:
         type: igs.interfaces.node.lifecycle.Validation 
         operations:

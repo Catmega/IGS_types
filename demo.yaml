@@ -66,9 +66,9 @@ topology_template:
 
     swarm-manager: # for frontend
       type: igs.nodes.Swarm.Manager
-      attributes:
-        network_name: remote_network
-        driver: overlay
+      # attributes:
+      #   network_name: remote_network
+      #   driver: overlay
       properties:
         node_lables: {tile: frontend, isNfsClient: "true"}
       requirements:

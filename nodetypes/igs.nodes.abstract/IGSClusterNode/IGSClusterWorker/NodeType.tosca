@@ -18,9 +18,21 @@ node_types:
       join_token:
         type: string
         default: { get_attribute: [ SELF, manager, join_token ] }
-      network_name:
-        type: string
-        default: { get_attribute: [ SELF, manager, network_name ] }
+      ########## inherits from igs.nodes.abstract.ClusterNode ###########
+      # host_name:
+      #   type: string
+      #   default: { get_attribute: [SELF, runtimeHost, host_name ] } 
+      ####################################################################
+      #### REMOVED ###################################################
+      # network_name:
+      #   type: string
+      #   default: { get_attribute: [ SELF, manager, network_name ] }
+      ################################################################
+    ########## inherits from igs.nodes.abstract.ClusterNode ###########
+    # properties:
+    #   node_lables:
+    #     type: string
+    ####################################################################
     requirements:
       - runtimeHost:
           capability: tosca.capabilities.Compute

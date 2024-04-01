@@ -1,37 +1,17 @@
 ---
-- name: add hosts to Ansible 
-  hosts: localhost
-  gather_facts: true  
-  vars:
-      host_ip: "{{ ANSIBLE_HOST_IP }}"
-  tasks:
-    - name: Add host 
-      add_host:
-        name: "{{ ANSIBLE_HOST_NAME }}"
-        ansible_host: "{{ ANSIBLE_HOST_IP }}"
-        ansible_user: "{{ ANSIBLE_USER }}"
-      when: 
-        - host_ip != "localhost"
-    # - name: test if got the correct data
-    #   ansible.builtin.fail:
-    #     msg: "{{ PORT }}"
-
-
-        
 - name: Join target machines to Docker Swarm
-  hosts: 
-    - "{{ ANSIBLE_HOST_NAME }}"
-  gather_facts: true
-  become: true
-  become_method: sudo
-  vars:
-    ansible_become_pass: "passw0rd"
+  hosts: all
+  gather_facts: false
+
 
 
   tasks:
     # # - name: test if got the correct join_token, manager_ip
     # #   ansible.builtin.fail:
     # #     msg: "{{ JOIN_TOKEN}},{{MANAGER_IP}}"
+    # - name: Print SSH address
+    #   fail:
+    #     msg: "SSH address is {{ ansible_host | default('Not defined') }}"
 
     - name: change permission
       command: sudo chmod 666 /var/run/docker.sock
@@ -41,7 +21,3 @@
         state: join
         join_token: "{{ JOIN_TOKEN}}"
         remote_addrs: [ '{{MANAGER_IP}}:{{COMM.port}}' ]
- 
-
-
-    

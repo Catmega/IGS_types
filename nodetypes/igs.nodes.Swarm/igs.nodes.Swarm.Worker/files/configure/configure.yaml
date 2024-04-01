@@ -1,41 +1,47 @@
-# ---
-# - name: Preliminary check for address
-#   hosts: localhost
-#   gather_facts: no
-#   vars:
-#     ip_addr: "localhost"
-#   tasks:
-
-#     - name: Add IP address to inventory if not localhost
-#       add_host:
-#         name: "{{ ip_addr }}"
-#         groups: dynamic_hosts
-#         # name: dynamic_host
-#         # ansible_host: "{{ ip_addr }}"
-#         # ansible_user: ubuntu
-#       when: ip_addr != "localhost"
-
-# - name: Execute tasks on the determined host
-#   vars:
-#     ip_addr: "localhost"
-#   hosts: "{{ 'localhost' if ip_addr == 'localhost' else 'dynamic_hosts' }}"
-#   gather_facts: no
-#   tasks:
-#     - name: Sample task
-#       fail:
-#         msg: "SSH address is {{ ansible_host | default('Not defined') }},The current host is {{ inventory_hostname| default('Not defined') }}"
-
-
 ---
-- name: add hosts to Ansible 
+- name: Preliminary check for manager's address
   hosts: localhost
-  gather_facts: true  
+  gather_facts: no
+  vars:
+    ip_addr: "{{ MANAGER_PRIVATE_ADDR }}"
   tasks:
+
+    - name: Add IP address to inventory if not localhost
+      add_host:
+        name: "{{ ip_addr }}"
+        groups: dynamic_hosts
+        # name: dynamic_host
+        # ansible_host: "{{ ip_addr }}"
+        # ansible_user: ubuntu
+      when: ip_addr != "localhost"
+
+- name: Execute tasks on the determined host
+  vars:
+    ip_addr: "{{MANAGER_PRIVATE_ADDR}}"
+  hosts: "{{ 'localhost' if ip_addr == 'localhost' else 'dynamic_hosts' }}"
+  gather_facts: no
+  tasks:
+    # - name: Sample task
+    #   fail:
+    #     msg: "SSH address is {{ ansible_host | default('Not defined') }},The current host is {{ inventory_hostname| default('Not defined') }}"
+
     - name: Merge node labels and new labels
       community.docker.docker_node:
         hostname: "{{ HOST_NAME }}"
         labels:
           "{{ NODE_LABELS }}"
+   
+
+# ---
+# - name: add hosts to Ansible 
+#   hosts: localhost
+#   gather_facts: true  
+#   tasks:
+#     - name: Merge node labels and new labels
+#       community.docker.docker_node:
+#         hostname: "{{ HOST_NAME }}"
+#         labels:
+#           "{{ NODE_LABELS }}"
    
 
 # - name: Join target machines to Docker Swarm

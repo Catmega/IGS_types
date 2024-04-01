@@ -7,36 +7,42 @@ imports:
   - nodetypes/igs.nodes.abstract/IGSOSInstance/NodeType.tosca
   - relationshiptypes/igs.relationships/ConnectsToManager/RelationshipType.tosca
 topology_template:
-  node_templates:
 
+  inputs:
+    host_1_ip:
+      type: string
+    host_1_username:
+      type: string
+    host_1_hostname:
+      type: string
+    host_2_ip:
+      type: string
+    host_2_username:
+      type: string
+    host_2_hostname:
+      type: string
+
+  node_templates:
     workstation-1: # for frontend
       type: igs.nodes.abstract.OSInstance
       attributes:
-        private_address: localhost
-        public_address: 192.168.221.163
-        username: ubuntu
-        name: localhost
-        tier: frontend
-        host_name: ubu22vm03
-
-    workstation-2: # for backend
+        private_address: localhost # This workstation is the local controller
+        public_address: { get_input: host_1_ip }  # 192.168.221.163
+        host_name: { get_input: host_1_hostname } # ubu22vm03
+        username: { get_input: host_1_username } # ubuntu
+        name: localhost # should get decrepted later
+        tier: frontend # should get decrepted later
+        
+    workstation-2: # for nfs
       type: igs.nodes.abstract.OSInstance
       attributes:
-        private_address: 129.69.209.200
-        public_address: 129.69.209.200
-        username: jingyue
-        name: remote_host
-        tier: backend
-        host_name: pcss22task2vm4
-    workstation-3: # for nfs
-      type: igs.nodes.abstract.OSInstance
-      attributes:
-        private_address: 192.168.221.133 #192.168.221.234
-        public_address: 192.168.221.133 #192.168.221.234
-        username: ubuntu
-        name: remote_host
-        tier: backend
-        host_name: igrepositopry
+        private_address: { get_input: host_2_ip } # 192.168.221.133 
+        public_address: { get_input: host_2_ip } # 192.168.221.133 
+        host_name: { get_input: host_2_hostname } # igrepositopry
+        username: { get_input: host_2_username } # ubuntu
+        name: remote_host # should get decrepted later
+        tier: backend # should get decrepted later
+        
 
     swarm-manager: # for frontend
       type: igs.nodes.Swarm.Manager
@@ -45,7 +51,8 @@ topology_template:
       requirements:
         - runtimeHost: docker-engine-1
         - host: workstation-1
-    swarm-worker-2: # for backend
+
+    swarm-worker-1: # for backend
       type: igs.nodes.Swarm.Worker
       properties:
         node_lables: {test: test}
@@ -53,16 +60,16 @@ topology_template:
         - manager:
             node: swarm-manager
             relationship: connectToManager_relationship
-        - runtimeHost: docker-engine-3
-        - host: workstation-3
+        - runtimeHost: docker-engine-2
+        - host: workstation-2
 
 
 
 
-    docker-engine-3:
+    docker-engine-2:
       type: igs.nodes.docker.DockerEngine
       requirements:
-        - host: workstation-3
+        - host: workstation-2
 
 
 

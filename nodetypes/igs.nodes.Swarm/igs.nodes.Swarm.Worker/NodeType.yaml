@@ -11,6 +11,10 @@ imports:
 
 node_types:
   igs.nodes.Swarm.Worker:
+    metadata:
+      targetNamespace: "igs.nodes.Swarm"
+      abstract: "false"
+      final: "false"
     derived_from: igs.nodes.abstract.ClusterWorker
     ############### inherits from ClusterWorker /ClusterNode ###############
     # attributes:
@@ -26,12 +30,13 @@ node_types:
       # host_name:
       #   type: string
       #   default: { get_attribute: [SELF, runtimeHost, host_name ] } 
+      # private_address: #inherited attr
+      #   type: string
+      #   default: { get_attribute: [SELF, host, private_address ] } 
       # public_address: #inherited attr
       #   type: string
-      #   default: { get_attribute: [SELF, runtimeHost, public_address ] } 
-      # public_address: #inherited attr
-      #   type: string
-      #   default: { get_attribute: [SELF, runtimeHost, public_address ] } 
+      #   description: each ClusterNode is based on a machine with an unique IP address, which is useful. e.g. ClusterWorker need to use this to recognize and join a ClusterManager
+      #   default: { get_attribute: [SELF, host, public_address ] } 
       ###########################################################
 
       # tier: # can be replaced with "labels" in Swarm
@@ -75,14 +80,18 @@ node_types:
               #   type: string
               #   required: true
               #   default: { get_attribute: [SELF, name ] } 
-              MANAGER_IP:
+              # MANAGER_IP:
+              #   type: string
+              #   required: true
+              #   default: { get_attribute: [ SELF, manager_ip ] }
+              # JOIN_TOKEN:
+              #   type: string
+              #   required: true
+              #   default: { get_attribute: [ SELF, join_token ] }
+              MANAGER_PRIVATE_ADDR:
                 type: string
                 required: true
-                default: { get_attribute: [ SELF, manager_ip ] }
-              JOIN_TOKEN:
-                type: string
-                required: true
-                default: { get_attribute: [ SELF, join_token ] }
+                default: { get_attribute: [ SELF, manager, private_address  ] }
               HOST_NAME:
                 type: string
                 required: true

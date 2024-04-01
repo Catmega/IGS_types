@@ -19,9 +19,7 @@
   hosts: all
   gather_facts: true
   become: true
-  become_method: sudo
-  vars:
-    ansible_become_pass: "passw0rd"
+
   tasks:
     # - name: Display Inventory Information
     #   command: ansible-inventory --list

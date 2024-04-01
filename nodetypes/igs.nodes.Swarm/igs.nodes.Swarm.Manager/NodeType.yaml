@@ -9,23 +9,31 @@ imports:
 
 node_types:
   igs.nodes.Swarm.Manager:
+    metadata:
+      targetNamespace: "igs.nodes.Swarm"
+      abstract: "false"
+      final: "false"
     derived_from: igs.nodes.abstract.ClusterManager
     # # ########## OSInstance related, inherits from ClusterWorker<-ClusterNode 
     # attributes:
       # host_name:
       #   type: string
-      #   default: { get_attribute: [SELF, runtimeHost, host_name ] } 
-    # #   public_address: #inherited attr
-    # #     type: string
-    # #     default: { get_attribute: [SELF, runtimeHost, public_address ] } 
+      #   default: { get_attribute: [SELF, host, host_name ] } 
+      #   public_address: #inherited attr
+      #     type: string
+      #     default: { get_attribute: [SELF, host, public_address ] } 
       # join_token:
       #   type: string
       #   default: haha
       #   description: the key for a node to joing an existing swarm cluster
+      # private_address: #inherited attr
+      #   type: string
+      #   default: { get_attribute: [SELF, runtimeHost, ansible_runtimeHost_ip ] }
+      # public_address: #inherited attr
+      #   type: string
+      #   description: each ClusterNode is based on a machine with an unique IP address, which is useful. e.g. ClusterWorker need to use this to recognize and join a ClusterManager
+      #   default: { get_attribute: [SELF, host, public_address ] }  
     ########## got removed######################################################
-    # #   private_address: #inherited attr
-    # #     type: string
-    # #     default: { get_attribute: [SELF, runtimeHost, ansible_runtimeHost_ip ] } 
     # #   username:
     # #     type: string
     # #     default: { get_attribute: [SELF, runtimeHost, ansible_user ] } 
@@ -43,9 +51,8 @@ node_types:
     #   node_lables:
     #     type: string
     ####################################################################################
-    requirements:
 
-      ######################################################################
+    requirements:
       ### override ClusterManager/ClusterNode's requirement-runtimeHost ####
       - runtimeHost:  
           capability: igs.capabilities.container.DockerRuntime

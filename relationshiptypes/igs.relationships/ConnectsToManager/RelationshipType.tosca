@@ -61,7 +61,9 @@ relationship_types:
           pre_configure_source:
             implementation:
               primary: files/join-cluster/join-cluster.yaml
-    artifacts:
-      join-cluster:
-        type: igs.artifacts.Ansible
-        file: files/join-cluster/join-cluster.yaml
+    #### Xopera cannot recognize relationshipType's artifact####
+    # artifacts:
+    #   join-cluster:
+    #     type: igs.artifacts.Ansible
+    #     file: files/join-cluster/join-cluster.yaml
+    

@@ -21,7 +21,14 @@ node_types:
       ########## inherits from igs.nodes.abstract.ClusterNode ###########
       # host_name:
       #   type: string
-      #   default: { get_attribute: [SELF, runtimeHost, host_name ] } 
+      #   default: { get_attribute: [SELF, host, host_name ] } 
+      # private_address: #inherited attr
+      #   type: string
+      #   default: { get_attribute: [SELF, host, private_address ] } 
+      # public_address: #inherited attr
+      #   type: string
+      #   description: each ClusterNode is based on a machine with an unique IP address, which is useful. e.g. ClusterWorker need to use this to recognize and join a ClusterManager
+      #   default: { get_attribute: [SELF, host, public_address ] } 
       ####################################################################
       #### REMOVED ###################################################
       # network_name:

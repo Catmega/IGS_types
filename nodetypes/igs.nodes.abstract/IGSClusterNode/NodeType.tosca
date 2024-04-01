@@ -21,12 +21,12 @@ node_types:
         type: string
         description: each ClusterNode is based on a machine with an unique IP address, which is useful. e.g. ClusterWorker need to use this to recognize and join a ClusterManager
         default: { get_attribute: [SELF, host, public_address ] } 
+
+      #######################################################################
+      #################### REMOVED #############################################
       # username:
       #   type: string
       #   default: { get_attribute: [SELF, host, username ] } 
-      #######################################################################
-      #################### REMOVED #############################################
-
       # name: # the name to catgorize hosts in ansible inverntory list. [localhost,remote_host]
       #   type: string
       #   default: { get_attribute: [SELF, runtimeHost, ansible_host_name ] } 
@@ -37,7 +37,7 @@ node_types:
       #   default: { get_attribute: [SELF, runtimeHost, tier ] } 
       host_name:
         type: string
-        default: { get_attribute: [SELF, runtimeHost, host_name ] } 
+        default: { get_attribute: [SELF, host, host_name ] } 
 
     properties:
       node_lables:

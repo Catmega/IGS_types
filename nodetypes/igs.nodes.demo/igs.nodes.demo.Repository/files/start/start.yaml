@@ -1,0 +1,41 @@
+- name: Run Tomcat Docker Container with igs repostiory Web application
+  hosts: all
+  gather_facts: no
+
+  vars:
+    image_namespace: igs
+    image_name: repository
+    image_version: '{{ REPOSITORY_VERSION }}'
+    stack_name: igsstack
+  tasks:
+    # - name: Build Docker Image
+    #   community.docker.docker_image:
+    #     name: igs-repository-spring
+    #     source: build
+    #     tag: latest
+    #     build:
+    #       path: "."
+    # - name: Print SSH address
+    #   fail:
+    #     msg: "conection is {{ansible_connection}}, SSH address is {{ ansible_host | default('Not defined') }},SSH user is {{ ansible_user | default('Not defined') }}"
+
+    - name: Ensure jsondiff is installed
+      pip:
+        name: jsondiff
+        state: present       
+    - name: Deploy stack - repostiory
+      community.docker.docker_stack:
+        state: present
+        name: '{{stack_name}}'
+        compose:
+          - version: '3'
+            services:
+              igsrepository:
+                image: '{{image_namespace}}/{{image_name}}:{{image_version}}'#igs/repository:1 # igs-repository-spring:latest
+                ports:
+                  - "8080:8080"
+                ### dependency is expressed by Tosca ###
+                # depends_on:
+                #   - postgres
+                ########################################
+

@@ -3,12 +3,11 @@
   gather_facts: false
 
   vars:
-    base_image: igs/java:8
+    base_image: igs/java:'{{BASE_JAVA_VERSION}}'
     container_name: container_with_java_tomcat
     image_namespace: igs
     image_name: tomcat
-    tomcat_version: 9
-    java_version: 8
+    tomcat_version: '{{TOMCAT_VERSION}}'
     container_start_command: /usr/local/bin/start-tomcat.sh
 
   pre_tasks:
@@ -50,6 +49,7 @@
     #     apt-get install -y tomcat'{{tomcat_version}}'
     #   delegate_to: '{{container_name}}'
 
+  # No clear documents provided to use this role
   # roles:
   #   - name: idealista.tomcat_role
   #     delegate_to: '{{ container_name }}'

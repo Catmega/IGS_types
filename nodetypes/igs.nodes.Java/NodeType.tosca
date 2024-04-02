@@ -1,0 +1,25 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  igs.nodes.Java:
+    derived_from: tosca.nodes.SoftwareComponent
+    metadata:
+      targetNamespace: "igs.nodes.Java"
+      abstract: "false"
+      final: "false"
+    properties:
+      java_version:
+        type: version
+        required: true
+    interfaces:
+      Standard:
+        type: tosca.interfaces.node.lifecycle.Standard
+        operations:
+          create:
+            inputs:
+              JAVA_VERSION:
+                type: string
+                required: true
+                default: { get_property: [SELF, java_version ] }
+            implementation:
+              primary: files/create/create.yaml 

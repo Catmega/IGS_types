@@ -36,6 +36,9 @@ imports:
   - nodetypes/igs.nodes.demo/igs.nodes.demo.Postgres/NodeType.tosca
   - nodetypes/igs.nodes.demo/igs.nodes.demo.Proxy/NodeType.tosca
   - nodetypes/igs.nodes.demo/igs.nodes.demo.Repository/NodeType.tosca
+  - nodetypes/igs.nodes.Tomcat/NodeType.tosca
+  - nodetypes/igs.nodes.Java/NodeType.tosca
+  - nodetypes/igs.nodes.demo/igs.nodes.container.OS/igs.nodes.container.OS.Ubuntu/NodeType.tosca
   - policytypes/igs.policies.validate.SwarmManager/PolicyType.tosca
   - policytypes/igs.policies.validate.SwarmWorker/PolicyType.tosca
   - policytypes/igs.policies.validate.DockerEngine/PolicyType.tosca
@@ -249,9 +252,25 @@ topology_template:
 
 
 ############containers###################################
+    Ubuntu-OS-Base:
+      type: igs.nodes.container.OS.Ubuntu
+    Java-Runtime:
+      type: igs.nodes.Java
+      properties:
+        java_version: 8
+      requirements:
+        - host: Ubuntu-OS-Base
+    Tomcat-AppServer:
+      type: igs.nodes.Tomcat
+      properties:
+        tomcat_version: 9
+      requirements:
+        - host: Java-Runtime
+
     Demo-Repository-Container:
       type: igs.nodes.demo.container.Repository
       properties:
+          repository_version: 1
           group: frontend
           labels: [node.labels.tile==frontend, node.labels.isNfsClient==true]
           container_data_dir: /no_data_yet
@@ -260,6 +279,7 @@ topology_template:
         - runtime: docker-engine-1
         - network: MockNetwork
         - storage: MockStorage
+        - TomcatWebServer: Tomcat-AppServer
 
     Demo-Nginx-Container:
       type: igs.nodes.demo.container.Proxy

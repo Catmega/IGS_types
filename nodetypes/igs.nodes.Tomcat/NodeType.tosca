@@ -1,0 +1,39 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  igs.nodes.Tomcat:
+    derived_from: tosca.nodes.WebServer
+    metadata:
+      targetNamespace: "igs.nodes.Tomcat"
+      abstract: "false"
+      final: "false"
+    properties:
+      base_java_version:
+        type: version
+        required: true
+        default: { get_property: [SELF, host, java_version ] }
+      tomcat_version:
+        type: version
+        required: true
+
+    requirements:
+      - host:  
+          capability: tosca.capabilities.Compute
+          node: igs.nodes.Java
+          relationship: tosca.relationships.HostedOn
+    interfaces:
+      Standard:
+        type: tosca.interfaces.node.lifecycle.Standard
+        operations:
+          create:
+            inputs:
+              BASE_JAVA_VERSION:
+                type: string
+                required: true
+                default: { get_property: [SELF, base_java_version ] }
+              TOMCAT_VERSION:
+                type: string
+                required: true
+                default: { get_property: [SELF, tomcat_version ] }
+            implementation:
+              primary: files/create/create.yaml 

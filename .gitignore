@@ -71,3 +71,9 @@
 .opera/instances/swarm-worker-2_0--docker-engine-3_0
 .opera/instances/swarm-worker-2_0--swarm-manager_0
 .opera/instances/swarm-worker-2_0--workstation-3_0
+.opera/instances/Demo-Repository-Container_0--Tomcat-AppServer_0
+.opera/instances/Java-Runtime_0
+.opera/instances/Java-Runtime_0--Ubuntu-OS-Base_0
+.opera/instances/Tomcat-AppServer_0
+.opera/instances/Tomcat-AppServer_0--Java-Runtime_0
+.opera/instances/Ubuntu-OS-Base_0

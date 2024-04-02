@@ -1,0 +1,11 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  igs.nodes.container.OS.Ubuntu:
+    derived_from: tosca.nodes.Root
+    metadata:
+      targetNamespace: "igs.nodes.container.OS"
+      abstract: "false"
+      final: "false"
+
+

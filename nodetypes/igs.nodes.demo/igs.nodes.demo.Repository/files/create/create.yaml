@@ -1,36 +1,79 @@
-- name: Run Tomcat Docker Container with igs repostiory Web application
-  hosts: all
-  gather_facts: no
+---
+- hosts: localhost
+  gather_facts: false
+
+  vars:
+    base_image: tomcat
+    base_version: '{{ BASE_TOMCAT_VERSION }}' # 9
+    container_name: container_with_java_tomcat_repo
+    image_namespace: igs
+    image_name: repository
+    image_version: '{{ REPOSITORY_VERSION }}' # 1
+    container_start_command: java -jar $CATALINA_BASE/webapps/app.jar
+    my_app_path: '{{REPOSITORY_ARTIFACT}}'  #/home/ubuntu/opera-root/git-project/ma-jingyue2023/templates/igs_types/nodetypes/igs.nodes.demo/igs.nodes.demo.Repository/files/create/Artifacts/igsRepository.jar
+    tomcat_webapp_path: /var/lib/tomcat9/webapps/app.jar
+
+  pre_tasks:
+
+    - name: Check for if this Docker image already exists
+      community.docker.docker_image_info:
+        name: '{{image_namespace}}/{{image_name}}:{{image_version}}'  
+      register: image_info
+
+    - name: End play if the image exists
+      meta: end_play
+      when: image_info.images | length > 0
+
+
+    - name: Start a container with java base image
+      community.docker.docker_container:
+        name: '{{container_name}}'
+        image: '{{image_namespace}}/{{base_image}}:{{base_version}}'
+        command: sleep infinity
+        state: started
+        detach: true
+
+    # - name: Add the newly created container to the inventory.
+    #   add_host:
+    #     hostname: '{{ container_name }}'
+    #     ansible_connection: docker
+    #     ansible_python_interpreter: /usr/bin/python3
+
+    # - name: install Python to make ansible runnable in the container.
+    #   raw: >
+    #     apt-get update &&
+    #     apt-get install -y --no-install-recommends python3
+    #   changed_when: true
+    #   delegate_to: '{{ container_name }}'
+
 
   tasks:
-    # - name: Build Docker Image
-    #   community.docker.docker_image:
-    #     name: igs-repository-spring
-    #     source: build
-    #     tag: latest
-    #     build:
-    #       path: "."
-    # - name: Print SSH address
-    #   fail:
-    #     msg: "conection is {{ansible_connection}}, SSH address is {{ ansible_host | default('Not defined') }},SSH user is {{ ansible_user | default('Not defined') }}"
+    # don't need to log into the container in this task
+    - name: Copy my jar application into tomcat container
+      community.docker.docker_container_copy_into:
+        container: '{{container_name}}'
+        path: '{{ my_app_path }}'
+        container_path: '{{ tomcat_webapp_path }}'
 
-    - name: Ensure jsondiff is installed
-      pip:
-        name: jsondiff
-        state: present       
-    - name: Deploy stack - repostiory
-      community.docker.docker_stack:
-        state: present
-        name: igsstack
-        compose:
-          - version: '3'
-            services:
-              igsrepository:
-                image: igs/repository:1 # igs-repository-spring:latest
-                ports:
-                  - "8080:8080"
-                ### dependency is expressed by Tosca ###
-                # depends_on:
-                #   - postgres
-                ########################################
+# docker cp {{ my_app_path }} {{container_name}}:{{ tomcat_webapp_path }}
 
+  post_tasks:
+    # - name: Clean up the container's python.
+    #   shell: |
+    #     apt-get remove --purge -y python3
+    #     rm -rf /var/lib/apt/lists/*
+    #   changed_when: true
+    #   delegate_to: '{{ container_name }}'
+
+    - name: Commit the container.
+      command: >
+        docker commit
+        -c 'CMD {{ container_start_command }}'
+        {{ container_name }} {{ image_namespace }}/{{ image_name }}:'{{image_version}}'
+      changed_when: true
+        
+    - name: Remove the container.
+
+      docker_container:
+        name: '{{ container_name }}'
+        state: absent

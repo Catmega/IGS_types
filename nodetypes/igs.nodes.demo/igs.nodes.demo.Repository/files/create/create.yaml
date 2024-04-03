@@ -25,7 +25,7 @@
       when: image_info.images | length > 0
 
 
-    - name: Start a container with java base image
+    - name: Start a container with tomcat base image
       community.docker.docker_container:
         name: '{{container_name}}'
         image: '{{image_namespace}}/{{base_image}}:{{base_version}}'

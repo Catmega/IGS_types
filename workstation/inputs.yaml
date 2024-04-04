@@ -1,0 +1,15 @@
+# This yaml file contains inputs for swarmPiece.yaml.
+#############################################################
+# to execute run in shell with
+# opera deploy -i swarmPiece-inputs.yaml swarmPiece.yaml 
+#############################################################
+## host_1 is your localhost controller machine
+host_1_ip: 192.168.221.163
+
+host_1_username: ubuntu
+
+host_1_hostname: ubu22vm03
+
+
+
+

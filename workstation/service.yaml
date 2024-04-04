@@ -1,0 +1,28 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+imports:
+
+  - modules/node_types/OSInstance/OSInstance.yaml
+metadata:
+  targetNamespace: "igs.service.workstation"
+topology_template:
+  inputs:
+    host_1_ip:
+      type: string
+    host_1_username:
+      type: string
+    host_1_hostname:
+      type: string
+
+  node_templates:
+    workstation-1: # for frontend
+      type: igs.nodes.abstract.OSInstance
+      attributes:
+        private_address: localhost # This workstation is the local controller
+        public_address: { get_input: host_1_ip }  # 192.168.221.163
+        host_name: { get_input: host_1_hostname } # ubu22vm03
+        username: { get_input: host_1_username } # ubuntu
+        name: localhost # should get decrepted later
+        tier: frontend # should get decrepted later
+
+ 

@@ -16,7 +16,7 @@ data_types:
         type: string
         default: httpAPI
         constraints:
-          - valid_values: [ httpAPI, ssh ]
+          - valid_values: [ httpAPI, ssh, tcp, udp, tfp ]
       timeout:
         type: integer
         required: false

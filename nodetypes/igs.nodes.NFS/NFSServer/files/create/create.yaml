@@ -53,23 +53,23 @@
         owner: nobody
         group: nogroup
         mode: '777'
+    #### move to RelationshipType -  ConnectsToNFSServer
+    # - name: Add new Line
+    #   ansible.builtin.lineinfile:
+    #     state: present
+    #     dest: /etc/exports
+    #     line: "{{ SERVER_MNT_PATH }} {{ item }}(rw,sync,no_subtree_check,no_root_squash)"
+    #     # https://github.com/docker-library/postgres/issues/361
+    #     insertafter: EOF
+    #   loop:
+    #     "{{ CLIENTS_IPS }}"
 
-    - name: Add new Line
-      ansible.builtin.lineinfile:
-        state: present
-        dest: /etc/exports
-        line: "{{ SERVER_MNT_PATH }} {{ item }}(rw,sync,no_subtree_check,no_root_squash)"
-        # https://github.com/docker-library/postgres/issues/361
-        insertafter: EOF
-      loop:
-        "{{ CLIENTS_IPS }}"
-
-    - name: export1 - 
-      shell:
-        cmd: "sudo exportfs -a"
+    # - name: export1 - 
+    #   shell:
+    #     cmd: "sudo exportfs -a"
         
 
-    - name: export2 - Restart nfs-kernel-server service
-      ansible.builtin.service:
-        name: nfs-kernel-server
-        state: restarted
+    # - name: export2 - Restart nfs-kernel-server service
+    #   ansible.builtin.service:
+    #     name: nfs-kernel-server
+    #     state: restarted

@@ -2,6 +2,7 @@ tosca_definitions_version: tosca_simple_yaml_1_3
 imports:
   - ../../igs.nodes.abstract/IGSBlockStorage/NodeType.tosca
   - ../../igs.nodes.abstract/IGSOSInstance/NodeType.tosca
+  - ../../../artifacttypes/igs.artifacts/Ansible/ArtifactType.tosca
 node_types:
   igs.nodes.NFS.NFSServer:
     derived_from: igs.nodes.abstract.BlockStorage
@@ -11,14 +12,14 @@ node_types:
       final: "false"
 
     attributes:
-      clients_ips:
+      clients_ips: # should decrepted later
         type: list
         entry_schema:
           type: string 
         # required: true  
       server_ip:
         type: string
-        default: { get_attribute: [SELF, host, private_address]}
+        default: { get_attribute: [SELF, host, public_address]}
     properties:
       server_mnt_path:
         type: string

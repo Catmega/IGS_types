@@ -1,0 +1,47 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../../../datatypes/Channel/DataType.tosca
+relationship_types:
+  igs.relationships.NFS.ConnectsToNFSServer:
+    derived_from: tosca.relationships.ConnectsTo
+    metadata:
+      targetNamespace: "igs.relationships.NFS"
+      abstract: "false"
+      final: "false"
+    properties:
+      channel:
+        type: igs.datatypes.Channel
+        required: false
+    # valid_target_types: [ igs.capabilities.NFS.NFSServer ]
+
+    interfaces:
+      Configure:
+        type: tosca.interfaces.relationship.Configure
+        inputs:
+          SERVER_MNT_PATH:
+            type: string
+            required: true
+            default: { get_property: [TARGET, server_mnt_path ] } 
+          CLIENT_IP:
+            type: string
+            required: true
+            default: { get_attribute: [SOURCE, client_ip ] }     
+          SERVER_IP:
+            type: string
+            required: true
+            default: { get_attribute: [TARGET, server_ip ] }    
+          COMM:
+            type: string
+            required: true
+            default: { get_property: [ SELF, channel] }
+        operations:
+        # NFSClient is the source node, NFSServer is the targrt node here
+        # deploy the target (NFSServer) first, then configure the relationship (export operation), then source(client)
+          # post_configure_target:
+          #   implementation:
+          #     primary: files/export/export.yaml
+          #     timeout: 0
+          # pre_configure_source:
+          #   implementation:
+          #     primary: files/check/check.yaml
+          #     timeout: 0

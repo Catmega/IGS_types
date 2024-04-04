@@ -1,0 +1,24 @@
+---
+- name: add NFS export information on the server
+  hosts: all
+  gather_facts: false
+
+  tasks:  
+
+
+    - name: Checking port 80 on the remote IP
+      ansible.builtin.wait_for:
+        host: "{{ SERVER_IP }}"  # Use the variable here
+        port: "{{COMM.port}}"
+        state: started  # Use 'started' to check if the port is open
+        timeout: 10  # Timeout in seconds
+      ignore_errors: true
+      register: port_check
+
+    - name: if port not available
+      fail:
+        msg: "{{COMM.commu_method}} connection from the (expected)NFS-Client:{{CLIENT_IP}} to NFS-Server:{{ SERVER_IP }} on Port {{COMM.port}} is not available.Please check it again before configuring the client machine"
+      when: port_check is failed
+
+
+          

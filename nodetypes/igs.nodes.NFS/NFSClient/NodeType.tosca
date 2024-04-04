@@ -22,12 +22,15 @@ node_types:
       #   default: { get_property: [SELF, storageServer, server_mnt_path ] }  
       client_mnt_path:
         type: string
+      client_ip:
+        type: string
+        default: { get_attribute: [SELF, host, public_address ] }
 
     requirements:
       - storageServer:
           capability: tosca.capabilities.Attachment
           node: igs.nodes.NFS.NFSServer
-          relationship: tosca.relationships.HostedOn
+          relationship: igs.relationships.NFS.ConnectsToNFSServer
           occurrences: [ 1, 1 ]  
 
       - host:

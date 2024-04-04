@@ -1,0 +1,26 @@
+---
+- name: add NFS export information on the server
+  hosts: all
+  gather_facts: false
+
+  tasks:  
+      - name: Add new Lines in export file
+      ansible.builtin.lineinfile:
+        state: present
+        dest: /etc/exports
+        line: "{{ SERVER_MNT_PATH }} {{ CLIENT_IP }}(rw,sync,no_subtree_check,no_root_squash)"
+        # https://github.com/docker-library/postgres/issues/361
+        insertafter: EOF
+   
+
+    - name: export1 - 
+      shell:
+        cmd: "sudo exportfs -a"
+        
+
+    - name: export2 - Restart nfs-kernel-server service
+      ansible.builtin.service:
+        name: nfs-kernel-server
+        state: restarted
+
+          

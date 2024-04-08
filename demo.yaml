@@ -43,6 +43,7 @@ imports:
   - policytypes/igs.policies.validate.SwarmWorker/PolicyType.tosca
   - policytypes/igs.policies.validate.DockerEngine/PolicyType.tosca
   - policytypes/igs.policies.validate.Postgres/PolicyType.tosca
+  - relationshiptypes/igs.relationshipsn.NFS/ConnectsToNFSServer/RelationshipType.tosca
 topology_template:
 
   node_templates:
@@ -145,7 +146,9 @@ topology_template:
       attributes:
         client_mnt_path: /mount/nfs #/mount/nfsshare
       requirements:
-        - storageServer: nfs-server
+        - storageServer:
+            node: nfs-server
+            relationship: connectToNFSServer_relationship
         - host: workstation-1
 
 
@@ -327,6 +330,12 @@ topology_template:
           port: 2377
           commu_method: httpAPI
 
+    connectToNFSServer_relationship:
+      type: igs.relationships.NFS.ConnectsToNFSServer
+      properties:
+        channel:
+          port: 2049
+          commu_method: tcp
   policies:
     - validate-SwarmManager:
         type: igs.policies.validate.SwarmManager

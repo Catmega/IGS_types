@@ -1,0 +1,61 @@
+---
+- name: Run Solr in a container and commit with a new core
+  hosts: all
+  vars:
+    container_name: container_with_solr
+    core_name: '{{CORE_NAME}}'
+    image_namespace: igs
+    image_name: solr
+    image_version: 'latest' # 1
+    host_port: '{{HOST_PORT}}'
+    schema_loc: '{{DOCUMENT_SCHEMA_LOCATION}}'
+  tasks:
+
+    - name: Load document schema from a file
+      set_fact:
+        document_schema: "{{ lookup('file', '{{schema_loc}}') | from_json }}"
+
+    - name: Pull and run Solr container
+      docker_container:
+        name: '{{container_name}}'
+        image: solr:latest
+        command: "solr-precreate {{core_name}}"
+        state: started
+        published_ports:
+          - "{{host_port}}:8983"
+
+    - name: Wait for Solr to be ready
+      uri:
+        url: "http://localhost:{{host_port}}/solr/admin/info/system"
+        method: GET
+        return_content: yes
+        status_code: 200
+      register: result
+      until: result.status == 200
+      retries: 30
+      delay: 10
+
+    - name: Add document schema for this core
+      uri:
+        url: "http://localhost:{{host_port}}/solr/{{core_name}}/schema"
+        method: POST
+        body: '{{document_schema}}'
+        body_format: json
+        headers:
+          Content-Type: "application/json"
+        status_code: 200
+        return_content: yes
+      register: create_schema_response
+
+
+    # - name: Commit the container.
+    #   command: >
+    #     docker commit
+    #     {{ container_name }} {{ image_namespace }}/{{ image_name }}:'{{image_version}}'
+    #   changed_when: true
+        
+    # - name: Remove the container.
+
+    #   docker_container:
+    #     name: '{{ container_name }}'
+    #     state: absent

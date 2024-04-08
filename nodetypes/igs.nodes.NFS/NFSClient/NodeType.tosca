@@ -3,6 +3,7 @@ imports:
   - ../../igs.nodes.abstract/IGSBlockStorage/NodeType.tosca
   - ../NFSServer/NodeType.tosca
   - ../../igs.nodes.abstract/IGSOSInstance/NodeType.tosca
+  - ../../../relationshiptypes/igs.relationshipsn.NFS/ConnectsToNFSServer/RelationshipType.tosca
 node_types:
   igs.nodes.NFS.NFSClient:
     derived_from: igs.nodes.abstract.BlockStorage

@@ -1,0 +1,10 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+artifact_types:
+  igs.artifacts.Json:
+    derived_from: tosca.artifacts.File
+    metadata:
+      targetNamespace: "igs.artifacts"
+      abstract: "false"
+      final: "false"
+    file_ext: [ json ]

@@ -1,0 +1,142 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+imports:
+  - nodetypes/igs.nodes.Swarm/igs.nodes.Swarm.Manager/NodeType.yaml
+  - nodetypes/igs.nodes.Swarm/igs.nodes.Swarm.Worker/NodeType.yaml
+  - nodetypes/igs.nodes.docker/IGSDockerEngine/NodeType.tosca
+  - nodetypes/igs.nodes.NFS/NFSServer/NodeType.tosca
+  - nodetypes/igs.nodes.NFS/NFSVolume/NodeType.tosca
+  - nodetypes/igs.nodes.NFS/NFSClient/NodeType.tosca
+  - nodetypes/igs.nodes.abstract/IGSOSInstance/NodeType.tosca
+
+
+
+
+  - nodetypes/igs.nodes.Solr.DocutmentSchema/NodeType.tosca
+  - nodetypes/igs.nodes.demo/igs.nodes.container.Solr/NodeType.tosca
+  - nodetypes/igs.nodes.Component/IGSFTSearch/NodeType.tosca
+topology_template:
+
+  node_templates:
+
+    workstation-1: # for frontend
+      type: igs.nodes.abstract.OSInstance
+      attributes:
+        private_address: localhost
+        public_address: 192.168.221.163
+        username: ubuntu
+        name: localhost
+        tier: frontend
+        host_name: ubu22vm03
+
+    workstation-2: # for backend
+      type: igs.nodes.abstract.OSInstance
+      attributes:
+        private_address: 129.69.209.200
+        public_address: 129.69.209.200
+        username: jingyue
+        name: remote_host
+        tier: backend
+        host_name: pcss22task2vm4
+
+    swarm-manager: # for frontend
+      type: igs.nodes.Swarm.Manager
+      # attributes:
+      #   network_name: remote_network
+      #   driver: overlay
+      properties:
+        node_lables: {tile: frontend, isNfsClient: "true"}
+      requirements:
+        - runtimeHost: docker-engine-1
+        - host: workstation-1
+    swarm-worker-1: # for backend
+      type: igs.nodes.Swarm.Worker
+      properties:
+        node_lables: {tile: backend, isNfsClient: "false"}
+      requirements:
+        - manager:
+            node: swarm-manager
+            relationship: connectToManager_relationship
+        - runtimeHost: docker-engine-2
+        - host: workstation-2
+    workstation-3: # for nfs
+      type: igs.nodes.abstract.OSInstance
+      attributes:
+        private_address: 192.168.221.133 #192.168.221.234
+        public_address: 192.168.221.133 #192.168.221.234
+        username: ubuntu
+        name: remote_host
+        tier: backend
+        host_name: igrepositopry
+
+
+
+    docker-engine-1:
+      type: igs.nodes.docker.DockerEngine
+      requirements:
+        - host: workstation-1
+    docker-engine-2:
+      type: igs.nodes.docker.DockerEngine
+      requirements:
+        - host: workstation-2
+    nfs-server: #/home/ubuntu/mntnfs #/mnt/nfsdir
+      type: igs.nodes.NFS.NFSServer
+      attributes:
+        clients_ips: [192.168.221.163, 129.69.209.200]
+      properties:
+        server_mnt_path: /home/ubuntu/mntnfs #/var/share 
+      requirements:
+        - host: workstation-3
+
+  
+
+
+##############components part#############################
+        
+
+    MockStorage:
+      type: tosca.nodes.Storage.ObjectStorage
+      properties:
+          name: mock-storage
+    MockNetwork:
+      # properties:
+      #     name: remote_network      
+      type: tosca.nodes.network.Network
+
+
+
+############containers###################################
+
+    FT-Search-Service:
+      type: igs.nodes.Component.FTSearchService
+      requirements:
+        - FTSearchEngine: Solr-Container
+    Solr-Container:
+      type: igs.nodes.container.Solr
+      properties:
+          solr_version: latest
+          host_port: 8086
+          core_name: IGS
+          group: backend
+          labels: [node.labels.tile==backend]
+      requirements:
+        - host: workstation-1
+        - runtime: docker-engine-1
+        - network: MockNetwork
+        - storage: MockStorage
+        - docSchema: Solr-Schema
+
+    Solr-Schema:
+      type: igs.nodes.Solr.DocumentSchema
+      properties:
+        absolute_loc_schema_file: /home/ubuntu/opera-root/git-project/IGS_types/nodetypes/igs.nodes.Solr.DocutmentSchema/files/Artifacts/doc_schema.json
+
+  relationship_templates:
+    connectToManager_relationship:
+      type: igs.relationships.ConnectsToManager
+      properties:
+        channel:
+          port: 2377
+          commu_method: httpAPI
+
+        

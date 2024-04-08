@@ -1,0 +1,28 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../../capabilitytypes/igs.capabilities/DocumentSchema/CapabilityType.tosca
+  - ../../artifacttypes/igs.artifacts/Json/ArtifactType.tosca
+  - ../igs.nodes.demo/igs.nodes.container.Solr/NodeType.tosca
+node_types:
+  igs.nodes.Solr.DocumentSchema:
+    derived_from: tosca.nodes.Root
+    metadata:
+      targetNamespace: "igs.nodes.Solr"
+      abstract: "false"
+      final: "false"
+    properties:
+      absolute_loc_schema_file:
+        type: string
+        required: true 
+       # default: { get_artifact: [SELF, schemaJsonFile ] } # not able to get the absolute file location 
+       
+
+    capabilities:
+      SolrDocumentSchema:
+        occurrences: [ 1, UNBOUNDED ]
+        valid_source_types: [ igs.nodes.container.Solr ]
+        type: igs.capabilities.DocumentSchema
+    artifacts:
+      schemaJsonFile:
+        type: igs.artifacts.Json
+        file: files/Artifacts/doc_schema.json

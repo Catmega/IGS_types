@@ -19,11 +19,11 @@ http://192.168.221.163:8085/solr/admin/cores?action=CREATE&name=test&instanceDir
 
  ## add fields in the schema
  curl --request POST \
-  --url http://localhost:8085/solr/IGS/schema \
+  --url http://localhost:8086/solr/IGS/schema \
   --header 'Content-Type: application/json' \
   --data '{
   "add-field": [
-    {"name": "name", "type": "text_general", "multiValued": false},
+    {"name": "recordName", "type": "text_general", "multiValued": false},
     {"name": "cat", "type": "string", "multiValued": true},
     {"name": "manu", "type": "string"},
     {"name": "features", "type": "text_general", "multiValued": true},

@@ -1,0 +1,9 @@
+{
+    "add-field": [
+  
+      {"name": "title", "type": "string", "multiValued": true},
+      {"name": "author", "type": "string"},
+      {"name": "description", "type": "text_general", "multiValued": true},
+      {"name": "location", "type": "location"}
+    ]
+  }

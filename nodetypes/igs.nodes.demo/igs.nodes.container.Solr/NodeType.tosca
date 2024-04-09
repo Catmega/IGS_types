@@ -4,6 +4,7 @@ imports:
   - ../../../artifacttypes/igs.artifacts/Json/ArtifactType.tosca
   - ../../igs.nodes.Solr.DocutmentSchema/NodeType.tosca
   - ../../../relationshiptypes/igs.relationships/RequireDocumentSchema/RelationshipType.tosca
+  - ../../../interfacetypes/igs.interfaces.node.lifecycle/Validation/InterfaceType.tosca
 node_types:
   igs.nodes.container.Solr:
     derived_from: igs.nodes.abstract.ContainerApplication
@@ -48,6 +49,12 @@ node_types:
             implementation:
               primary: files/start/start.yaml 
 
+      Validation:
+        type: igs.interfaces.node.lifecycle.Validation 
+        operations:
+          validate: 
+            implementation:
+              primary: files/validate/validate.yaml 
     requirements:
       - docSchema:
           capability: igs.capabilities.DocumentSchema

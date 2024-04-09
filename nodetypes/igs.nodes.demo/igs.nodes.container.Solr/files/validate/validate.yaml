@@ -1,0 +1,93 @@
+---
+- name: add hosts to Ansible 
+  hosts: localhost
+  gather_facts: true  
+  vars:
+    log_file_loc: /home/ubuntu/opera-root/git-project/IGS_types/validation.log
+    core_name: IGS #'{{CORE_NAME}}'
+    host_port: 8086 #'{{HOST_PORT}}'
+    # doc_id: '001-232400'
+    doc_found: false
+  tasks:
+
+
+    - name: write a banner
+      delegate_to: localhost
+      ansible.builtin.shell: echo "*********Validating Solr on machine $(hostname -I | awk '{ print $1 }')****{{ ansible_date_time.date }} {{ ansible_date_time.time }}*****" >> '{{log_file_loc}}'
+
+    - name: check if Solr is ready
+      uri:
+        url: "http://localhost:{{host_port}}/solr"
+        method: GET
+        return_content: yes
+        status_code: 200
+      register: response
+      until: response.status == 200
+      retries: 30
+      delay: 10
+
+    - name: if failed, write msg back to a file in the controller node
+      delegate_to: localhost
+      ansible.builtin.shell: echo " Failure! Solr is not available" >> '{{log_file_loc}}'
+      when: response.status != 200
+
+    - name: if succeed, write msg back to a file in the controller node
+      delegate_to: localhost
+      ansible.builtin.shell: echo " Success! Solr is available" >> '{{log_file_loc}}'
+      when: response.status == 200
+
+    - name: upload a json doc for this core
+      uri:
+        url: "http://localhost:{{host_port}}/solr/{{core_name}}/update"
+        method: POST
+        body: '[{
+    "id" : "001-232401",
+    "title" : "Review on Cloud Applications",
+    "author" : "Nancy",
+    "description" : "This paper talks about the current researches on Cloud Applications. Excellent review."
+  }]'
+        body_format: json
+        headers:
+          Content-Type: "application/json"
+        status_code: 200
+        return_content: yes
+      register: upload_json_doc_response
+
+    - name: if failed, write msg back to a file in the controller node
+      delegate_to: localhost
+      ansible.builtin.shell: echo " Failure! Json Document CANNOT be uploaded to Solr" >> '{{log_file_loc}}'
+      when: upload_json_doc_response.status != 200
+
+    - name: if succeed, write msg back to a file in the controller node
+      delegate_to: localhost
+      ansible.builtin.shell: echo " Success! Json Document can be uploaded to Solr" >> '{{log_file_loc}}'
+      when: upload_json_doc_response.status == 200
+
+    - name: query the json doc
+      uri:
+        url: "http://localhost:{{host_port}}/solr/{{core_name}}/select?q=author%3ANancy"
+        method: GET
+        status_code: 200
+        return_content: yes
+      register: query_doc_response
+    # - name: query the json doc
+    #   debug:
+    #     msg: "{{query_doc_response}}"
+
+    - name: Check for the given ID in the response
+      set_fact:
+        id_found: true
+      when: item.id == "001-232401"
+      loop: "{{ query_doc_response.json.response.docs }}"
+      loop_control:
+        label: "{{ item.id }}"
+
+    - name: if failed, write msg back to a file in the controller node
+      delegate_to: localhost
+      ansible.builtin.shell: echo " Failure! Json Document CANNOT be queried Solr" >> '{{log_file_loc}}'
+      when: id_found == false
+
+    - name: if succeed, write msg back to a file in the controller node
+      delegate_to: localhost
+      ansible.builtin.shell: echo " Success! Json Document can be queried to Solr" >> '{{log_file_loc}}'
+      when: id_found == true

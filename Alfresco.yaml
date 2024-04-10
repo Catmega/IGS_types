@@ -45,6 +45,7 @@ imports:
   - capabilitytypes/igs.capabilities.container/Transform/CapabilityType.tosca
   - capabilitytypes/igs.capabilities/MessageBrokerService/CapabilityType.tosca
   - relationshiptypes/igs.relationships/ConnectsToManager/RelationshipType.tosca
+  - relationshiptypes/igs.relationshipsn.NFS/ConnectsToNFSServer/RelationshipType.tosca
 topology_template:
 
   node_templates:
@@ -71,9 +72,9 @@ topology_template:
 
     swarm-manager: # for frontend
       type: igs.nodes.Swarm.Manager
-      attributes:
-        network_name: remote_network
-        driver: overlay
+      # attributes:
+      #   network_name: remote_network
+      #   driver: overlay
       #   private_address: localhost
       #   public_address: 192.168.221.163
       #   username: ubuntu
@@ -84,6 +85,7 @@ topology_template:
         node_lables: {tile: frontend, isNfsClient: "true"}
       requirements:
         - runtimeHost: docker-engine-1
+        - host: workstation-1
 
     swarm-worker-1: # for backend
       type: igs.nodes.Swarm.Worker
@@ -101,6 +103,7 @@ topology_template:
             node: swarm-manager
             relationship: connectToManager_relationship
         - runtimeHost: docker-engine-2
+        - host: workstation-2
 
     # swarm-worker-2: # for backend
     #   type: igs.nodes.Swarm.Worker
@@ -193,7 +196,9 @@ topology_template:
       attributes:
         client_mnt_path: /mount/nfs #/mount/nfsshare
       requirements:
-        - storageServer: nfs-server
+        - storageServer:
+            node: nfs-server
+            relationship: connectToNFSServer_relationship
         - host: workstation-1
 
 
@@ -447,7 +452,12 @@ topology_template:
         channel:
           port: 2377
           commu_method: httpAPI
-
+    connectToNFSServer_relationship:
+      type: igs.relationships.NFS.ConnectsToNFSServer
+      properties:
+        channel:
+          port: 2049
+          commu_method: tcp
           
 #########deploy single container, for testing only########
 #     workstation-1: # for frontend

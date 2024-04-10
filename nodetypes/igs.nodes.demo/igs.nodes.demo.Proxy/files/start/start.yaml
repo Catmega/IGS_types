@@ -1,0 +1,33 @@
+- name: Run Tomcat Docker Container with Default Webapp
+  hosts: all
+  gather_facts: no
+  # http://192.168.221.163:8080/docs
+  vars:
+    labels: '{{ LABELS }}'
+    image_namespace: igsrepo
+    image_name: nginx
+    image_version: '{{ NGINX_VERSION }}' # latest #
+  tasks:
+          
+    - name: Deploy stack - proxy
+      community.docker.docker_stack:
+        state: present
+        name: igsstack
+        compose:
+          - version: '3'
+            services:
+              proxy:
+                image: '{{image_namespace}}/{{image_name}}:{{image_version}}'
+                ports:
+                  - "80:80"
+                ### dependency is expressed by Tosca ###
+                # depends_on:
+                #   - igsrepository
+                #   - igsportal
+                ########################################
+                deploy:
+                  placement:
+                    constraints:
+                      - "{{ item }}"
+      loop:
+        "{{ labels }}"

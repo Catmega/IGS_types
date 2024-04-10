@@ -7,5 +7,10 @@ node_types:
       targetNamespace: "igs.nodes.container.OS"
       abstract: "false"
       final: "false"
+    properties:
+      os_version:
+        type: version
+        required: true
+
 
 

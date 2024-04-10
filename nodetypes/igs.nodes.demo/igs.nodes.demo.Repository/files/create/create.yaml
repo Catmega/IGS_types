@@ -6,7 +6,7 @@
     base_image: tomcat
     base_version: '{{ BASE_TOMCAT_VERSION }}' # 9
     container_name: container_with_java_tomcat_repo
-    image_namespace: igs
+    image_namespace: igsrepo
     image_name: repository
     image_version: '{{ REPOSITORY_VERSION }}' # 1
     container_start_command: java -jar $CATALINA_BASE/webapps/app.jar
@@ -15,15 +15,31 @@
 
   pre_tasks:
 
-    - name: Check for if this Docker image already exists
-      community.docker.docker_image_info:
+    # - name: Check for if this Docker image already exists
+    #   community.docker.docker_image_info:
+    #     name: '{{image_namespace}}/{{image_name}}:{{image_version}}'  
+    #   register: image_info
+
+    # - name: End play if the image exists
+    #   meta: end_play
+    #   when: image_info.images | length > 0
+
+    - name: Check if image is available locally
+      docker_image_info:
         name: '{{image_namespace}}/{{image_name}}:{{image_version}}'  
-      register: image_info
+      register: local_image_info
 
-    - name: End play if the image exists
+    - name: Check for Docker image on Docker Hub
+      uri:
+        url: "https://hub.docker.com/v2/repositories/{{ image_namespace }}/{{ image_name }}/tags/{{ image_version }}/"
+        method: GET
+        return_content: yes
+        status_code: 200,404
+      register: docker_hub_image_response
+
+    - name: Skip the rest of the tasks if image is found
       meta: end_play
-      when: image_info.images | length > 0
-
+      when: local_image_info.images|length > 0 or not docker_hub_image_response == 404
 
     - name: Start a container with tomcat base image
       community.docker.docker_container:

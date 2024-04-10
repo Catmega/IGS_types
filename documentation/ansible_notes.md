@@ -87,3 +87,9 @@ hosts: localhost
 connection: local
 ```
 But this is not possible if I'm using Xopera to operate Ansible.)
+
+
+# debug host
+    # - name: Print SSH address
+    #   fail:
+    #     msg: "conection is {{ansible_connection}}, SSH address is {{ ansible_host | default('Not defined') }},SSH user is {{ ansible_user | default('Not defined') }}"

@@ -1,25 +1,102 @@
 - name: Run Tomcat Docker Container with Default Webapp
   hosts: all
   gather_facts: no
-
-  tasks:
-    - name: Build Docker Image of igs-portal
-      community.docker.docker_image:
-        name: igs-portal
-        source: build
-        tag: latest
-        build:
-          path: "."
+  vars:
+    base_image: tomcat
+    base_version: '{{ BASE_TOMCAT_VERSION }}' # 9  # 
+    container_name: container_with_java_tomcat_portal
+    image_namespace: igsrepo
+    image_name: portal
+    image_version: '{{ PORTAL_VERSION }}' # 1
+    container_start_command: /usr/local/bin/start-tomcat.sh
+    my_app_path: '{{PORTAL_ARTIFACT}}'  # /home/ubuntu/opera-root/git-project/IGS_types/nodetypes/igs.nodes.demo/igs.nodes.demo.PortalUI/files/create/Artifacts/index.html 
+    tomcat_webapp_path: /var/lib/tomcat9/webapps/ROOT/index.html
+  pre_tasks:
+    # - name: Build Docker Image of igs-portal
+    #   community.docker.docker_image:
+    #     name: igs-portal
+    #     source: build
+    #     tag: latest
+    #     build:
+    #       path: "."
       ##### strange error when running with xopera ###############
       # "msg": "An unexpected Docker error occurred: 500 Server Error for http+docker://localhost/v1.44/build?t=igs-portal%3Alatest&q=False&nocache=False&rm=True&forcerm=True&pull=False: Internal Server Error (\"Cannot locate specified Dockerfile: Dockerfile\")"
       ######################################################################
-    
-    - name: Deploy stack - portal
-      community.docker.docker_stack:
-        state: present
-        name: igsstack
-        compose:
-          - version: '3'
-            services:
-              igsportal:
-                image: igs-portal:latest
+
+    - name: Check if image is available locally
+      docker_image_info:
+        name: '{{image_namespace}}/{{image_name}}:{{image_version}}'  
+      register: local_image_info
+
+    - name: try to pull the image from public docker hub if not locally
+      docker_image:
+        name: '{{image_namespace}}/{{image_name}}:{{image_version}}'
+        source: pull
+      register: docker_hub_image_info
+      when: local_image_info.images|length == 0
+      ignore_errors: yes
+
+    - name: Check for Docker image on Docker Hub
+      uri:
+        url: "https://hub.docker.com/v2/repositories/{{ image_namespace }}/{{ image_name }}/tags/{{ image_version }}/"
+        method: GET
+        return_content: yes
+        status_code: 200,404
+      register: docker_hub_image_response
+
+    - name: Skip the rest of the tasks if image is found
+      meta: end_play
+      when: local_image_info.images|length > 0 or not docker_hub_image_response == 404
+
+    - name: Start a container with tomcat base image
+      community.docker.docker_container:
+        name: '{{container_name}}'
+        image: '{{image_namespace}}/{{base_image}}:{{base_version}}'
+        command: sleep infinity
+        state: started
+        detach: true
+
+    # - name: Add the newly created container to the inventory.
+    #   add_host:
+    #     hostname: '{{ container_name }}'
+    #     ansible_connection: docker
+    #     ansible_python_interpreter: /usr/bin/python3
+
+    # - name: install Python to make ansible runnable in the container.
+    #   raw: >
+    #     apt-get update &&
+    #     apt-get install -y --no-install-recommends python3
+    #   changed_when: true
+    #   delegate_to: '{{ container_name }}'
+
+
+  tasks:
+    # don't need to log into the container in this task
+    - name: Copy my jar application into tomcat container
+      community.docker.docker_container_copy_into:
+        container: '{{container_name}}'
+        path: '{{ my_app_path }}'
+        container_path: '{{ tomcat_webapp_path }}'
+
+# docker cp {{ my_app_path }} {{container_name}}:{{ tomcat_webapp_path }}
+
+  post_tasks:
+    # - name: Clean up the container's python.
+    #   shell: |
+    #     apt-get remove --purge -y python3
+    #     rm -rf /var/lib/apt/lists/*
+    #   changed_when: true
+    #   delegate_to: '{{ container_name }}'
+
+    - name: Commit the container.
+      command: >
+        docker commit
+        -c 'CMD {{ container_start_command }}'
+        {{ container_name }} {{ image_namespace }}/{{ image_name }}:'{{image_version}}'
+      changed_when: true
+        
+    - name: Remove the container.
+
+      docker_container:
+        name: '{{ container_name }}'
+        state: absent

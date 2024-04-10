@@ -3,28 +3,46 @@
   gather_facts: false
 
   vars:
-    base_image: ubuntu:latest
+    # base_image: ubuntu:latest
+    base_image: ubuntu
+    base_version: '{{ BASE_OS_VERSION }}'
     container_name: container_with_java
-    image_namespace: igs
+    image_namespace: igsrepo
     image_name: java
-    java_version: '{{JAVA_VERSION}}'  #8 # openjdk-8-jre , defailt-jre
+    image_version: '{{JAVA_VERSION}}'  #8 # openjdk-8-jre , defailt-jre
 
   tasks:
 
-    - name: Check for if this Docker image already exists
-      community.docker.docker_image_info:
-        name: '{{image_namespace}}/{{image_name}}:{{java_version}}'  
-      register: image_info
+    # - name: Check for if this Docker image already exists
+    #   community.docker.docker_image_info:
+    #     name: '{{image_namespace}}/{{image_name}}:{{image_version}}'  
+    #   register: image_info
 
-    - name: End play if the image exists
+    # - name: End play if the image exists
+    #   meta: end_play
+    #   when: image_info.images | length > 0
+
+    - name: Check if image is available locally
+      docker_image_info:
+        name: '{{image_namespace}}/{{image_name}}:{{image_version}}'  
+      register: local_image_info
+
+    - name: Check for Docker image on Docker Hub
+      uri:
+        url: "https://hub.docker.com/v2/repositories/{{ image_namespace }}/{{ image_name }}/tags/{{ image_version }}/"
+        method: GET
+        return_content: yes
+        status_code: 200,404
+      register: docker_hub_image_response
+
+    - name: Skip the rest of the tasks if image is found
       meta: end_play
-      when: image_info.images | length > 0
-
+      when: local_image_info.images|length > 0 or not docker_hub_image_response == 404
 
     - name: Start a container with os base image
       community.docker.docker_container:
         name: container_with_java
-        image: '{{base_image}}'
+        image: '{{base_image}}:{{base_version}}'
         command: sleep infinity
         state: started
         detach: true
@@ -45,7 +63,7 @@
     - name: Install Java Runtime in the container
       raw: |
         apt-get update
-        apt-get install -y openjdk-'{{java_version}}'-jre
+        apt-get install -y openjdk-'{{image_version}}'-jre
       delegate_to: '{{container_name}}'
 
   post_tasks:
@@ -59,7 +77,7 @@
     - name: Commit the container.
       command: >
         docker commit
-        {{ container_name }} {{ image_namespace }}/{{ image_name }}:'{{java_version}}'
+        {{ container_name }} {{ image_namespace }}/{{ image_name }}:'{{image_version}}'
       changed_when: true
 
         # docker commit

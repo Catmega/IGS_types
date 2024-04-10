@@ -3,10 +3,11 @@
   gather_facts: no
 
   vars:
-    image_namespace: igs
+    image_namespace: igsrepo
     image_name: repository
     image_version: '{{ REPOSITORY_VERSION }}'
     stack_name: igsstack
+    labels: '{{ LABELS }}'
   tasks:
     # - name: Build Docker Image
     #   community.docker.docker_image:
@@ -15,14 +16,13 @@
     #     tag: latest
     #     build:
     #       path: "."
-    # - name: Print SSH address
-    #   fail:
-    #     msg: "conection is {{ansible_connection}}, SSH address is {{ ansible_host | default('Not defined') }},SSH user is {{ ansible_user | default('Not defined') }}"
 
-    - name: Ensure jsondiff is installed
-      pip:
-        name: jsondiff
-        state: present       
+
+    # - name: Ensure jsondiff is installed
+    #   pip:
+    #     name: jsondiff
+    #     state: present       
+
     - name: Deploy stack - repostiory
       community.docker.docker_stack:
         state: present
@@ -31,11 +31,12 @@
           - version: '3'
             services:
               igsrepository:
-                image: '{{image_namespace}}/{{image_name}}:{{image_version}}'#igs/repository:1 # igs-repository-spring:latest
+                image: '{{image_namespace}}/{{image_name}}:{{image_version}}' # igs/repository:1 # igs-repository-spring:latest
                 ports:
                   - "8080:8080"
-                ### dependency is expressed by Tosca ###
-                # depends_on:
-                #   - postgres
-                ########################################
-
+                deploy:
+                  placement:
+                    constraints:
+                      - "{{ item }}"
+      loop:
+        "{{ labels }}"

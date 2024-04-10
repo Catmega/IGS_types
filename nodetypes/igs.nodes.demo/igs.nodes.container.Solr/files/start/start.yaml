@@ -15,18 +15,31 @@
       set_fact:
         document_schema: "{{ lookup('file', '{{schema_loc}}') | from_json }}"
 
-    - name: Pull and run Solr container
-      docker_container:
-        name: '{{container_name}}'
-        image: solr:latest
-        command: "solr-precreate {{core_name}}"
-        state: started
-        published_ports:
-          - "{{host_port}}:8983"
+    # - name: Pull and run Solr container
+    #   docker_container:
+    #     name: '{{container_name}}'
+    #     image: solr:latest
+    #     command: "solr-precreate {{core_name}}"
+    #     state: started
+    #     published_ports:
+    #       - "{{host_port}}:8983"
+
+    - name: Deploy stack - proxy
+      community.docker.docker_stack:
+        state: present
+        name: igsstack
+        compose:
+          - version: '3'
+            services:
+              solr:
+                image: solr:latest
+                ports:
+                  - "{{host_port}}:8983"
+                command: "solr-precreate {{core_name}}"
 
     - name: Wait for Solr to be ready
       uri:
-        url: "http://localhost:{{host_port}}/solr/admin/info/system"
+        url: "http://localhost:{{host_port}}/solr"
         method: GET
         return_content: yes
         status_code: 200

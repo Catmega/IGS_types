@@ -3,24 +3,40 @@
   gather_facts: false
 
   vars:
-    base_image: igs/java:'{{BASE_JAVA_VERSION}}'
+    base_image: igsrepo/java:'{{BASE_JAVA_VERSION}}'
     container_name: container_with_java_tomcat
-    image_namespace: igs
+    image_namespace: igsrepo
     image_name: tomcat
-    tomcat_version: '{{TOMCAT_VERSION}}'
+    image_version: '{{TOMCAT_VERSION}}'
     container_start_command: /usr/local/bin/start-tomcat.sh
 
   pre_tasks:
 
-    - name: Check for if this Docker image already exists
-      community.docker.docker_image_info:
-        name: '{{image_namespace}}/{{image_name}}:{{tomcat_version}}' 
-      register: image_info
+    # - name: Check for if this Docker image already exists
+    #   community.docker.docker_image_info:
+    #     name: '{{image_namespace}}/{{image_name}}:{{image_version}}' 
+    #   register: image_info
 
-    - name: End play if the image exists
+    # - name: End play if the image exists
+    #   meta: end_play
+    #   when: image_info.images | length > 0
+
+    - name: Check if image is available locally
+      docker_image_info:
+        name: '{{image_namespace}}/{{image_name}}:{{image_version}}'  
+      register: local_image_info
+
+    - name: Check for Docker image on Docker Hub
+      uri:
+        url: "https://hub.docker.com/v2/repositories/{{ image_namespace }}/{{ image_name }}/tags/{{ image_version }}/"
+        method: GET
+        return_content: yes
+        status_code: 200,404
+      register: docker_hub_image_response
+
+    - name: Skip the rest of the tasks if image is found
       meta: end_play
-      when: image_info.images | length > 0
-
+      when: local_image_info.images|length > 0 or not docker_hub_image_response == 404
 
     - name: Start a container with java base image
       community.docker.docker_container:
@@ -46,7 +62,7 @@
     # - name: Install Tomcat Runtime in the container
     #   raw: |
     #     apt-get update
-    #     apt-get install -y tomcat'{{tomcat_version}}'
+    #     apt-get install -y tomcat'{{image_version}}'
     #   delegate_to: '{{container_name}}'
 
   # No clear documents provided to use this role
@@ -63,7 +79,7 @@
     - name: Install Tomcat Runtime in the container
       raw: |
         apt-get update
-        apt-get install -y tomcat'{{tomcat_version}}'
+        apt-get install -y tomcat'{{image_version}}'
       delegate_to: '{{container_name}}'
 
     - name: Set CATALINA_HOME and CATALINA_BASE
@@ -106,7 +122,7 @@
       command: >
         docker commit
         -c 'CMD {{ container_start_command }}'
-        {{ container_name }} {{ image_namespace }}/{{ image_name }}:'{{tomcat_version}}'
+        {{ container_name }} {{ image_namespace }}/{{ image_name }}:'{{image_version}}'
       changed_when: true
 
         # docker commit

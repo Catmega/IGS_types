@@ -14,9 +14,14 @@ node_types:
       Standard:
         type: tosca.interfaces.node.lifecycle.Standard
         operations:
-          create:
+          start:
+            inputs:
+              LABELS:
+                type: string
+                required: true
+                default: { get_property: [ SELF, labels] }
             implementation:
-              primary: files/create/create.yaml 
+              primary: files/start/start.yaml 
               # deploy in a docker stack
 
       Validation:

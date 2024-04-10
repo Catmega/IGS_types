@@ -2,29 +2,34 @@
   hosts: all
   gather_facts: no
   # http://192.168.221.163:8080/docs
+  vars:
+    image_namespace: igsrepo
+    image_name: nginx
+    image_version: '{{ NGINX_VERSION }}' # latest #
   tasks:
+    - name: Check if image is available locally
+      docker_image_info:
+        name: '{{image_namespace}}/{{image_name}}:{{image_version}}'  
+      register: local_image_info
+
+    - name: Check for Docker image on Docker Hub
+      uri:
+        url: "https://hub.docker.com/v2/repositories/{{ image_namespace }}/{{ image_name }}/tags/{{ image_version }}/"
+        method: GET
+        return_content: yes
+        status_code: 200,404
+      register: docker_hub_image_response
+
+    - name: Skip the rest of the tasks if image is found
+      meta: end_play
+      when: local_image_info.images|length > 0 or not docker_hub_image_response == 404
+
     - name: Build Docker Image
       community.docker.docker_image:
-        name: igs-proxy
+        name: '{{image_namespace}}/{{image_name}}:{{image_version}}'
         source: build
         tag: latest
         build:
           path: "."
           
-    - name: Deploy stack - proxy
-      community.docker.docker_stack:
-        state: present
-        name: igsstack
-        compose:
-          - version: '3'
-            services:
-              proxy:
-                image: igs-proxy:latest
-                ports:
-                  - "80:80"
-                ### dependency is expressed by Tosca ###
-                # depends_on:
-                #   - igsrepository
-                #   - igsportal
-                ########################################
-
+ 

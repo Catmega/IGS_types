@@ -1,0 +1,52 @@
+---
+- name: Check Docker Image Availability
+  hosts: localhost
+  vars:
+    image_namespace: igsrepo
+    image_name: portal
+    image_version: 1 #'{{ REPOSITORY_VERSION }}'
+    stack_name: igsstack
+  tasks:
+    - name: Check if image is available locally
+      docker_image_info:
+        name: '{{image_namespace}}/{{image_name}}:{{image_version}}'  
+      register: local_image_info
+    # method 1 
+    # - name: try to pull the image from public docker hub if not locally
+    #   docker_image:
+    #     name: '{{image_namespace}}/{{image_name}}:{{image_version}}'
+    #     source: pull
+    #   register: docker_hub_image_info
+    #   when: local_image_info.images|length == 0
+    #   ignore_errors: yes
+
+    # - name: Skip the rest of the tasks if image is found
+    #   meta: end_play
+    #   when: local_image_info.images|length > 0 or not docker_hub_image_info.failed
+
+    #method 2
+    - name: Check for Docker image on Docker Hub
+      uri:
+        url: "https://hub.docker.com/v2/repositories/{{ image_namespace }}/{{ image_name }}/tags/{{ image_version }}/"
+        method: GET
+        return_content: yes
+        status_code: 200,404
+      register: docker_hub_image_response
+
+    # - name: Print result
+    #   debug:
+    #     msg: "{{docker_hub_image_response.status}}"
+    - name: Skip the rest of the tasks if image is found
+      meta: end_play
+      when: local_image_info.images|length > 0 or not docker_hub_image_response == 404
+
+
+    - name: Print result
+      debug:
+        msg: "found"
+      when: docker_hub_image_response.status == 200
+
+    - name: Print result if not exists
+      debug:
+        msg: "not found"
+      when: docker_hub_image_response.status == 404

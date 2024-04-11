@@ -1,29 +1,29 @@
 tosca_definitions_version: tosca_simple_yaml_1_3
 imports:
+  - ../../igs.nodes.abstract/IGSComponent/NodeType.tosca
   - ../../igs.nodes.abstract/IGSDBMS/NodeType.tosca
   - ../PostgresDatabase/NodeType.tosca
   - ../../igs.nodes.abstract/IGSContainerApplication/NodeType.tosca
   - ../../../capabilitytypes/igs.capabilities.container/PostgresDBMS/CapabilityType.tosca
 node_types:
   igs.nodes.postgres.PostgresDBMS:
-    derived_from: igs.nodes.abstract.DBMS
+    derived_from: igs.nodes.abstract.Component
     metadata:
       targetNamespace: "igs.nodes.postgres"
       abstract: "false"
       final: "false"
-    properties:
-      port:
-        type: string
-        default: 5432
+    # properties:
+    #   port:
+    #     type: string
+    #     default: 5432
     capabilities:
       host:
         occurrences: [ 1, UNBOUNDED ]
         valid_source_types: [ igs.nodes.postgres.PostgresDatabase ]
         type: tosca.capabilities.Compute
     requirements:
-      - host:
+      - containerApplication:
           capability: igs.capabilities.container.PostgresDBMS
           node: igs.nodes.abstract.ContainerApplication
           relationship: tosca.relationships.DependsOn
           occurrences: [ 1, 1 ]
-

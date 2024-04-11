@@ -9,7 +9,7 @@ node_types:
       abstract: "false"
       final: "false"
     properties:
-      nginx_version:
+      image_version:
         type: version
         required: true
     interfaces:
@@ -21,20 +21,20 @@ node_types:
               NGINX_VERSION:
                 type: string
                 required: true
-                default: { get_property: [SELF, nginx_version ] }
+                default: { get_property: [SELF, image_version ] }
             implementation:
               primary: files/create/create.yaml 
-          start:
-            inputs:
-              LABELS:
-                type: string
-                required: true
-                default: { get_property: [ SELF, labels] }
-              NGINX_VERSION:
-                type: string
-                required: true
-                default: { get_property: [SELF, nginx_version ] }
-            implementation:
-              primary: files/start/start.yaml 
+          # start:
+          #   inputs:
+          #     LABELS:
+          #       type: string
+          #       required: true
+          #       default: { get_property: [ SELF, labels] }
+          #     NGINX_VERSION:
+          #       type: string
+          #       required: true
+          #       default: { get_property: [SELF, image_version ] }
+          #   implementation:
+          #     primary: files/start/start.yaml 
               # create the image, then deploy in a docker stack
 

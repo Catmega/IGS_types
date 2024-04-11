@@ -22,15 +22,17 @@ node_types:
     properties:
       group:
         type: string
-        required: true
+        required: false
         constraints:
           - valid_values: [ frontend, backend ]
       labels:
         type: list
+        required: false
         entry_schema:
           type: string 
       networkName:
         type: string
+        required: false
         default: { get_attribute: [SELF, network, name ] }
 
       client_mnt_path:
@@ -42,6 +44,16 @@ node_types:
         required: false
         default: { get_property: [SELF, storage, name ] }
       container_data_dir:
+        type: string
+        required: false
+
+      image_namespace:
+        type: list
+        required: false
+      image_name:
+        type: string
+        required: false
+      image_version:
         type: string
         required: false
 

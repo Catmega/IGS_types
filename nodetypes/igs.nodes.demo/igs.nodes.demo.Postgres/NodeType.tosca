@@ -11,18 +11,18 @@ node_types:
       final: "false"
 
     interfaces:
-      Standard:
-        type: tosca.interfaces.node.lifecycle.Standard
-        operations:
-          start:
-            inputs:
-              LABELS:
-                type: string
-                required: true
-                default: { get_property: [ SELF, labels] }
-            implementation:
-              primary: files/start/start.yaml 
-              # deploy in a docker stack
+      # Standard:
+      #   type: tosca.interfaces.node.lifecycle.Standard
+      #   operations:
+      #     start:
+      #       inputs:
+      #         LABELS:
+      #           type: string
+      #           required: true
+      #           default: { get_property: [ SELF, labels] }
+      #       implementation:
+      #         primary: files/start/start.yaml 
+      #         # deploy in a docker stack
 
       Validation:
         type: igs.interfaces.node.lifecycle.Validation 

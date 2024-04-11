@@ -5,7 +5,7 @@
   vars:
     image_namespace: igsrepo
     image_name: repository
-    image_version: '{{ REPOSITORY_VERSION }}'
+    image_version: '{{ REPOSITORY_VERSION }}' # 1
     stack_name: igsstack
     labels: '{{ LABELS }}'
   tasks:

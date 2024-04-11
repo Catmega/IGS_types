@@ -156,6 +156,14 @@ topology_template:
         
     Repository:
       type: igs.nodes.Component.Repository.reduced
+      properties:
+        stack_name: igsstack
+        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        labels: node.labels.applicationTile==backend
+      artifacts:
+        docker_compose_file:
+          type: tosca.artifacts.File
+          file: artifacts/repository-stack.yaml
       requirements:
         # - fedSearch: Fed-Search
         # - obejectService: Object-Service
@@ -232,13 +240,26 @@ topology_template:
     Postgres-DBMS:
       type: igs.nodes.postgres.PostgresDBMS
       properties:
-          name: Postgres-DBMS
-          port: 5432
+        stack_name: igsstack
+        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        labels: node.labels.applicationTile==backend
+      artifacts:
+        docker_compose_file:
+          type: tosca.artifacts.File
+          file: artifacts/postgres-stack.yaml
       requirements:
-        - host: Demo-Postgres-Container
+        - containerApplication: Demo-Postgres-Container
 
     Proxy-Service:
       type: igs.nodes.Component.ProxyService.reduced
+      properties:
+        stack_name: igsstack
+        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        labels: node.labels.applicationTile==frontend
+      artifacts:
+        docker_compose_file:
+          type: tosca.artifacts.File
+          file: artifacts/proxy-stack.yaml
       requirements:
         - containerApplication: Demo-Nginx-Container
         - repositoryService: Repository-Portal-Service
@@ -248,6 +269,14 @@ topology_template:
     
     Repository-Portal-Service:
       type: igs.nodes.Component.RepositoryService
+      properties:
+        stack_name: igsstack
+        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        labels: node.labels.applicationTile==frontend
+      artifacts:
+        docker_compose_file:
+          type: tosca.artifacts.File
+          file: artifacts/portal-stack.yaml
       requirements:
         - repository: Repository
         - containerApplication: Demo-Portal-Container
@@ -258,9 +287,10 @@ topology_template:
     Demo-Postgres-Container:
       type: igs.nodes.demo.container.Postgres
       properties:
-          group: frontend
-          labels: [node.labels.applicationTile==backend, node.labels.isNfsClient==true]
-          container_data_dir: /var/lib/postgresql/data
+        image_namespace: igsrepo
+        image_name: postgres
+        image_version: 14.4
+          # container_data_dir: /var/lib/postgresql/data
       requirements:
         - host: workstation-1
         - runtime: docker-engine-1
@@ -287,9 +317,10 @@ topology_template:
     Demo-Portal-Container:
       type: igs.nodes.demo.container.Portal
       properties:
-          group: frontend
-          portal_version: 1
-          labels: [node.labels.applicationTile==frontend]
+        image_namespace: igsrepo
+        image_name: portal
+        image_version: 1
+
       requirements:
         - host: workstation-1
         - runtime: docker-engine-1
@@ -317,9 +348,9 @@ topology_template:
     Demo-Repository-Container:
       type: igs.nodes.demo.container.Repository
       properties:
-          repository_version: 1
-          group: frontend
-          labels: [node.labels.applicationTile==backend]
+        image_version: 1
+        image_namespace: igsrepo
+        image_name: repository
       requirements:
         - host: workstation-1
         - runtime: docker-engine-1
@@ -330,9 +361,9 @@ topology_template:
     Demo-Nginx-Container:
       type: igs.nodes.demo.container.Proxy
       properties:
-          group: frontend
-          labels: [node.labels.applicationTile==frontend]
-          nginx_version: latest
+        image_name: nginx
+        image_namespace: igsrepo
+        image_version: latest
       requirements:
         - host: workstation-1
         - runtime: docker-engine-1

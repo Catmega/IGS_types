@@ -1,0 +1,27 @@
+- name: Run Tomcat Docker Container with igs repostiory Web application
+  hosts: all
+  gather_facts: no
+
+  # vars:
+  #   DOCKER_COMPOSE_FILE: './hh/d1.yaml'
+
+  tasks:
+    # - name: Set dynamic variable
+    #   set_fact:
+    #     image_namespace: igsrepo
+    #     image_name: repository
+    #     image_version: 1 #'{{ REPOSITORY_VERSION }}'
+    #     stack_name: igsstack
+    #     labels: 'node.labels.applicationTile==backend' #'{{ LABELS }}'
+
+    - name: Dynamically include tasks based on a variable
+      include_tasks: "{{ file_path }}"
+      vars:
+        file_path: "{{DOCKER_COMPOSE_FILE_LOC}}"    
+        image_namespace: "{{IMAGE_NAMESPACE}}"
+        image_name: "{{IMAGE_NAME}}"
+        image_version: "{{IMAGE_VERSION}}" #'{{ REPOSITORY_VERSION }}'
+        stack_name: "{{STACK_NAME}}"
+        labels: "{{LABELS}}" #'{{ LABELS }}'
+  
+# - import_playbook: '{{t}}'

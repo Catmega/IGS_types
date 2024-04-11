@@ -1,0 +1,13 @@
+- name: Deploy stack - repostiory
+  community.docker.docker_stack:
+    state: present
+    name: igsstack
+    compose:
+      - version: '3'
+        services:
+          igsportal:
+            image: '{{image_namespace}}/{{image_name}}:{{image_version}}' 
+            deploy:
+              placement:
+                constraints:
+                  - "{{ labels }}"

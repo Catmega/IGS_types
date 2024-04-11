@@ -11,7 +11,7 @@ node_types:
       abstract: "false"
       final: "false"
     properties:
-      portal_version:
+      image_version:
         type: version
         required: true
       base_tomcat_version:
@@ -36,25 +36,25 @@ node_types:
               PORTAL_VERSION:
                 type: string
                 required: true
-                default: { get_property: [SELF, portal_version ] }
+                default: { get_property: [SELF, image_version ] }
               PORTAL_ARTIFACT:
                 type: string
                 required: true
                 default: { get_artifact: [SELF, portal ] }
             implementation:
               primary: files/create/create.yaml 
-          start:
-            inputs:
-              LABELS:
-                type: string
-                required: true
-                default: { get_property: [ SELF, labels] }
-              PORTAL_VERSION:
-                type: string
-                required: true
-                default: { get_property: [SELF, portal_version ] }
-            implementation:
-              primary: files/start/start.yaml 
+          # start:
+          #   inputs:
+          #     LABELS:
+          #       type: string
+          #       required: true
+          #       default: { get_property: [ SELF, labels] }
+          #     PORTAL_VERSION:
+          #       type: string
+          #       required: true
+          #       default: { get_property: [SELF, image_version ] }
+          #   implementation:
+          #     primary: files/start/start.yaml 
     artifacts:
       portal:
         type: igs.artifacts.Html

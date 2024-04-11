@@ -11,9 +11,10 @@ node_types:
       abstract: "false"
       final: "false"
     properties:
-      repository_version:
-        type: version
-        required: true
+      ##### inherited #####
+      # image_version:
+      #   type: version
+      #   required: true
       base_tomcat_version:
         type: version
         required: true
@@ -36,7 +37,7 @@ node_types:
               REPOSITORY_VERSION:
                 type: string
                 required: true
-                default: { get_property: [SELF, repository_version ] }
+                default: { get_property: [SELF, image_version ] }
               REPOSITORY_ARTIFACT:
                 type: string
                 required: true
@@ -44,19 +45,19 @@ node_types:
 
             implementation:
               primary: files/create/create.yaml 
-          start:
-            inputs:
-              REPOSITORY_VERSION:
-                type: string
-                required: true
-                default: { get_property: [SELF, repository_version ] }
-              LABELS:
-                type: string
-                required: true
-                default: { get_property: [ SELF, labels] }
-            implementation:
-              primary: files/start/start.yaml 
-              # create the image, then deploy in a docker stack
+    #       start:
+    #         inputs:
+    #           REPOSITORY_VERSION:
+    #             type: string
+    #             required: true
+    #             default: { get_property: [SELF, image_version ] }
+    #           LABELS:
+    #             type: string
+    #             required: true
+    #             default: { get_property: [ SELF, labels] }
+    #         # implementation:
+    #         #   primary: files/start/start.yaml 
+    #           # create the image, then deploy in a docker stack
 
     artifacts:
       repository:

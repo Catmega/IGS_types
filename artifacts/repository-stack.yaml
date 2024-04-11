@@ -1,0 +1,17 @@
+  
+
+- name: Deploy stack - repostiory
+  community.docker.docker_stack:
+    state: present
+    name: '{{stack_name}}'
+    compose:
+      - version: '3'
+        services:
+          igsrepository:
+            image: '{{image_namespace}}/{{image_name}}:{{image_version}}' # igs/repository:1 # igs-repository-spring:latest
+            ports:
+              - "8080:8080"
+            deploy:
+              placement:
+                constraints:
+                  - "{{ labels }}"

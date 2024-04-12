@@ -3,7 +3,7 @@ imports:
   - ../../igs.nodes.abstract/IGSComponent/NodeType.tosca
   - ../../../capabilitytypes/igs.capabilities.container/Proxy/CapabilityType.tosca
   - ../../igs.nodes.abstract/IGSContainerApplication/NodeType.tosca
-  - ../IGSRepositoryService/NodeType.tosca
+  - ../IGSPortalService/NodeType.tosca
   - ../IGSRecordsManagement/NodeType.tosca
   - ../IGSRepositoryAdministration/NodeType.tosca
   - ../IGSContentAppService/NodeType.tosca
@@ -23,7 +23,7 @@ node_types:
           occurrences: [ 1, 1 ]
       - repositoryService:
           capability: tosca.capabilities.Compute
-          node: igs.nodes.Component.RepositoryService
+          node: igs.nodes.Component.PortalService
           relationship: tosca.relationships.DependsOn
           occurrences: [ 1, 1 ]  
       - recordsManagement:

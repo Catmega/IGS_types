@@ -22,7 +22,7 @@ imports:
   - nodetypes/igs.nodes.postgres/PostgresRecordsCatalog/NodeType.tosca
   - nodetypes/igs.nodes.Component/ProxyService/NodeType.tosca
   - nodetypes/igs.nodes.Component/ProxyService-reduced/NodeType.tosca
-  - nodetypes/igs.nodes.Component/IGSRepositoryService/NodeType.tosca
+  - nodetypes/igs.nodes.Component/IGSPortalService/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSRecordsManagement/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSRepositoryAdministration/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSSecurityService/NodeType.tosca
@@ -44,6 +44,7 @@ imports:
   - policytypes/igs.policies.validate.DockerEngine/PolicyType.tosca
   - policytypes/igs.policies.validate.Postgres/PolicyType.tosca
   - relationshiptypes/igs.relationshipsn.NFS/ConnectsToNFSServer/RelationshipType.tosca
+  - artifacttypes/igs.artifacts/DockerCompose/ArtifactType.tosca
 topology_template:
 
   node_templates:
@@ -162,7 +163,7 @@ topology_template:
         labels: node.labels.applicationTile==backend
       artifacts:
         docker_compose_file:
-          type: tosca.artifacts.File
+          type: igs.artifacts.Ansible.DockerCompose
           file: artifacts/repository-stack.yaml
       requirements:
         # - fedSearch: Fed-Search
@@ -245,7 +246,7 @@ topology_template:
         labels: node.labels.applicationTile==backend
       artifacts:
         docker_compose_file:
-          type: tosca.artifacts.File
+          type: igs.artifacts.Ansible.DockerCompose
           file: artifacts/postgres-stack.yaml
       requirements:
         - containerApplication: Demo-Postgres-Container
@@ -258,24 +259,24 @@ topology_template:
         labels: node.labels.applicationTile==frontend
       artifacts:
         docker_compose_file:
-          type: tosca.artifacts.File
+          type: igs.artifacts.Ansible.DockerCompose
           file: artifacts/proxy-stack.yaml
       requirements:
         - containerApplication: Demo-Nginx-Container
-        - repositoryService: Repository-Portal-Service
+        - repositoryService: Portal-Service
         # - recordsManagement: Records-Management
         # - repositoryAdministration: Repository-Administration
         # - contentAppService: ContentApp-Service
     
-    Repository-Portal-Service:
-      type: igs.nodes.Component.RepositoryService
+    Portal-Service:
+      type: igs.nodes.Component.PortalService
       properties:
         stack_name: igsstack
         docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.applicationTile==frontend
       artifacts:
         docker_compose_file:
-          type: tosca.artifacts.File
+          type: igs.artifacts.Ansible.DockerCompose
           file: artifacts/portal-stack.yaml
       requirements:
         - repository: Repository

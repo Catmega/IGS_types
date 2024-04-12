@@ -9,7 +9,15 @@ node_types:
       targetNamespace: "igs.nodes.demo.container"
       abstract: "false"
       final: "false"
-
+    properties:
+      client_mnt_path:
+        type: string
+        required: false
+        default: undefined
+      volume_dir:
+        type: string
+        required: false
+        default: undefined
     interfaces:
       # Standard:
       #   type: tosca.interfaces.node.lifecycle.Standard

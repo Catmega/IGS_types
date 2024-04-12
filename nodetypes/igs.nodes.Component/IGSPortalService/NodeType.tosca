@@ -6,7 +6,7 @@ imports:
   - ../../igs.nodes.abstract/IGSContainerApplication/NodeType.tosca
 
 node_types:
-  igs.nodes.Component.RepositoryService:
+  igs.nodes.Component.PortalService:
     derived_from: igs.nodes.abstract.Component
     metadata:
       targetNamespace: "igs.nodes.Component"

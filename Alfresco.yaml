@@ -20,7 +20,7 @@ imports:
   - nodetypes/igs.nodes.postgres/PostgresObjectCatalog/NodeType.tosca
   - nodetypes/igs.nodes.postgres/PostgresRecordsCatalog/NodeType.tosca
   - nodetypes/igs.nodes.Component/ProxyService/NodeType.tosca
-  - nodetypes/igs.nodes.Component/IGSRepositoryService/NodeType.tosca
+  - nodetypes/igs.nodes.Component/IGSPortalService/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSRecordsManagement/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSRepositoryAdministration/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSSecurityService/NodeType.tosca
@@ -207,7 +207,7 @@ topology_template:
     ContentApp-Service:
       type: igs.nodes.Component.ContentAppService
       properties:
-        stack_name: newstack
+        stack_name: alfstack
         service_name: content-app
         docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.tile==frontend
@@ -221,7 +221,7 @@ topology_template:
     Repository:
       type: igs.nodes.Component.Repository
       properties:
-        stack_name: newstack
+        stack_name: alfstack
         service_name: alfresco
         docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.isNfsClient==true
@@ -258,7 +258,7 @@ topology_template:
     Solr:
       type: igs.nodes.SolrSearch
       properties:
-        stack_name: newstack
+        stack_name: alfstack
         service_name: solr6
         docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.isNfsClient==true
@@ -326,7 +326,7 @@ topology_template:
     Postgres-DBMS:
       type: igs.nodes.postgres.PostgresDBMS
       properties:
-        stack_name: newstack
+        stack_name: alfstack
         docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.isNfsClient==true
       artifacts:
@@ -339,7 +339,7 @@ topology_template:
     Proxy-Service:
       type: igs.nodes.Component.ProxyService
       properties:
-        stack_name: newstack
+        stack_name: alfstack
         service_name: proxy
         docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.tile==frontend
@@ -355,9 +355,9 @@ topology_template:
         - contentAppService: ContentApp-Service
     
     Portal-Service:
-      type: igs.nodes.Component.RepositoryService
+      type: igs.nodes.Component.PortalService
       properties:
-        stack_name: newstack
+        stack_name: alfstack
         service_name: share
         docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.tile==frontend
@@ -389,7 +389,7 @@ topology_template:
     Message-Service:
       type: igs.nodes.Component.MessageService
       properties:
-        stack_name: newstack
+        stack_name: alfstack
         service_name: activemq
         docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.tile==backend
@@ -404,7 +404,7 @@ topology_template:
     Transform-Service:
       type: igs.nodes.Component.TransformService
       properties:
-        stack_name: newstack
+        stack_name: alfstack
         service_name: transform-core-aio
         docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.tile==backend

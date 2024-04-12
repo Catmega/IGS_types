@@ -1,7 +1,7 @@
 tosca_definitions_version: tosca_simple_yaml_1_3
 imports:      
   - ../../igs.nodes.docker/IGSDockerApplication/NodeType.tosca
-  - ../../igs.nodes.Component/IGSRepositoryService/NodeType.tosca
+  - ../../igs.nodes.Component/IGSPortalService/NodeType.tosca
   - ../../../capabilitytypes/igs.capabilities.container/RepositoryUI/CapabilityType.tosca
 node_types:
   Alfresco.nodes.DockerContainer.Share:
@@ -53,7 +53,7 @@ node_types:
 
     capabilities: 
       containerApplication:
-        valid_source_types: [ igs.nodes.Component.RepositoryService ]
+        valid_source_types: [ igs.nodes.Component.PortalService ]
         type: igs.capabilities.container.RepositoryServiceUI
 
     # interfaces:

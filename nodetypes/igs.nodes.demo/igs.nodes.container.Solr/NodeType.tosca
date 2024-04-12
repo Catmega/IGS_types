@@ -13,6 +13,14 @@ node_types:
       abstract: "false"
       final: "false"
     properties:
+      client_mnt_path:
+        type: string
+        required: false
+        default: undefined
+      volume_dir:
+        type: string
+        required: false
+        default: undefined
       solr_version:
         type: version
         required: true

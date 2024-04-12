@@ -25,11 +25,13 @@ node_types:
         required: false
         constraints:
           - valid_values: [ frontend, backend ]
+        default: undefined
       labels:
         type: list
         required: false
         entry_schema:
           type: string 
+        default: undefined
       networkName:
         type: string
         required: false
@@ -46,16 +48,20 @@ node_types:
       container_data_dir:
         type: string
         required: false
+        default: undefined
 
       image_namespace:
         type: list
         required: false
+        default: undefined
       image_name:
         type: string
         required: false
+        default: undefined
       image_version:
         type: string
         required: false
+        default: undefined
 
     requirements:
       - runtime:

@@ -8,70 +8,78 @@ node_types:
     derived_from: igs.nodes.docker.DockerApplication
 
     properties:
-      mem_limit: 
-        type:  scalar-unit.size
-        default: 128m
-        constraints:
-          - less_or_equal: 128m
+      client_mnt_path:
+        type: string
+        required: false
+        default: undefined
+      volume_dir:
+        type: string
+        required: false
+        default: undefined
+    #   mem_limit: 
+    #     type:  scalar-unit.size
+    #     default: 128m
+    #     constraints:
+    #       - less_or_equal: 128m
 
-      disable_prometheus: 
-        type: string
-        required: true
-        default: "true"
-      disable_syncservice: 
-        type: string
-        required: true
-        default: "true"
-      disable_adw: 
-        type: string
-        required: true
-        default: "true"
-      enable_content_app: 
-        type: string
-        required: true
-        default: "true"
-      container_port:
-        type: string
-        default: "8080"    
-      host_port:
-        type: string
-        default: "8080" 
-    interfaces:
-      Standard:
-        type: tosca.interfaces.node.lifecycle.Standard
-        operations:
-          create: 
-            inputs:
-              MEM_LIMIT:
-                type: string
-                required: true
-                default: { get_property: [ SELF, mem_limit ] }
-              DISABLE_PROMETHEUS:
-                type: string
-                required: true
-                default: { get_property: [ SELF, disable_prometheus ] }
-              DISABLE_SYNCSERVICE:
-                type: string
-                required: true
-                default: { get_property: [ SELF, disable_syncservice ] }
-              DISABLE_ADW:
-                type: string
-                required: true
-                default: { get_property: [ SELF, disable_adw ] }
-              ENABLE_CONTENT_APP:
-                type: string
-                required: true
-                default: { get_property: [ SELF, enable_content_app ] }
-              CONTAINER_GROUP:
-                type: string
-                required: true
-                default: { get_property: [ SELF, group] }
-              LABELS:
-                type: string
-                required: true
-                default: { get_property: [ SELF, labels] }
-            implementation:
-              primary: playbooks/test.yaml 
+    #   disable_prometheus: 
+    #     type: string
+    #     required: true
+    #     default: "true"
+    #   disable_syncservice: 
+    #     type: string
+    #     required: true
+    #     default: "true"
+    #   disable_adw: 
+    #     type: string
+    #     required: true
+    #     default: "true"
+    #   enable_content_app: 
+    #     type: string
+    #     required: true
+    #     default: "true"
+    #   container_port:
+    #     type: string
+    #     default: "8080"    
+    #   host_port:
+    #     type: string
+    #     default: "8080" 
+    # interfaces:
+    #   Standard:
+    #     type: tosca.interfaces.node.lifecycle.Standard
+    #     operations:
+    #       create: 
+    #         inputs:
+    #           MEM_LIMIT:
+    #             type: string
+    #             required: true
+    #             default: { get_property: [ SELF, mem_limit ] }
+    #           DISABLE_PROMETHEUS:
+    #             type: string
+    #             required: true
+    #             default: { get_property: [ SELF, disable_prometheus ] }
+    #           DISABLE_SYNCSERVICE:
+    #             type: string
+    #             required: true
+    #             default: { get_property: [ SELF, disable_syncservice ] }
+    #           DISABLE_ADW:
+    #             type: string
+    #             required: true
+    #             default: { get_property: [ SELF, disable_adw ] }
+    #           ENABLE_CONTENT_APP:
+    #             type: string
+    #             required: true
+    #             default: { get_property: [ SELF, enable_content_app ] }
+    #           CONTAINER_GROUP:
+    #             type: string
+    #             required: true
+    #             default: { get_property: [ SELF, group] }
+    #           LABELS:
+    #             type: string
+    #             required: true
+    #             default: { get_property: [ SELF, labels] }
+    #         implementation:
+    #           primary: playbooks/test.yaml 
 
           
     capabilities: 

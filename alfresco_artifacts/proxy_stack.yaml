@@ -1,0 +1,21 @@
+- name: Deploy stack
+  community.docker.docker_stack:
+    state: present
+    name: '{{stack_name}}'
+    compose:
+      - version: '3'
+        services:
+          proxy:
+            image: '{{image_namespace}}/{{image_name}}:{{image_version}}'
+            deploy:
+              placement:
+                constraints:
+                  - "{{ labels }}"
+            environment:
+              DISABLE_PROMETHEUS: "true"
+              DISABLE_SYNCSERVICE: "true"
+              DISABLE_ADW: "true"
+              DISABLE_CONTROL_CENTER: "true"
+              ENABLE_CONTENT_APP: "true"
+            ports:
+              - "8080:8080"

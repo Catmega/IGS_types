@@ -1,0 +1,18 @@
+- name: Deploy stack
+  community.docker.docker_stack:
+    state: present
+    name: '{{stack_name}}'
+    compose:
+      - version: '3'
+        services:
+          activemq:
+            image: '{{image_namespace}}/{{image_name}}:{{image_version}}'
+            deploy:
+              placement:
+                constraints:
+                  - "{{ labels }}"
+            ports:
+              - "8161:8161" # Web Console
+              - "5672:5672" # AMQP
+              - "61616:61616" # OpenWire
+              - "61613:61613" # STOMP

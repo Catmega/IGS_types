@@ -7,24 +7,32 @@ node_types:
   Alfresco.nodes.DockerContainer.ControlCenter:
     derived_from: igs.nodes.docker.DockerApplication
     properties:
-        mem_limit: 
-          type:  scalar-unit.size
-          default: 128m
-          constraints:
-            - less_or_equal: 128m
+      client_mnt_path:
+        type: string
+        required: false
+        default: undefined
+      volume_dir:
+        type: string
+        required: false
+        default: undefined
+      mem_limit: 
+        type:  scalar-unit.size
+        default: 128m
+        constraints:
+          - less_or_equal: 128m
 
-        app_config_provider:
-          type: string
-          required: true
-          default: "ECM"
-        app_config_auth_path:
-          type: string
-          required: true
-          default: "BASIC"
-        base_path:
-          type: string
-          required: true
-          default: ./
+      app_config_provider:
+        type: string
+        required: true
+        default: "ECM"
+      app_config_auth_path:
+        type: string
+        required: true
+        default: "BASIC"
+      base_path:
+        type: string
+        required: true
+        default: ./
 
     capabilities: 
       containerApplication:

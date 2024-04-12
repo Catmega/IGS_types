@@ -12,6 +12,11 @@ node_types:
       docker_compose_file_loc:
         type: string
         required: false
+        default: notGiven
+      service_name:
+        type: string
+        required: false
+        default: undefinedname
       image_namespace:
         type: list
         required: false
@@ -27,9 +32,25 @@ node_types:
       stack_name:
         type: string
         required: false
+        default: undefined
       labels:
         type: string
         required: false
+        default: undefined
+
+      client_mnt_path:
+        type: string
+        required: false
+        default: { get_property: [SELF, containerApplication, client_mnt_path ] } 
+      volume_dir:
+        type: string
+        required: false
+        default: { get_property: [SELF, containerApplication, volume_dir ] }
+      container_data_dir:
+        type: string
+        required: false
+        default: { get_property: [SELF, containerApplication, container_data_dir ] }
+
     requirements:
 
       - containerApplication:
@@ -45,27 +66,44 @@ node_types:
             inputs:
               DOCKER_COMPOSE_FILE_LOC:
                 type: string
-                required: true
+                required: false
                 default: { get_property: [SELF, docker_compose_file_loc ] }
               LABELS:
                 type: string
-                required: true
+                required: false
                 default: { get_property: [ SELF, labels] }
               IMAGE_NAMESPACE:
                 type: string
-                required: true
+                required: false
                 default: { get_property: [ SELF, image_namespace] }
               IMAGE_NAME:
                 type: string
-                required: true
+                required: false
                 default: { get_property: [ SELF, image_name] }
               IMAGE_VERSION:
                 type: string
-                required: true
+                required: false
                 default: { get_property: [ SELF, image_version] }
               STACK_NAME:
                 type: string
-                required: true
+                required: false
                 default: { get_property: [ SELF, stack_name] }
+              SERVICE_NAME:
+                type: string
+                required: false
+                default: { get_property: [ SELF, service_name] } 
+
+              CLIENT_MNT_DIR:
+                type: string
+                required: false
+                default: { get_property: [ SELF, client_mnt_path ] } 
+              VOLUME_DIR:
+                type: string
+                required: false
+                default: { get_property: [ SELF, volume_dir ] }
+              CONTAINER_DATA_DIR:
+                type: string
+                required: false
+                default: { get_property: [ SELF, container_data_dir ] }
             implementation:
               primary: files/start/start.yaml 

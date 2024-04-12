@@ -8,90 +8,98 @@ node_types:
     derived_from: igs.nodes.abstract.ContainerApplication
         
     properties:
-        mem_limit: 
-          type:  scalar-unit.size
-          default: 1g
-          constraints:
-            - less_or_equal: 1g
-        WebConsole_port:
-          type: string
-          default: 8161
-        AMQP_port:
-          type: string
-          default: 5672
-        OpenWire_port:
-          type: string
-          default: 61616
-        STOMP_port:
-          type: string
-          default: 61613
-        image:
-          type: string
-          default: alfresco/alfresco-activemq
+      client_mnt_path:
+        type: string
+        required: false
+        default: undefined
+      volume_dir:
+        type: string
+        required: false
+        default: undefined
+    #     mem_limit: 
+    #       type:  scalar-unit.size
+    #       default: 1g
+    #       constraints:
+    #         - less_or_equal: 1g
+    #     WebConsole_port:
+    #       type: string
+    #       default: 8161
+    #     AMQP_port:
+    #       type: string
+    #       default: 5672
+    #     OpenWire_port:
+    #       type: string
+    #       default: 61616
+    #     STOMP_port:
+    #       type: string
+    #       default: 61613
+    #     image:
+    #       type: string
+    #       default: alfresco/alfresco-activemq
 
-    interfaces:
-      Standard:
-        type: tosca.interfaces.node.lifecycle.Standard
-        operations:
-          create: 
-            inputs:
-                MEM_LIMIT:
-                  type: integer
-                  required: true
-                  default: { get_property: [ SELF, mem_limit ] }
+    # interfaces:
+    #   Standard:
+    #     type: tosca.interfaces.node.lifecycle.Standard
+    #     operations:
+    #       create: 
+    #         inputs:
+    #             MEM_LIMIT:
+    #               type: integer
+    #               required: true
+    #               default: { get_property: [ SELF, mem_limit ] }
                 
-                WEBCONSOLE_PORT:
-                  type: string
-                  required: true
-                  default: { get_property: [ SELF, WebConsole_port ] }
+    #             WEBCONSOLE_PORT:
+    #               type: string
+    #               required: true
+    #               default: { get_property: [ SELF, WebConsole_port ] }
 
-                AMPQ_PORT:
-                  type: string
-                  required: true
-                  default: { get_property: [ SELF, AMQP_port ] }
+    #             AMPQ_PORT:
+    #               type: string
+    #               required: true
+    #               default: { get_property: [ SELF, AMQP_port ] }
                 
-                OPENWIRE_PORT:
-                  type: string
-                  required: true
-                  default: { get_property: [ SELF, OpenWire_port ] }
+    #             OPENWIRE_PORT:
+    #               type: string
+    #               required: true
+    #               default: { get_property: [ SELF, OpenWire_port ] }
                 
-                STOMP_PORT:
-                  type: string
-                  required: true
-                  default: { get_property: [ SELF, STOMP_port ] }
+    #             STOMP_PORT:
+    #               type: string
+    #               required: true
+    #               default: { get_property: [ SELF, STOMP_port ] }
                 
-                IMAGE:
-                  type: string
-                  required: true
-                  default: { get_property: [ SELF, image] }
+    #             IMAGE:
+    #               type: string
+    #               required: true
+    #               default: { get_property: [ SELF, image] }
                   
-                CONTAINER_GROUP:
-                  type: string
-                  required: true
-                  default: { get_property: [ SELF, group] }
-                LABELS:
-                  type: string
-                  required: true
-                  default: { get_property: [ SELF, labels] }
+    #             CONTAINER_GROUP:
+    #               type: string
+    #               required: true
+    #               default: { get_property: [ SELF, group] }
+    #             LABELS:
+    #               type: string
+    #               required: true
+    #               default: { get_property: [ SELF, labels] }
 
-                ## ERROR! unable to direcly execute docker-compose file with ansible
-                # DOCKER_COMPOSE_FILE:
-                #   type: string
-                #   required: true
-                #   default: { get_artifact: [ SELF, docker-compose] }
+    #             ## ERROR! unable to direcly execute docker-compose file with ansible
+    #             # DOCKER_COMPOSE_FILE:
+    #             #   type: string
+    #             #   required: true
+    #             #   default: { get_artifact: [ SELF, docker-compose] }
 
-                ## ERROR! unable to retrieve artifact's property
-                # DOCKER_IMAGE_NAME:
-                #   type: string
-                #   required: true
-                #   default: { get_property: [ SELF, docker-compose, image_name] }
-                ## ERROR! unable to retrieve artifact's property
-                # DOCKER_IMAGE_VERSION:
-                #   type: string
-                #   required: true
-                #   default: { get_property: [ SELF, docker-compose, version] }
-            implementation:
-              primary: playbooks/test.yaml 
+    #             ## ERROR! unable to retrieve artifact's property
+    #             # DOCKER_IMAGE_NAME:
+    #             #   type: string
+    #             #   required: true
+    #             #   default: { get_property: [ SELF, docker-compose, image_name] }
+    #             ## ERROR! unable to retrieve artifact's property
+    #             # DOCKER_IMAGE_VERSION:
+    #             #   type: string
+    #             #   required: true
+    #             #   default: { get_property: [ SELF, docker-compose, version] }
+    #         implementation:
+    #           primary: playbooks/test.yaml 
 
     # artifacts:
     #   docker-compose:

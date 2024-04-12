@@ -2,17 +2,14 @@
   hosts: all
   gather_facts: no
 
-  # vars:
-  #   DOCKER_COMPOSE_FILE: './hh/d1.yaml'
+  vars:
+    given_file: "{{DOCKER_COMPOSE_FILE_LOC}}"
 
   tasks:
-    # - name: Set dynamic variable
-    #   set_fact:
-    #     image_namespace: igsrepo
-    #     image_name: repository
-    #     image_version: 1 #'{{ REPOSITORY_VERSION }}'
-    #     stack_name: igsstack
-    #     labels: 'node.labels.applicationTile==backend' #'{{ LABELS }}'
+
+    - name: Skip the rest of the tasks if image is found
+      meta: end_play
+      when: given_file == "notGiven"
 
     - name: Dynamically include tasks based on a variable
       include_tasks: "{{ file_path }}"
@@ -22,6 +19,11 @@
         image_name: "{{IMAGE_NAME}}"
         image_version: "{{IMAGE_VERSION}}" #'{{ REPOSITORY_VERSION }}'
         stack_name: "{{STACK_NAME}}"
+        service_name: "{{SERVICE_NAME}}"
         labels: "{{LABELS}}" #'{{ LABELS }}'
+        client_mnt_path: "{{ CLIENT_MNT_DIR | default('undefined') }}"
+        volume_dir: "{{ VOLUME_DIR | default('undefined') }}"
+        container_data_dir: "{{ CONTAINER_DATA_DIR | default('undefined') }}"
+
   
 # - import_playbook: '{{t}}'

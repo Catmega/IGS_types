@@ -1,0 +1,48 @@
+- name: Deploy stack
+  community.docker.docker_stack:
+    state: present
+    name: '{{stack_name}}'
+    compose:
+      - version: '3'
+        services:
+          alfresco:
+            image: '{{image_namespace}}/{{image_name}}:{{image_version}}'
+            deploy:
+              placement:
+                constraints:
+                  - "{{ labels }}"
+            environment:
+              JAVA_TOOL_OPTIONS: >-
+                -Dencryption.keystore.type=JCEKS
+                -Dencryption.cipherAlgorithm=DESede/CBC/PKCS5Padding
+                -Dencryption.keyAlgorithm=DESede
+                -Dencryption.keystore.location=/usr/local/tomcat/shared/classes/alfresco/extension/keystore/keystore
+                -Dmetadata-keystore.password=mp6yc0UD9e
+                -Dmetadata-keystore.aliases=metadata
+                -Dmetadata-keystore.metadata.password=oKIWzVdEdA
+                -Dmetadata-keystore.metadata.algorithm=DESede
+              JAVA_OPTS: >-
+                -Ddb.driver=org.postgresql.Driver
+                -Ddb.username=alfresco
+                -Ddb.password=alfresco
+                -Ddb.url=jdbc:postgresql://postgres:5432/alfresco
+                -Dsolr.host=solr6
+                -Dsolr.port=8983
+                -Dsolr.http.connection.timeout=1000
+                -Dsolr.secureComms=secret
+                -Dsolr.sharedSecret=secret
+                -Dsolr.base.url=/solr
+                -Dindex.subsystem.name=solr6
+                -Dshare.host=127.0.0.1
+                -Dshare.port=8080
+                -Dalfresco.host=localhost
+                -Dalfresco.port=8080
+                -Dcsrf.filter.enabled=false
+                -Daos.baseUrlOverwrite=http://localhost:8080/alfresco/aos
+                -Dmessaging.broker.url="failover:(nio://activemq:61616)?timeout=3000&jms.useCompression=true"
+                -Ddeployment.method=DOCKER_COMPOSE
+                -DlocalTransform.core-aio.url=http://transform-core-aio:8090/
+                -XX:MinRAMPercentage=50
+                -XX:MaxRAMPercentage=80
+            volumes:
+              - "{{ client_mnt_path }}/{{volume_dir}}:{{ container_data_dir }}"

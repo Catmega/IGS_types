@@ -1,0 +1,23 @@
+- name: Deploy stack
+  community.docker.docker_stack:
+    state: present
+    name: '{{stack_name}}'
+    compose:
+      - version: '3'
+        services:
+          postgres:
+            image: '{{image_namespace}}/{{image_name}}:{{image_version}}'
+            deploy:
+              placement:
+                constraints:
+                  - "{{ labels }}"
+            environment:
+              - POSTGRES_PASSWORD=alfresco
+              - POSTGRES_USER=alfresco
+              - POSTGRES_DB=alfresco
+            command: postgres -c max_connections=300 -c log_min_messages=LOG
+            ports:
+              - "5432:5432"
+            volumes:
+              - "{{ client_mnt_path }}/{{volume_dir}}:{{ container_data_dir }}"
+          

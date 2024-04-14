@@ -9,6 +9,13 @@
     image_version: 'latest' # 1
     host_port: '{{HOST_PORT}}'
     schema_loc: '{{DOCUMENT_SCHEMA_LOCATION}}'
+
+    # container_name: container_with_solr
+    # core_name: IGS
+    # image_name: solr
+    # image_version: 'latest' # 1
+    # host_port: 8086
+    # schema_loc: /home/ubuntu/opera-root/git-project/IGS_types/artifacts/doc_schema.json
   tasks:
 
     - name: Load document schema from a file

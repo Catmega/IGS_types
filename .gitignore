@@ -261,3 +261,9 @@ test/hh/d4.yaml
 .opera/instances/Records-Management_0--MockContainer_0
 .opera/instances/Repository-Administration_0--MockContainer_0
 .opera/instances/Storage-Service_0--MockContainer_0
+.opera/instances/Mock-Storage-Service_0
+.opera/instances/Mock-Storage-Service_0--MockContainer_0
+.opera/instances/Solr-Search-Engine_0
+.opera/instances/Solr-Search-Engine_0--Mock-Storage-Service_0
+.opera/instances/Solr-Search-Engine_0--Solr-Container_0
+.opera/instances/Solr-Search-Engine_0--Solr-Schema_0

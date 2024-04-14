@@ -21,41 +21,33 @@ node_types:
         type: string
         required: false
         default: undefined
-      solr_version:
-        type: version
-        required: true
-      host_port:
-        type: string
-        required: false
-      core_name:
-        type: string
-        required: true  
+
 
     interfaces:
-      Standard:
-        type: tosca.interfaces.node.lifecycle.Standard
-        operations:
-          start:
-            inputs:
-              SOLR_VERSION:
-                type: string
-                required: true
-                default: { get_property: [SELF, solr_version ] }
-              HOST_PORT:
-                type: string
-                required: true
-                default: { get_property: [SELF, host_port ] }
-              CORE_NAME:
-                type: string
-                required: true
-                default: { get_property: [SELF, core_name ] }
-              DOCUMENT_SCHEMA_LOCATION:
-                type: string
-                required: true
-                default: { get_property: [SELF, docSchema, absolute_loc_schema_file ] }
+      # Standard:
+      #   type: tosca.interfaces.node.lifecycle.Standard
+      #   operations:
+      #     start:
+      #       inputs:
+      #         SOLR_VERSION:
+      #           type: string
+      #           required: true
+      #           default: { get_property: [SELF, solr_version ] }
+      #         HOST_PORT:
+      #           type: string
+      #           required: true
+      #           default: { get_property: [SELF, host_port ] }
+      #         CORE_NAME:
+      #           type: string
+      #           required: true
+      #           default: { get_property: [SELF, core_name ] }
+      #         DOCUMENT_SCHEMA_LOCATION:
+      #           type: string
+      #           required: true
+      #           default: { get_property: [SELF, docSchema, absolute_loc_schema_file ] }
             
-            implementation:
-              primary: files/start/start.yaml 
+      #       implementation:
+      #         primary: files/start/start.yaml 
 
       Validation:
         type: igs.interfaces.node.lifecycle.Validation 
@@ -63,11 +55,11 @@ node_types:
           validate: 
             implementation:
               primary: files/validate/validate.yaml 
-    requirements:
-      - docSchema:
-          capability: igs.capabilities.DocumentSchema
-          node: igs.nodes.Solr.DocumentSchema
-          relationship: igs.relationships.RequireDocumentSchema
+    # requirements:
+    #   - docSchema:
+    #       capability: igs.capabilities.DocumentSchema
+    #       node: igs.nodes.Solr.DocumentSchema
+    #       relationship: igs.relationships.RequireDocumentSchema
     # artifacts:
     #   doc_schema:
     #     type: igs.artifacts.Json

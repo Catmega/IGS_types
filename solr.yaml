@@ -8,13 +8,13 @@ imports:
   - nodetypes/igs.nodes.NFS/NFSVolume/NodeType.tosca
   - nodetypes/igs.nodes.NFS/NFSClient/NodeType.tosca
   - nodetypes/igs.nodes.abstract/IGSOSInstance/NodeType.tosca
-
-
-
-
   - nodetypes/igs.nodes.Solr.DocutmentSchema/NodeType.tosca
+  - nodetypes/igs.nodes.Solrnew/NodeType.tosca
   - nodetypes/igs.nodes.demo/igs.nodes.container.Solr/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSFTSearch/NodeType.tosca
+  - nodetypes/igs.nodes.Component/IGSStorageService/NodeType.tosca
+  - artifacttypes/igs.artifacts/Ansible/ArtifactType.tosca
+  - artifacttypes/igs.artifacts/DockerCompose/ArtifactType.tosca
 topology_template:
 
   node_templates:
@@ -103,7 +103,22 @@ topology_template:
       #     name: remote_network      
       type: tosca.nodes.network.Network
 
+    MockContainer: 
+      type: igs.nodes.abstract.ContainerApplication
+      properties:
+        client_mnt_path: undefined 
+        volume_dir: undefined
+        networkName: undefined
+      requirements:
+        - host: workstation-1
+        - runtime: docker-engine-1
+        - network: MockNetwork
+        - storage: MockStorage
 
+    Mock-Storage-Service:
+      type: igs.nodes.abstract.Component
+      requirements:
+        - containerApplication: MockContainer
 
 ############containers###################################
 
@@ -111,25 +126,49 @@ topology_template:
       type: igs.nodes.Component.FTSearchService
       requirements:
         - FTSearchEngine: Solr-Container
+        - containerApplication: MockContainer
+
+
+    Solr-Search-Engine:
+      type: igs.nodes.SolrSearchNew
+      properties:
+        stack_name: solrstack
+        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        labels: node.labels.applicationTile==backend
+        document_schema_file_loc: { get_property: [SELF, docSchema, absolute_loc_schema_file ] }
+        core_name: IGS
+      artifacts:
+        docker_compose_file:
+          type: igs.artifacts.Ansible.DockerCompose
+          file: artifacts/solr-stack.yaml
+      requirements:
+        - containerApplication: Solr-Container
+        - storageService: Mock-Storage-Service
+        - docSchema: Solr-Schema
+
     Solr-Container:
       type: igs.nodes.container.Solr
       properties:
-          solr_version: latest
-          host_port: 8086
-          core_name: IGS
-          group: backend
-          labels: [node.labels.tile==backend]
+        image_name: solr
+        image_namespace: docker.io
+        image_version: latest
+
+        # solr_version: latest
+        # host_port: 8086
+        # core_name: IGS
+        # group: backend
+        # labels: [node.labels.tile==backend]
       requirements:
         - host: workstation-1
         - runtime: docker-engine-1
         - network: MockNetwork
         - storage: MockStorage
-        - docSchema: Solr-Schema
+        # - docSchema: Solr-Schema
 
     Solr-Schema:
       type: igs.nodes.Solr.DocumentSchema
       properties:
-        absolute_loc_schema_file: /home/ubuntu/opera-root/git-project/IGS_types/nodetypes/igs.nodes.Solr.DocutmentSchema/files/Artifacts/doc_schema.json
+        absolute_loc_schema_file: /home/ubuntu/opera-root/git-project/IGS_types/artifacts/doc_schema.json
 
   relationship_templates:
     connectToManager_relationship:

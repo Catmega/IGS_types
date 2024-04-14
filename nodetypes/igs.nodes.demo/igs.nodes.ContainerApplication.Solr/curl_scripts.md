@@ -71,7 +71,22 @@ curl -X POST -H 'Content-Type: application/json' 'http://localhost:8085/solr/IGS
     "pages_i" : 384
 }'
 
+[{
+    "id" : "001-232401",
+    "title" : "Review on Cloud Applications",
+    "author" : "Nancy",
+    "description" : "This paper talks about the current researches on Cloud Applications. Excellent review."
+  }]
 
+curl --request POST \
+  --url 'http://localhost:8085/solr/IGS/update' \
+  --header 'Content-Type: application/json' \
+  --data '  [{
+    "id" : "001-232401",
+    "title" : "Information Governance System running on a Cloud",
+    "author" : "Nancy",
+    "description" : "This paper talks about how a Information Governance System runs on a Cloud"
+  }]'
 
 curl --request POST \
   --url 'http://localhost:8085/solr/IGS/update' \
@@ -105,6 +120,7 @@ curl --request POST \
 ]'
 ## query
 
+curl 'http://localhost:8085/solr/IGS/select?q=author%3ANancy' 
 curl 'http://localhost:8084/solr/gettingstarted/select?q=name%3Alightning'
 (%3A is the encoding for ":")
 ## upload local file

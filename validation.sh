@@ -4,6 +4,7 @@ opera notify -e validation_trigger_DockerEngine
 opera notify -e validation_trigger_SwarmManager
 opera notify -e validation_trigger_SwarmWorker
 opera notify -e validation_trigger_Postgres
+# opera notify -e validation_trigger_Solr
 cat /home/ubuntu/opera-root/git-project/IGS_types/validation.log
 
 

@@ -10,11 +10,12 @@ imports:
   - nodetypes/igs.nodes.abstract/IGSOSInstance/NodeType.tosca
   - nodetypes/igs.nodes.Solr.DocutmentSchema/NodeType.tosca
   - nodetypes/igs.nodes.Solrnew/NodeType.tosca
-  - nodetypes/igs.nodes.demo/igs.nodes.container.Solr/NodeType.tosca
+  - nodetypes/igs.nodes.demo/igs.nodes.ContainerApplication.Solr/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSFTSearch/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSStorageService/NodeType.tosca
   - artifacttypes/igs.artifacts/Ansible/ArtifactType.tosca
   - artifacttypes/igs.artifacts/DockerCompose/ArtifactType.tosca
+  - policytypes/igs.policies.validate.Solr/PolicyType.tosca
 topology_template:
 
   node_templates:
@@ -137,6 +138,7 @@ topology_template:
         labels: node.labels.applicationTile==backend
         document_schema_file_loc: { get_property: [SELF, docSchema, absolute_loc_schema_file ] }
         core_name: IGS
+        port: 8085
       artifacts:
         docker_compose_file:
           type: igs.artifacts.Ansible.DockerCompose
@@ -147,7 +149,7 @@ topology_template:
         - docSchema: Solr-Schema
 
     Solr-Container:
-      type: igs.nodes.container.Solr
+      type: igs.nodes.ContainerApplication.Solr
       properties:
         image_name: solr
         image_namespace: docker.io
@@ -178,4 +180,7 @@ topology_template:
           port: 2377
           commu_method: httpAPI
 
-        
+  policies:
+    - validate-SolrEnginee:
+        type: igs.policies.validate.Solr
+        targets: [ Solr-Search-Engine ]        

@@ -8,6 +8,7 @@ imports:
   - ../igs.nodes.Solr.DocutmentSchema/NodeType.tosca
   - ../../relationshiptypes/igs.relationships/RequireDocumentSchema/RelationshipType.tosca
   - ../../capabilitytypes/igs.capabilities/DocumentSchema/CapabilityType.tosca
+  - ../../interfacetypes/igs.interfaces.node.lifecycle/Validation/InterfaceType.tosca
 node_types:
   igs.nodes.SolrSearchNew:
     derived_from: igs.nodes.abstract.Component
@@ -112,3 +113,18 @@ node_types:
                 default: { get_property: [SELF, port ] }
             implementation:
               primary: files/configure/configure.yaml 
+      Validation:
+        type: igs.interfaces.node.lifecycle.Validation 
+        operations:
+          validate: 
+            inputs:
+              CORE_NAME:
+                type: string
+                required: false
+                default: { get_property: [ SELF, core_name] }
+              HOST_PORT:
+                type: string
+                required: false
+                default: { get_property: [ SELF, port ] }
+            implementation:
+              primary: files/validate/validate.yaml 

@@ -12,11 +12,11 @@ node_types:
       final: "false"
 
     attributes:
-      clients_ips: # should decrepted later
-        type: list
-        entry_schema:
-          type: string 
-        # required: true  
+      # clients_ips: # should decrepted later
+      #   type: list
+      #   entry_schema:
+      #     type: string 
+      #   # required: true  
       server_ip:
         type: string
         default: { get_attribute: [SELF, host, public_address]}
@@ -30,7 +30,7 @@ node_types:
           # node: igs.nodes.abstract.CloudPlatform
           node: igs.nodes.abstract.OSInstance
           relationship: tosca.relationships.HostedOn
-          occurrences: [ 1, 1 ]
+          occurrences: [ 1, UNBOUNDED ]
     interfaces:
       Standard:
         type: tosca.interfaces.node.lifecycle.Standard
@@ -54,32 +54,32 @@ node_types:
                 type: string
                 required: true
                 default: { get_property: [SELF, server_mnt_path ] } 
-              CLIENTS_IPS:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, clients_ips ] }                 
-          #  implementation:
-          #    primary: files/create/create.yaml #create
+              # CLIENTS_IPS:
+              #   type: string
+              #   required: true
+              #   default: { get_attribute: [SELF, clients_ips ] }                 
+            implementation:
+              primary: files/create/create.yaml #create
             
 
-          delete:
-            inputs:
+          # delete:
+          #   inputs:
 
-              ANSIBLE_HOST_IP:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, host, private_address ] }
-              ANSIBLE_USER:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, host, username ] }
-              ANSIBLE_HOST_NAME:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, host, name ] } 
+          #     ANSIBLE_HOST_IP:
+          #       type: string
+          #       required: true
+          #       default: { get_attribute: [SELF, host, private_address ] }
+          #     ANSIBLE_USER:
+          #       type: string
+          #       required: true
+          #       default: { get_attribute: [SELF, host, username ] }
+          #     ANSIBLE_HOST_NAME:
+          #       type: string
+          #       required: true
+          #       default: { get_attribute: [SELF, host, name ] } 
 
-            # implementation:
-            #   primary: files/delete/delete.yaml #delete
+          #   implementation:
+          #     primary: files/delete/delete.yaml #delete
           
     artifacts:
       create:

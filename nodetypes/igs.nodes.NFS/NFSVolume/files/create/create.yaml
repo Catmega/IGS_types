@@ -1,29 +1,40 @@
 ---
-- name: add remote machine
-  hosts: localhost
-  become: yes
-  vars:
-      host_ip: "{{ ANSIBLE_HOST_IP }}"
-  tasks:
-    - name: Add targets 
-      add_host:
-        name: "{{ ANSIBLE_HOST_NAME }}"
-        ansible_host: "{{ ANSIBLE_HOST_IP }}"
-        ansible_user: "{{ ANSIBLE_USER }}"
-      when: 
-        - host_ip != "localhost"
+# - name: add remote machine
+#   hosts: localhost
+#   become: yes
+#   vars:
+#       host_ip: "{{ ANSIBLE_HOST_IP }}"
+#   tasks:
+#     - name: Add targets 
+#       add_host:
+#         name: "{{ ANSIBLE_HOST_NAME }}"
+#         ansible_host: "{{ ANSIBLE_HOST_IP }}"
+#         ansible_user: "{{ ANSIBLE_USER }}"
+#       when: 
+#         - host_ip != "localhost"
 
-- name: create
-  hosts: 
-    - localhost
+# - name: create
+#   hosts: 
+#     - localhost
+#   gather_facts: false
+
+- name: add NFS export information on the server
+  hosts: all
   gather_facts: false
-
   # vars:
 
   #   SERVER_MNT_PATH: /mnt/nfsdir
   #   SERVER_IP:  129.69.209.200
   #   VOLUME_NAME: nfs_test
   tasks:
+    - name: Check if mount directory exists
+      stat:
+        path: "{{CLIENT_MNT_PATH}}/{{VOLUME_DIR}}"
+      register: volume_dir_existence
+
+    - name: check volume status
+      meta: end_play
+      when: volume_dir_existence.stat.exists
 
     - name: Creates sub-mount directory
       ansible.builtin.file:

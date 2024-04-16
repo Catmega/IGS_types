@@ -34,14 +34,14 @@ relationship_types:
             type: string
             required: true
             default: { get_property: [ SELF, channel] }
-       # operations:
+        operations:
         # NFSClient is the source node, NFSServer is the targrt node here
         # deploy the target (NFSServer) first, then configure the relationship (export operation), then source(client)
-          # post_configure_target:
-          #   implementation:
-          #     primary: files/export/export.yaml
-          #     timeout: 0
-          # pre_configure_source:
-          #   implementation:
-          #     primary: files/check/check.yaml
-          #     timeout: 0
+          post_configure_target:
+            implementation:
+              primary: files/export/export.yaml
+              timeout: 0
+          pre_configure_source:
+            implementation:
+              primary: files/check/check.yaml
+              timeout: 0

@@ -162,8 +162,6 @@ topology_template:
 
     nfs-server: #/home/ubuntu/mntnfs #/mnt/nfsdir
       type: igs.nodes.NFS.NFSServer
-      attributes:
-        clients_ips: [192.168.221.163, 129.69.209.200]
       properties:
         server_mnt_path: /home/ubuntu/mntnfs #/var/share 
       requirements:

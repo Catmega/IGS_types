@@ -44,7 +44,7 @@ node_types:
       Standard:
         type: tosca.interfaces.node.lifecycle.Standard
         operations:
-          create:
+          configure:
             inputs:
 
               ANSIBLE_HOST_IP:
@@ -71,28 +71,28 @@ node_types:
                 type: string
                 required: true
                 default: { get_attribute: [SELF, client_mnt_path ] }               
-            # implementation:
-            #   primary: files/create/create.yaml #create
+            implementation:
+              primary: files/configure/configure.yaml #create
             
 
-          delete:
-            inputs:
+          # delete:
+          #   inputs:
 
-              ANSIBLE_HOST_IP:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, host, private_address ] }
-              ANSIBLE_USER:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, host, username ] }
-              ANSIBLE_HOST_NAME:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, host, name ] } 
+          #     ANSIBLE_HOST_IP:
+          #       type: string
+          #       required: true
+          #       default: { get_attribute: [SELF, host, private_address ] }
+          #     ANSIBLE_USER:
+          #       type: string
+          #       required: true
+          #       default: { get_attribute: [SELF, host, username ] }
+          #     ANSIBLE_HOST_NAME:
+          #       type: string
+          #       required: true
+          #       default: { get_attribute: [SELF, host, name ] } 
 
-            # implementation:
-            #   primary: files/delete/delete.yaml #delete
+          #   implementation:
+          #     primary: files/delete/delete.yaml #delete
           
     artifacts:
       create:

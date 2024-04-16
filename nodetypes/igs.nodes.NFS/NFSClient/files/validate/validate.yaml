@@ -1,0 +1,17 @@
+---
+- name: add NFS export information on the server
+  hosts: all
+  gather_facts: false
+
+  tasks:  
+
+    - name: check NFS mount output with NFS server ip address
+      ansible.builtin.shell: mount | grep -i nfs | grep -w '{{SERVER_IP}}' | grep -w '{{CLIENT_MNT_PATH}}'
+      register: nfs_client_mount_result
+      ignore_errors: true
+
+
+    - name: if the output is not empty, it's mounted, skip the rest
+      debug:
+        msg: "NFS mount from {{ SERVER_IP }} on {{ CLIENT_MNT_PATH }} is mounted."
+      when: nfs_client_mount_result.stdout != ""

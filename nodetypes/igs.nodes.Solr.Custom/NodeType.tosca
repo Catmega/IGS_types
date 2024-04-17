@@ -10,7 +10,7 @@ imports:
   - ../../capabilitytypes/igs.capabilities/DocumentSchema/CapabilityType.tosca
   - ../../interfacetypes/igs.interfaces.node.lifecycle/Validation/InterfaceType.tosca
 node_types:
-  igs.nodes.SolrSearchNew:
+  igs.nodes.Solr.Custom:
     derived_from: igs.nodes.abstract.Component
     metadata:
       targetNamespace: "igs.nodes.Solr"

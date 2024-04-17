@@ -9,7 +9,7 @@ imports:
   - nodetypes/igs.nodes.NFS/NFSClient/NodeType.tosca
   - nodetypes/igs.nodes.abstract/IGSOSInstance/NodeType.tosca
   - nodetypes/igs.nodes.Solr.DocutmentSchema/NodeType.tosca
-  - nodetypes/igs.nodes.Solrnew/NodeType.tosca
+  - nodetypes/igs.nodes.Solr.Custom/NodeType.tosca
   - nodetypes/igs.nodes.demo/igs.nodes.ContainerApplication.Solr/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSFTSearch/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSStorageService/NodeType.tosca
@@ -60,17 +60,6 @@ topology_template:
             relationship: connectToManager_relationship
         - runtimeHost: docker-engine-2
         - host: workstation-2
-    workstation-3: # for nfs
-      type: igs.nodes.abstract.OSInstance
-      attributes:
-        private_address: 192.168.221.133 #192.168.221.234
-        public_address: 192.168.221.133 #192.168.221.234
-        username: ubuntu
-        name: remote_host
-        tier: backend
-        host_name: igrepositopry
-
-
 
     docker-engine-1:
       type: igs.nodes.docker.DockerEngine
@@ -80,17 +69,7 @@ topology_template:
       type: igs.nodes.docker.DockerEngine
       requirements:
         - host: workstation-2
-    nfs-server: #/home/ubuntu/mntnfs #/mnt/nfsdir
-      type: igs.nodes.NFS.NFSServer
-      attributes:
-        clients_ips: [192.168.221.163, 129.69.209.200]
-      properties:
-        server_mnt_path: /home/ubuntu/mntnfs #/var/share 
-      requirements:
-        - host: workstation-3
-
   
-
 
 ##############components part#############################
         
@@ -131,7 +110,7 @@ topology_template:
 
 
     Solr-Search-Engine:
-      type: igs.nodes.SolrSearchNew
+      type: igs.nodes.Solr.Custom
       properties:
         stack_name: solrstack
         docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }

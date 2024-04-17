@@ -8,7 +8,7 @@
     given_file: "{{DOCKER_COMPOSE_FILE_LOC}}"
   tasks:
 
-    - name: Skip the rest of the tasks if image is found
+    - name: Skip the rest of the tasks if DOCKER_COMPOSE_FILE_LOC is not found
       meta: end_play
       when: given_file == "notGiven"
 

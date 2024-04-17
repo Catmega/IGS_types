@@ -26,15 +26,15 @@ imports:
   - nodetypes/igs.nodes.Component/IGSSecurityService/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSTransformServices/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSMessageService/NodeType.tosca
-  - nodetypes/Alfresco.nodes.DockerContainer/solr/NodeType.tosca
-  - nodetypes/Alfresco.nodes.DockerContainer/activemq/NodeType.tosca
-  - nodetypes/Alfresco.nodes.DockerContainer/alfresco/NodeType.tosca
+  - nodetypes/Alfresco.nodes.ContainerApplication/solr/NodeType.tosca
+  - nodetypes/Alfresco.nodes.ContainerApplication/activemq/NodeType.tosca
+  - nodetypes/Alfresco.nodes.ContainerApplication/alfresco/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSContentAppService/NodeType.tosca
-  - nodetypes/Alfresco.nodes.DockerContainer/contentApp/NodeType.tosca
-  - nodetypes/Alfresco.nodes.DockerContainer/controlCenter/NodeType.tosca
-  - nodetypes/Alfresco.nodes.DockerContainer/share/NodeType.tosca
-  - nodetypes/Alfresco.nodes.DockerContainer/transformCore/NodeType.tosca
-  - nodetypes/Alfresco.nodes.DockerContainer/nginx/NodeType.tosca
+  - nodetypes/Alfresco.nodes.ContainerApplication/contentApp/NodeType.tosca
+  - nodetypes/Alfresco.nodes.ContainerApplication/controlCenter/NodeType.tosca
+  - nodetypes/Alfresco.nodes.ContainerApplication/share/NodeType.tosca
+  - nodetypes/Alfresco.nodes.ContainerApplication/transformCore/NodeType.tosca
+  - nodetypes/Alfresco.nodes.ContainerApplication/nginx/NodeType.tosca
   - nodetypes/igs.nodes.abstract/IGSOSInstance/NodeType.tosca
   - nodetypes/igs.nodes.demo/igs.nodes.ContainerApplication.Postgres/NodeType.tosca
   - capabilitytypes/igs.capabilities.container/Solr/CapabilityType.tosca
@@ -428,7 +428,7 @@ topology_template:
 
 ############containers###################################
     Alfresco-ActiveMQ-Container:
-      type: Alfresco.nodes.DockerContainer.ActiveMQ
+      type: Alfresco.nodes.ContainerApplication.ActiveMQ
       properties:
         image_name: alfresco-activemq
         image_namespace: alfresco
@@ -441,7 +441,7 @@ topology_template:
         - frontend: Alfresco-ContentApp-Container
 
     Alfresco-ContentApp-Container:
-      type: Alfresco.nodes.DockerContainer.ContentApp
+      type: Alfresco.nodes.ContainerApplication.ContentApp
       properties:
         image_name: alfresco-content-app
         image_namespace: alfresco
@@ -453,7 +453,7 @@ topology_template:
         - storage: MockStorage
 
     Alfresco-ControlCenter-Container:
-      type: Alfresco.nodes.DockerContainer.ControlCenter
+      type: Alfresco.nodes.ContainerApplication.ControlCenter
       properties:
         image_name: alfresco-control-center
         image_namespace: quay.io/alfresco
@@ -465,7 +465,7 @@ topology_template:
         - storage: MockStorage
 
     Alfresco-Solr-Container:
-      type: Alfresco.nodes.DockerContainer.Solr
+      type: Alfresco.nodes.ContainerApplication.Solr
       properties:
         image_name: alfresco-search-services
         image_namespace: alfresco
@@ -478,7 +478,7 @@ topology_template:
         - storage: solr-volume
 
     Alfresco-Repository-Container:
-      type: Alfresco.nodes.DockerContainer.ContentRepository
+      type: Alfresco.nodes.ContainerApplication.ContentRepository
       properties:
         image_namespace: alfresco
         image_name: alfresco-governance-repository-community
@@ -491,7 +491,7 @@ topology_template:
         - storage: repository-volume
 
     Alfresco-Nginx-Container:
-      type: Alfresco.nodes.DockerContainer.Proxy
+      type: Alfresco.nodes.ContainerApplication.Proxy
       properties:
         image_namespace: alfresco
         image_name: alfresco-acs-nginx
@@ -520,7 +520,7 @@ topology_template:
         - storage: postgres-volume
 
     Alfresco-Share-Container:
-      type: Alfresco.nodes.DockerContainer.Share
+      type: Alfresco.nodes.ContainerApplication.Share
       properties:
         image_namespace: alfresco
         image_name: alfresco-governance-share-community
@@ -532,7 +532,7 @@ topology_template:
         - storage: MockStorage
 
     Alfresco-TransformCore-Container:
-      type: Alfresco.nodes.DockerContainer.TransformCore
+      type: Alfresco.nodes.ContainerApplication.TransformCore
       properties:
         image_namespace: alfresco
         image_name: alfresco-transform-core-aio
@@ -599,7 +599,7 @@ topology_template:
 #       type: tosca.nodes.network.Network
 
 #     # Alfresco-Nginx-Container:
-#     #   type: Alfresco.nodes.DockerContainer.Proxy
+#     #   type: Alfresco.nodes.ContainerApplication.Proxy
 #     #   properties:
 #     #       group: frontend
 #     #   requirements:
@@ -608,7 +608,7 @@ topology_template:
 #     #     - storage: MockStorage
 
 #     Alfresco-Postgres-Container:
-#       type: Alfresco.nodes.DockerContainer.Postgres
+#       type: Alfresco.nodes.ContainerApplication.Postgres
 #       properties:
 #           group: frontend
 #       requirements:
@@ -617,7 +617,7 @@ topology_template:
 #         - storage: MockStorage
 
 #     Alfresco-Repository-Container:
-#       type: Alfresco.nodes.DockerContainer.ContentRepository
+#       type: Alfresco.nodes.ContainerApplication.ContentRepository
 #       properties:
 #           group: frontend
 #       requirements:
@@ -626,7 +626,7 @@ topology_template:
 #         - storage: MockStorage
 
 #     Alfresco-Solr-Container:
-#       type: Alfresco.nodes.DockerContainer.Solr
+#       type: Alfresco.nodes.ContainerApplication.Solr
 #       properties:
 #           group: frontend
 #       requirements:
@@ -711,7 +711,7 @@ topology_template:
 
 
     # Alfresco-ActiveMQ-Container:
-    #     type: Alfresco.nodes.DockerContainer.ActiveMQ
+    #     type: Alfresco.nodes.ContainerApplication.ActiveMQ
     #     properties:
     #         group: backend
     #     requirements:
@@ -721,7 +721,7 @@ topology_template:
     #       - frontend: Alfresco-ContentApp-Container
 
     # Alfresco-ContentApp-Container:
-    #     type: Alfresco.nodes.DockerContainer.ContentApp
+    #     type: Alfresco.nodes.ContainerApplication.ContentApp
     #     properties:
     #         group: frontend
     #         labels: [node.labels.tile==frontend]
@@ -732,7 +732,7 @@ topology_template:
     #       - storage: MockStorage
 
     # Alfresco-Postgres-Container:
-    #   type: Alfresco.nodes.DockerContainer.Postgres
+    #   type: Alfresco.nodes.ContainerApplication.Postgres
     #   properties:
     #       group: frontend
     #       container_data_dir:  /var/lib/postgresql/data

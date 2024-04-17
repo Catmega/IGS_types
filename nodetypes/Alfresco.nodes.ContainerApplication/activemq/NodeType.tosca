@@ -4,7 +4,7 @@ imports:
   - ../../../capabilitytypes/igs.capabilities.container/MessageBroker/CapabilityType.tosca
   - ../../igs.nodes.Component/IGSMessageService/NodeType.tosca
 node_types:
-  Alfresco.nodes.DockerContainer.ActiveMQ:
+  Alfresco.nodes.ContainerApplication.ActiveMQ:
     derived_from: igs.nodes.abstract.ContainerApplication
         
     properties:

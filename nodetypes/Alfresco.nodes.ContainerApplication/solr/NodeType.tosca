@@ -10,7 +10,7 @@ imports:
 # comment out the ansible_user ansible_name in properties
 # add capabilities and corresboding imports
 node_types:
-  Alfresco.nodes.DockerContainer.Solr:
+  Alfresco.nodes.ContainerApplication.Solr:
     derived_from: igs.nodes.docker.DockerApplication
                 # ALFRESCO_SECURE_COMMS: "secret"
             

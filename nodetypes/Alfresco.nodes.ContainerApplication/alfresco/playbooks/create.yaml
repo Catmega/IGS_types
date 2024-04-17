@@ -161,4 +161,4 @@
             remote_network:
               external: true
               driver: overlay 
-# templates/igs_types/nodetypes/Alfresco.nodes.DockerContainer/alfresco/playbooks/create.yaml
+# templates/igs_types/nodetypes/Alfresco.nodes.ContainerApplication/alfresco/playbooks/create.yaml

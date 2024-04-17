@@ -4,7 +4,7 @@ imports:
   - ../../igs.nodes.Component/IGSProxyService/NodeType.tosca
   - ../../../capabilitytypes/igs.capabilities.container/Proxy/CapabilityType.tosca
 node_types:
-  Alfresco.nodes.DockerContainer.Proxy:
+  Alfresco.nodes.ContainerApplication.Proxy:
     derived_from: igs.nodes.docker.DockerApplication
 
     properties:

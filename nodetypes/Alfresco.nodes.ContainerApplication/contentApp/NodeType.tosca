@@ -4,7 +4,7 @@ imports:
   - ../../../capabilitytypes/igs.capabilities.container/ContentApp/CapabilityType.tosca
   - ../../igs.nodes.Component/IGSContentAppService/NodeType.tosca
 node_types:
-  Alfresco.nodes.DockerContainer.ContentApp:
+  Alfresco.nodes.ContainerApplication.ContentApp:
     derived_from: igs.nodes.docker.DockerApplication
 
     properties:

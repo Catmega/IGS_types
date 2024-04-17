@@ -4,7 +4,7 @@ imports:
   - ../../igs.nodes.Component/IGSSecurityService/NodeType.tosca
   - ../../../capabilitytypes/igs.capabilities.container/Security/CapabilityType.tosca
 node_types:
-  Alfresco.nodes.DockerContainer.ControlCenter:
+  Alfresco.nodes.ContainerApplication.ControlCenter:
     derived_from: igs.nodes.docker.DockerApplication
     properties:
       client_mnt_path:

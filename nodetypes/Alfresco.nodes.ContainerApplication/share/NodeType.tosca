@@ -4,7 +4,7 @@ imports:
   - ../../igs.nodes.Component/IGSPortalService/NodeType.tosca
   - ../../../capabilitytypes/igs.capabilities.container/RepositoryUI/CapabilityType.tosca
 node_types:
-  Alfresco.nodes.DockerContainer.Share:
+  Alfresco.nodes.ContainerApplication.Share:
     derived_from: igs.nodes.docker.DockerApplication
 
     properties:

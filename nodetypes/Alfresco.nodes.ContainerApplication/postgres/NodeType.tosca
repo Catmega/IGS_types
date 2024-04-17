@@ -4,7 +4,7 @@ imports:
   - ../../../capabilitytypes/igs.capabilities.container/PostgresDBMS/CapabilityType.tosca
   - ../../igs.nodes.postgres/PostgresDBMS/NodeType.tosca
 node_types:
-  Alfresco.nodes.DockerContainer.Postgres:
+  Alfresco.nodes.ContainerApplication.Postgres:
     derived_from: igs.nodes.docker.DockerApplication
 
     properties:

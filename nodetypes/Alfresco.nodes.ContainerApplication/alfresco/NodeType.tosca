@@ -4,7 +4,7 @@ imports:
   - ../../../capabilitytypes/igs.capabilities.container/Repository/CapabilityType.tosca
   - ../../igs.nodes.Component/IGSRepository/NodeType.tosca
 node_types:
-  Alfresco.nodes.DockerContainer.ContentRepository:
+  Alfresco.nodes.ContainerApplication.ContentRepository:
     derived_from: igs.nodes.docker.DockerApplication
 ################secret version####################
                   # -Ddb.driver="{{ DDB_DRIVER }}"

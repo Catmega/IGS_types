@@ -34,9 +34,9 @@ imports:
   - nodetypes/Alfresco.nodes.DockerContainer/controlCenter/NodeType.tosca
   - nodetypes/Alfresco.nodes.DockerContainer/share/NodeType.tosca
   - nodetypes/Alfresco.nodes.DockerContainer/transformCore/NodeType.tosca
-  - nodetypes/Alfresco.nodes.DockerContainer/postgres/NodeType.tosca
   - nodetypes/Alfresco.nodes.DockerContainer/nginx/NodeType.tosca
   - nodetypes/igs.nodes.abstract/IGSOSInstance/NodeType.tosca
+  - nodetypes/igs.nodes.demo/igs.nodes.ContainerApplication.Postgres/NodeType.tosca
   - capabilitytypes/igs.capabilities.container/Solr/CapabilityType.tosca
   - capabilitytypes/igs.capabilities.container/PostgresDBMS/CapabilityType.tosca
   - capabilitytypes/igs.capabilities.container/RepositoryUI/CapabilityType.tosca
@@ -375,9 +375,18 @@ topology_template:
     
     Repository-Administration:
       type: igs.nodes.Component.RepositoryAdministration
+      properties:
+        stack_name: alfstack
+        service_name: control-center
+        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        labels: node.labels.tile==frontend
+      artifacts:
+        docker_compose_file:
+          type: igs.artifacts.Ansible.DockerCompose
+          file: alfresco_artifacts/controlCenter_stack.yaml
       requirements:
         - securityService: Security-Service
-        - containerApplication: MockContainer
+        - containerApplication: Alfresco-ControlCenter-Container
 
     Security-Service:
       type: igs.nodes.Component.SecurityService
@@ -446,8 +455,9 @@ topology_template:
     Alfresco-ControlCenter-Container:
       type: Alfresco.nodes.DockerContainer.ControlCenter
       properties:
-          group: frontend
-          labels: [node.labels.tile==frontend]
+        image_name: alfresco-control-center
+        image_namespace: quay.io/alfresco
+        image_version: 8.2.0
       requirements:
         - host: workstation-1
         - runtime: docker-engine-1
@@ -497,7 +507,7 @@ topology_template:
         # - dependency_4: Alfresco-ControlCenter-Container
 
     Alfresco-Postgres-Container:
-      type: Alfresco.nodes.DockerContainer.Postgres
+      type: igs.nodes.ContainerApplication.Postgres
       properties:
         image_namespace: docker.io
         image_name: postgres

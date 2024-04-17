@@ -31,7 +31,7 @@ imports:
 
 
   - nodetypes/igs.nodes.demo/igs.nodes.demo.PortalUI/NodeType.tosca
-  - nodetypes/igs.nodes.demo/igs.nodes.demo.Postgres/NodeType.tosca
+  - nodetypes/igs.nodes.demo/igs.nodes.ContainerApplication.Postgres/NodeType.tosca
   - nodetypes/igs.nodes.demo/igs.nodes.demo.Proxy/NodeType.tosca
   - nodetypes/igs.nodes.demo/igs.nodes.demo.Repository/NodeType.tosca
   - nodetypes/igs.nodes.Tomcat/NodeType.tosca
@@ -109,8 +109,6 @@ topology_template:
         - host: workstation-2
     nfs-server: #/home/ubuntu/mntnfs #/mnt/nfsdir
       type: igs.nodes.NFS.NFSServer
-      attributes:
-        clients_ips: [192.168.221.163, 129.69.209.200]
       properties:
         server_mnt_path: /home/ubuntu/mntnfs #/var/share 
       requirements:
@@ -205,7 +203,14 @@ topology_template:
     #   type: igs.nodes.Component.StorageService
     #   requirements:
     #     - BlockStorage: nfs-client-1
-    
+    postgres-volume:
+      type: igs.nodes.NFS.Volume
+      properties:
+        name: igs-postgresdata-volume
+      requirements:
+        - host: workstation-1
+        - storageClient: nfs-client-1
+
     Catalog:
       type: igs.nodes.postgres.PostgresCatalog
       properties:
@@ -284,17 +289,17 @@ topology_template:
 
 ############containers###################################
     Demo-Postgres-Container:
-      type: igs.nodes.demo.container.Postgres
+      type: igs.nodes.ContainerApplication.Postgres
       properties:
-        image_namespace: igsrepo
+        image_namespace: docker.io
         image_name: postgres
         image_version: 14.4
-          # container_data_dir: /var/lib/postgresql/data
+        container_data_dir: /var/lib/postgresql/data
       requirements:
         - host: workstation-1
         - runtime: docker-engine-1
         - network: MockNetwork
-        - storage: MockStorage
+        - storage: postgres-volume
     ###
     Ubuntu-OS-Base-for-Portal:
       type: igs.nodes.container.OS.Ubuntu

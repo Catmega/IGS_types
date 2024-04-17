@@ -18,3 +18,5 @@
               placement:
                 constraints:
                   - "{{ labels }}"
+            volumes:
+              - "{{ client_mnt_path }}/{{volume_dir}}:{{ container_data_dir }}"

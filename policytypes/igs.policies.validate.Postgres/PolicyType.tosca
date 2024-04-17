@@ -3,13 +3,13 @@ tosca_definitions_version: tosca_simple_yaml_1_3
 policy_types:
   igs.policies.validate.Postgres:
     derived_from: tosca.policies.Root
-    targets: [ igs.nodes.demo.container.Postgres ]
+    targets: [ igs.nodes.ContainerApplication.Postgres ]
     triggers:
         igs.triggers.validate.Postgres:
             description: A trigger for validation
             event: validation_trigger_Postgres
             target_filter:
-                node: igs.nodes.demo.container.Postgres
+                node: igs.nodes.ContainerApplication.Postgres
             action:
                 - call_operation: Validation.validate
 

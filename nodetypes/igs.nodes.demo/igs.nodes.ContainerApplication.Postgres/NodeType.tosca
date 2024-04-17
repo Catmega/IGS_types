@@ -3,21 +3,25 @@ imports:
   - ../../igs.nodes.docker/IGSDockerApplication/NodeType.tosca
   - ../../../interfacetypes/igs.interfaces.node.lifecycle/Validation/InterfaceType.tosca
 node_types:
-  igs.nodes.demo.container.Postgres:
+  igs.nodes.ContainerApplication.Postgres:
     derived_from: igs.nodes.abstract.ContainerApplication
     metadata:
       targetNamespace: "igs.nodes.demo.container"
       abstract: "false"
       final: "false"
     properties:
-      client_mnt_path:
+      # client_mnt_path:
+      #   type: string
+      #   required: false
+      #   default: undefined
+      # volume_dir:
+      #   type: string
+      #   required: false
+      #   default: undefined
+      container_data_dir:
         type: string
         required: false
-        default: undefined
-      volume_dir:
-        type: string
-        required: false
-        default: undefined
+        default: /var/lib/postgresql/data
     interfaces:
       # Standard:
       #   type: tosca.interfaces.node.lifecycle.Standard

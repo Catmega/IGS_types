@@ -9,7 +9,7 @@ imports:
   - ../IGSContentAppService/NodeType.tosca
   - ../../../capabilitytypes/igs.capabilities/ContentAppService/CapabilityType.tosca
 node_types:
-  igs.nodes.Component.ProxyService:
+  igs.nodes.Component.ProxyService-old:
     derived_from: igs.nodes.abstract.Component
     metadata:
       targetNamespace: "igs.nodes.Component"

@@ -8,7 +8,6 @@ imports:
   - nodetypes/igs.nodes.NFS/NFSVolume/NodeType.tosca
   - nodetypes/igs.nodes.NFS/NFSClient/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSRepository/NodeType.tosca
-  - nodetypes/igs.nodes.Component/IGSRepository-reduced/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSFedSearch/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSFTSearch/NodeType.tosca
   - nodetypes/igs.nodes.Solr/NodeType.tosca
@@ -20,8 +19,7 @@ imports:
   - nodetypes/igs.nodes.postgres/PostgresCatalog/NodeType.tosca
   - nodetypes/igs.nodes.postgres/PostgresObjectCatalog/NodeType.tosca
   - nodetypes/igs.nodes.postgres/PostgresRecordsCatalog/NodeType.tosca
-  - nodetypes/igs.nodes.Component/ProxyService/NodeType.tosca
-  - nodetypes/igs.nodes.Component/ProxyService-reduced/NodeType.tosca
+  - nodetypes/igs.nodes.Component/IGSProxyService/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSPortalService/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSRecordsManagement/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSRepositoryAdministration/NodeType.tosca
@@ -156,7 +154,7 @@ topology_template:
 ##############components part#############################
         
     Repository:
-      type: igs.nodes.Component.Repository.reduced
+      type: igs.nodes.Component.Repository
       properties:
         stack_name: igsstack
         docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
@@ -252,7 +250,7 @@ topology_template:
         - containerApplication: Demo-Postgres-Container
 
     Proxy-Service:
-      type: igs.nodes.Component.ProxyService.reduced
+      type: igs.nodes.Component.ProxyService
       properties:
         stack_name: igsstack
         docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }

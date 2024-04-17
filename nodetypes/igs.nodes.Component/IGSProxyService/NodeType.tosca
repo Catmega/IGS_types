@@ -8,7 +8,7 @@ imports:
 # reduced version of igs.nodes.Component.ProxyService, leave out the requirements for:
 # recordsManagement, repositoryAdministration, contentAppService
 node_types:
-  igs.nodes.Component.ProxyService.reduced:
+  igs.nodes.Component.ProxyService:
     derived_from: igs.nodes.abstract.Component
     metadata:
       targetNamespace: "igs.nodes.Component"

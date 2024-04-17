@@ -1,22 +1,36 @@
 tosca_definitions_version: tosca_simple_yaml_1_3
 imports:
   - ../../igs.nodes.abstract/IGSComponent/NodeType.tosca
+  - ../IGSFedSearch/NodeType.tosca
+  - ../IGSObjectService/NodeType.tosca
   - ../../igs.nodes.abstract/IGSDatabase/NodeType.tosca
   - ../../igs.nodes.abstract/IGSContainerApplication/NodeType.tosca
+  - ../IGSMessageService/NodeType.tosca
+  - ../../../capabilitytypes/igs.capabilities/MessageBrokerService/CapabilityType.tosca
+  - ../../../capabilitytypes/igs.capabilities/TransformService/CapabilityType.tosca
   - ../../../relationshiptypes/igs.relationships/RequireCatalog/RelationshipType.tosca
   - ../../../relationshiptypes/igs.relationships/RequireObjectCatalog/RelationshipType.tosca
   - ../../../relationshiptypes/igs.relationships/RequireRecordsCatalog/RelationshipType.tosca
   - ../../../capabilitytypes/igs.capabilities.container/Repository/CapabilityType.tosca
-# reduced version of igs.nodes.Component.Repository, leave out the requirements for:
-# fedSearch, messageBroker, obejectService, transform
+
 node_types:
-  igs.nodes.Component.Repository.reduced:
+  igs.nodes.Component.Repository-old:
     derived_from: igs.nodes.abstract.Component
     metadata:
       targetNamespace: "igs.nodes.Component"
       abstract: "false"
       final: "false"
     requirements:
+      - fedSearch:
+          capability: tosca.capabilities.Compute
+          node: igs.nodes.Component.FedSearch
+          relationship: tosca.relationships.DependsOn
+          occurrences: [ 1, 1 ]
+      - obejectService:
+          capability: tosca.capabilities.Compute
+          node: igs.nodes.Component.ObejectService
+          relationship: tosca.relationships.DependsOn
+          occurrences: [ 1, 1 ]
       - catalog:
           capability: tosca.capabilities.Endpoint.Database
           node: igs.nodes.abstract.Database
@@ -31,6 +45,16 @@ node_types:
           capability: tosca.capabilities.Endpoint.Database
           node: igs.nodes.abstract.Database
           relationship: igs.relationships.RequireRecordsCatalog
+          occurrences: [ 1, 1 ]
+      - messageBroker:
+          capability: igs.capabilities.MessageBrokerService
+          node: igs.nodes.Component.MessageService
+          relationship: tosca.relationships.ConnectsTo
+          occurrences: [ 1, 1 ]
+      - transform:
+          capability: igs.capabilities.TransformService
+          node: igs.nodes.Component.TransformService
+          relationship: tosca.relationships.ConnectsTo
           occurrences: [ 1, 1 ]
       - containerApplication:
           capability: igs.capabilities.container.Repository

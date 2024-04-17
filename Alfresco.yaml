@@ -7,7 +7,7 @@ imports:
   - nodetypes/igs.nodes.NFS/NFSServer/NodeType.tosca
   - nodetypes/igs.nodes.NFS/NFSVolume/NodeType.tosca
   - nodetypes/igs.nodes.NFS/NFSClient/NodeType.tosca
-  - nodetypes/igs.nodes.Component/IGSRepository/NodeType.tosca
+  - nodetypes/igs.nodes.Component/AlfrescoRepository/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSFedSearch/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSFTSearch/NodeType.tosca
   - nodetypes/igs.nodes.Solr/NodeType.tosca
@@ -19,7 +19,7 @@ imports:
   - nodetypes/igs.nodes.postgres/PostgresCatalog/NodeType.tosca
   - nodetypes/igs.nodes.postgres/PostgresObjectCatalog/NodeType.tosca
   - nodetypes/igs.nodes.postgres/PostgresRecordsCatalog/NodeType.tosca
-  - nodetypes/igs.nodes.Component/ProxyService/NodeType.tosca
+  - nodetypes/igs.nodes.Component/AlfrescoProxyService/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSPortalService/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSRecordsManagement/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSRepositoryAdministration/NodeType.tosca
@@ -217,7 +217,7 @@ topology_template:
         - containerApplication: Alfresco-ContentApp-Container
         
     Repository:
-      type: igs.nodes.Component.Repository
+      type: Alfresco.nodes.Component.Repository
       properties:
         stack_name: alfstack
         service_name: alfresco
@@ -335,7 +335,7 @@ topology_template:
         - containerApplication: Alfresco-Postgres-Container
 
     Proxy-Service:
-      type: igs.nodes.Component.ProxyService
+      type: Alfresco.nodes.Component.ProxyService
       properties:
         stack_name: alfstack
         service_name: proxy

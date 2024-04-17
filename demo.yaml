@@ -263,7 +263,7 @@ topology_template:
           file: artifacts/proxy-stack.yaml
       requirements:
         - containerApplication: Demo-Nginx-Container
-        - repositoryService: Portal-Service
+        - portalService: Portal-Service
         # - recordsManagement: Records-Management
         # - repositoryAdministration: Repository-Administration
         # - contentAppService: ContentApp-Service

@@ -347,7 +347,7 @@ topology_template:
           file: alfresco_artifacts/proxy_stack.yaml
       requirements:
         - containerApplication: Alfresco-Nginx-Container
-        - repositoryService: Portal-Service
+        - portalService: Portal-Service
         - recordsManagement: Records-Management
         - repositoryAdministration: Repository-Administration
         - contentAppService: ContentApp-Service

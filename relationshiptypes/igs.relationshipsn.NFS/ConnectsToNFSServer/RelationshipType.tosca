@@ -30,7 +30,7 @@ relationship_types:
             type: string
             required: true
             default: { get_attribute: [TARGET, server_ip ] }    
-          COMM:
+          CHANNEL:
             type: string
             required: true
             default: { get_property: [ SELF, channel] }

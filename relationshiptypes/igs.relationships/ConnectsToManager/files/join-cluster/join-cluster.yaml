@@ -20,4 +20,4 @@
       community.docker.docker_swarm:
         state: join
         join_token: "{{ JOIN_TOKEN}}"
-        remote_addrs: [ '{{MANAGER_IP}}:{{COMM.port}}' ]
+        remote_addrs: [ '{{MANAGER_IP}}:{{CHANNEL.port}}' ]

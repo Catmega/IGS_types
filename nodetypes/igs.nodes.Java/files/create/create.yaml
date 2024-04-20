@@ -4,12 +4,12 @@
 
   vars:
     # base_image: ubuntu:latest
-    base_image: ubuntu
+    base_image: '{{ BASE_OS_NAME }}' #ubuntu
     base_version: '{{ BASE_OS_VERSION }}'
     container_name: container_with_java
-    image_namespace: igsrepo
-    image_name: java
-    image_version: '{{JAVA_VERSION}}'  #8 # openjdk-8-jre , defailt-jre
+    image_namespace: '{{ IMAGE_NAMESPACE }}' #igsrepo
+    image_name: '{{ IMAGE_NAME }}' #java
+    image_version: '{{RUNTIME_VERSION}}'  #8 # openjdk-8-jre , defailt-jre
 
   tasks:
 
@@ -37,7 +37,7 @@
 
     - name: Skip the rest of the tasks if image is found
       meta: end_play
-      when: local_image_info.images|length > 0 or not docker_hub_image_response == 404
+      when: local_image_info.images|length > 0 or not docker_hub_image_response.status == 404
 
     - name: Start a container with os base image
       community.docker.docker_container:
@@ -90,3 +90,10 @@
       docker_container:
         name: '{{ container_name }}'
         state: absent
+
+    - name: Push the Docker image to Docker Hub
+      community.docker.docker_image:
+        name: "{{image_namespace}}/{{ image_name }}"
+        tag: "{{ image_version }}"
+        push: yes
+        source: local

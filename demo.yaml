@@ -43,6 +43,8 @@ imports:
   - policytypes/igs.policies.validate.Postgres/PolicyType.tosca
   - relationshiptypes/igs.relationshipsn.NFS/ConnectsToNFSServer/RelationshipType.tosca
   - artifacttypes/igs.artifacts/DockerCompose/ArtifactType.tosca
+  - artifacttypes/igs.artifacts/Html/ArtifactType.tosca
+  - artifacttypes/igs.artifacts/Jar/ArtifactType.tosca
 topology_template:
 
   node_templates:
@@ -305,16 +307,19 @@ topology_template:
       type: igs.nodes.container.OS.Ubuntu
       properties:
         os_version: latest
+        os_name: ubuntu
     Java-Runtime-for-Portal:
       type: igs.nodes.Java
       properties:
-        java_version: 8
+        runtime_version: 8
+        image_namespace: igsrepo
       requirements:
         - host: Ubuntu-OS-Base-for-Portal
     Tomcat-AppServer-for-Portal:
       type: igs.nodes.Tomcat
       properties:
-        tomcat_version: 9
+        webapp_server_version: 9
+        image_namespace: igsrepo
       requirements:
         - host: Java-Runtime-for-Portal
 
@@ -324,28 +329,35 @@ topology_template:
         image_namespace: igsrepo
         image_name: portal
         image_version: 1
-
+        app_file_loc: { get_artifact: [ SELF, portal_UI_app_file ] }
+      artifacts:
+        portal_UI_app_file:
+          type: igs.artifacts.Html
+          file: artifacts/portal-ui.html
       requirements:
         - host: workstation-1
         - runtime: docker-engine-1
         - network: MockNetwork
         - storage: MockStorage
-        - TomcatWebServer: Tomcat-AppServer-for-Portal
+        - webAppServer: Tomcat-AppServer-for-Portal
     ####
     Ubuntu-OS-Base-for-Repository:
       type: igs.nodes.container.OS.Ubuntu
       properties:
         os_version: latest
+        os_name: ubuntu
     Java-Runtime-for-Repository:
       type: igs.nodes.Java
       properties:
-        java_version: 8
+        runtime_version: 8
+        image_namespace: igsrepo
       requirements:
         - host: Ubuntu-OS-Base-for-Repository
     Tomcat-AppServer-for-Repository:
       type: igs.nodes.Tomcat
       properties:
-        tomcat_version: 9
+        webapp_server_version: 9
+        image_namespace: igsrepo
       requirements:
         - host: Java-Runtime-for-Repository
 
@@ -355,12 +367,17 @@ topology_template:
         image_version: 1
         image_namespace: igsrepo
         image_name: repository
+        app_file_loc: { get_artifact: [ SELF, repository_app_file ] }
+      artifacts:
+        repository_app_file:
+          type: igs.artifacts.JAR
+          file: artifacts/igsRepository.jar
       requirements:
         - host: workstation-1
         - runtime: docker-engine-1
         - network: MockNetwork
         - storage: MockStorage
-        - TomcatWebServer: Tomcat-AppServer-for-Repository
+        - webAppServer: Tomcat-AppServer-for-Repository
 
     Demo-Nginx-Container:
       type: igs.nodes.demo.container.Proxy

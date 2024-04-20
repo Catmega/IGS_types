@@ -26,10 +26,18 @@ node_types:
         operations:
           create:
             inputs:
-              NGINX_VERSION:
+              IMAGE_VERSION:
                 type: string
                 required: true
                 default: { get_property: [SELF, image_version ] }
+              IMAGE_NAMESPACE:
+                type: string
+                required: false
+                default: { get_property: [ SELF, image_namespace] }
+              IMAGE_NAME:
+                type: string
+                required: false
+                default: { get_property: [ SELF, image_name] }
             implementation:
               primary: files/create/create.yaml 
           # start:

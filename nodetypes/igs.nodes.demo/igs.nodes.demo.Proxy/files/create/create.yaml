@@ -3,9 +3,9 @@
   gather_facts: no
   # http://192.168.221.163:8080/docs
   vars:
-    image_namespace: igsrepo
-    image_name: nginx
-    image_version: '{{ NGINX_VERSION }}' # latest #
+    image_namespace: '{{ IMAGE_NAMESPACE }}' # igsrepo
+    image_name: '{{ IMAGE_NAME }}' # nginx
+    image_version: '{{ IMAGE_VERSION }}' # latest #
   tasks:
     - name: Check if image is available locally
       docker_image_info:
@@ -22,7 +22,7 @@
 
     - name: Skip the rest of the tasks if image is found
       meta: end_play
-      when: local_image_info.images|length > 0 or not docker_hub_image_response == 404
+      when: local_image_info.images|length > 0 or not docker_hub_image_response.status == 404
 
     - name: Build Docker Image
       community.docker.docker_image:
@@ -32,4 +32,9 @@
         build:
           path: "."
           
- 
+    - name: Push the Docker image to Docker Hub
+      community.docker.docker_image:
+        name: "{{image_namespace}}/{{ image_name }}"
+        tag: "{{ image_version }}"
+        push: yes
+        source: local

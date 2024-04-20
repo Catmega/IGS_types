@@ -22,12 +22,16 @@ node_types:
       image_version:
         type: version
         required: true
-      base_tomcat_version:
+      base_webapp_server_version:
         type: version
         required: true
-        default: { get_property: [SELF, TomcatWebServer, tomcat_version ] }
+        default: { get_property: [SELF, webAppServer, webapp_server_version ] }
+      app_file_loc:
+        type: string
+        required: true
+        default: notGiven
     requirements:
-      - TomcatWebServer:  
+      - webAppServer:  
           capability: tosca.capabilities.Compute
           node: igs.nodes.Tomcat
           relationship: tosca.relationships.HostedOn
@@ -40,7 +44,7 @@ node_types:
               BASE_TOMCAT_VERSION:
                 type: string
                 required: true
-                default: { get_property: [SELF, base_tomcat_version ] }
+                default: { get_property: [SELF, base_webapp_server_version ] }
               PORTAL_VERSION:
                 type: string
                 required: true
@@ -48,7 +52,15 @@ node_types:
               PORTAL_ARTIFACT:
                 type: string
                 required: true
-                default: { get_artifact: [SELF, portal ] }
+                default: { get_property: [SELF, app_file_loc ] }
+              IMAGE_NAMESPACE:
+                type: string
+                required: false
+                default: { get_property: [ SELF, image_namespace] }
+              IMAGE_NAME:
+                type: string
+                required: false
+                default: { get_property: [ SELF, image_name] }
             implementation:
               primary: files/create/create.yaml 
           # start:
@@ -63,7 +75,7 @@ node_types:
           #       default: { get_property: [SELF, image_version ] }
           #   implementation:
           #     primary: files/start/start.yaml 
-    artifacts:
-      portal:
-        type: igs.artifacts.Html
-        file: files/create/Artifacts
+    # artifacts:
+    #   portal:
+    #     type: igs.artifacts.Html
+    #     file: files/create/Artifacts

@@ -8,14 +8,24 @@ node_types:
       abstract: "false"
       final: "false"
     properties:
-      base_java_version:
+      base_runtime_version:
         type: version
         required: true
-        default: { get_property: [SELF, host, java_version ] }
-      tomcat_version:
+        default: { get_property: [SELF, host, runtime_version ] }
+      base_runtime_name:
         type: version
         required: true
-
+        default: { get_property: [SELF, host, runtime_name ] }
+      webapp_server_version:
+        type: version
+        required: true
+      webapp_server_name:
+        type: string
+        required: true
+        default: tomcat
+      image_namespace:
+        type: string
+        required: true
     requirements:
       - host:  
           capability: tosca.capabilities.Compute
@@ -27,13 +37,25 @@ node_types:
         operations:
           create:
             inputs:
-              BASE_JAVA_VERSION:
+              BASE_RUNTIME_VERSION:
                 type: string
                 required: true
-                default: { get_property: [SELF, base_java_version ] }
+                default: { get_property: [SELF, base_runtime_version ] }
+              BASE_RUNTIME_NAME:
+                type: string
+                required: true
+                default: { get_property: [SELF, base_runtime_name ] }
               TOMCAT_VERSION:
                 type: string
                 required: true
-                default: { get_property: [SELF, tomcat_version ] }
+                default: { get_property: [SELF, webapp_server_version ] }
+              IMAGE_NAME:
+                type: string
+                required: true
+                default: { get_property: [SELF, webapp_server_name ] }
+              IMAGE_NAMESPACE:
+                type: string
+                required: false
+                default: { get_property: [ SELF, image_namespace] }
             implementation:
               primary: files/create/create.yaml 

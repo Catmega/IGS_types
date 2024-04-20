@@ -1,16 +1,16 @@
 - name: Run Tomcat Docker Container with Default Webapp
-  hosts: all
+  hosts: localhost
   gather_facts: no
   vars:
     base_image: tomcat
     base_version: '{{ BASE_TOMCAT_VERSION }}' # 9  # 
     container_name: container_with_java_tomcat_portal
-    image_namespace: igsrepo
-    image_name: portal
+    image_namespace: '{{IMAGE_NAMESPACE}}' # igsrepo
+    image_name: '{{IMAGE_NAME}}' # portal
     image_version: '{{ PORTAL_VERSION }}' # 1
     container_start_command: /usr/local/bin/start-tomcat.sh
     my_app_path: '{{PORTAL_ARTIFACT}}'  # /home/ubuntu/opera-root/git-project/IGS_types/nodetypes/igs.nodes.demo/igs.nodes.demo.PortalUI/files/create/Artifacts/index.html 
-    tomcat_webapp_path: /var/lib/tomcat9/webapps/ROOT/index.html
+    webserver_webapp_path: /var/lib/tomcat9/webapps/ROOT/index.html
   pre_tasks:
     # - name: Build Docker Image of igs-portal
     #   community.docker.docker_image:
@@ -22,7 +22,13 @@
       ##### strange error when running with xopera ###############
       # "msg": "An unexpected Docker error occurred: 500 Server Error for http+docker://localhost/v1.44/build?t=igs-portal%3Alatest&q=False&nocache=False&rm=True&forcerm=True&pull=False: Internal Server Error (\"Cannot locate specified Dockerfile: Dockerfile\")"
       ######################################################################
+    # - name: List contents of the current directory
+    #   command: ls -la
+    #   register: ls_output
 
+    # - name: Print the contents of the directory
+    #   fail:
+    #     msg: "{{ ls_output.stdout_lines }}"
     - name: Check if image is available locally
       docker_image_info:
         name: '{{image_namespace}}/{{image_name}}:{{image_version}}'  
@@ -46,7 +52,7 @@
 
     - name: Skip the rest of the tasks if image is found
       meta: end_play
-      when: local_image_info.images|length > 0 or not docker_hub_image_response == 404
+      when: local_image_info.images|length > 0 or not docker_hub_image_response.status == 404
 
     - name: Start a container with tomcat base image
       community.docker.docker_container:
@@ -76,9 +82,9 @@
       community.docker.docker_container_copy_into:
         container: '{{container_name}}'
         path: '{{ my_app_path }}'
-        container_path: '{{ tomcat_webapp_path }}'
+        container_path: '{{ webserver_webapp_path }}'
 
-# docker cp {{ my_app_path }} {{container_name}}:{{ tomcat_webapp_path }}
+# docker cp {{ my_app_path }} {{container_name}}:{{ webserver_webapp_path }}
 
   post_tasks:
     # - name: Clean up the container's python.
@@ -94,9 +100,17 @@
         -c 'CMD {{ container_start_command }}'
         {{ container_name }} {{ image_namespace }}/{{ image_name }}:'{{image_version}}'
       changed_when: true
-        
-    - name: Remove the container.
 
+    - name: Remove the container.
       docker_container:
         name: '{{ container_name }}'
         state: absent
+        
+    - name: Push the Docker image to Docker Hub
+      community.docker.docker_image:
+        name: "{{image_namespace}}/{{ image_name }}"
+        tag: "{{ image_version }}"
+        push: yes
+        source: local
+
+

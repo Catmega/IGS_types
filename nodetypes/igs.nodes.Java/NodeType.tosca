@@ -8,26 +8,49 @@ node_types:
       abstract: "false"
       final: "false"
     properties:
-      java_version:
+      runtime_version:
         type: version
+        required: true
+      runtime_name:
+        type: string
+        required: true
+        default: java
+      image_namespace:
+        type: string
         required: true
       base_OS_version:
         type: version
         required: true
         default: { get_property: [SELF, host, os_version ] }
+      base_OS_name:
+        type: version
+        required: true
+        default: { get_property: [SELF, host, os_name ] }
     interfaces:
       Standard:
         type: tosca.interfaces.node.lifecycle.Standard
         operations:
           create:
             inputs:
-              JAVA_VERSION:
+              RUNTIME_VERSION:
                 type: string
                 required: true
-                default: { get_property: [SELF, java_version ] }
+                default: { get_property: [SELF, runtime_version ] }
               BASE_OS_VERSION:
                 type: string
                 required: true
                 default: { get_property: [SELF, base_OS_version ] }
+              BASE_OS_NAME:
+                type: string
+                required: true
+                default: { get_property: [SELF, base_OS_name ] }
+              IMAGE_NAME:
+                type: string
+                required: true
+                default: { get_property: [SELF, runtime_name ] }
+              IMAGE_NAMESPACE:
+                type: string
+                required: false
+                default: { get_property: [ SELF, image_namespace] }
             implementation:
               primary: files/create/create.yaml 

@@ -11,6 +11,10 @@ node_types:
       os_version:
         type: version
         required: true
+      os_name:
+        type: version
+        required: true
+        default: ubuntu
 
 
 

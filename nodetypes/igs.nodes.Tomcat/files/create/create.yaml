@@ -3,10 +3,10 @@
   gather_facts: false
 
   vars:
-    base_image: igsrepo/java:'{{BASE_JAVA_VERSION}}'
+    base_image: '{{IMAGE_NAMESPACE}}/{{BASE_RUNTIME_NAME}}:{{BASE_RUNTIME_VERSION}}' #igsrepo/java:'{{BASE_JAVA_VERSION}}'
     container_name: container_with_java_tomcat
-    image_namespace: igsrepo
-    image_name: tomcat
+    image_namespace: '{{ IMAGE_NAMESPACE }}' #igsrepo
+    image_name: '{{ IMAGE_NAME }}' #tomcat
     image_version: '{{TOMCAT_VERSION}}'
     container_start_command: /usr/local/bin/start-tomcat.sh
 
@@ -135,3 +135,10 @@
       docker_container:
         name: '{{ container_name }}'
         state: absent
+
+    - name: Push the Docker image to Docker Hub
+      community.docker.docker_image:
+        name: "{{image_namespace}}/{{ image_name }}"
+        tag: "{{ image_version }}"
+        push: yes
+        source: local

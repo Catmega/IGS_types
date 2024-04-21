@@ -1,33 +1,41 @@
 ---
-- name: add remote machine
-  hosts: localhost
-  become: yes
-  vars:
-      host_ip: "{{ ANSIBLE_HOST_IP }}"
-  tasks:
-    - name: Add targets 
-      add_host:
-        name: "{{ ANSIBLE_HOST_NAME }}"
-        ansible_host: "{{ ANSIBLE_HOST_IP }}"
-        ansible_user: "{{ ANSIBLE_USER }}"
-      when: 
-        - host_ip != "localhost"
+# - name: add remote machine
+#   hosts: localhost
+#   become: yes
+#   vars:
+#       host_ip: "{{ ANSIBLE_HOST_IP }}"
+#   tasks:
+#     - name: Add targets 
+#       add_host:
+#         name: "{{ ANSIBLE_HOST_NAME }}"
+#         ansible_host: "{{ ANSIBLE_HOST_IP }}"
+#         ansible_user: "{{ ANSIBLE_USER }}"
+#       when: 
+#         - host_ip != "localhost"
 
+# - name: create
+#   hosts: 
+#     - "{{ ANSIBLE_HOST_NAME }}"
+#   gather_facts: true
+#   become: true
+#   become_method: sudo
 
-    # - name: check the output to see if the hosts are added 
-    #   debug:
-    #     var: hostvars
-- name: create
-  hosts: 
-    - "{{ ANSIBLE_HOST_NAME }}"
-  gather_facts: true
-  become: true
-  become_method: sudo
-
+- name: install docker engine
+  hosts: all
+  gather_facts: false
   tasks:
     # - name: use this task to check if your os belong to the Debian family
     #   debug:
     #     msg: ansible_os_family == "{{ ansible_os_family }}"
+    - name: use docker command to check if docker exist
+      command: docker --version
+      register: docker_result
+      ignore_errors: true
+
+    - name: if Docker is installed skip the rest
+      meta: end_play
+      when: docker_result.rc == 0
+      
     - name: remove apt key
       ansible.builtin.file:
         path: /etc/apt/keyrings/docker.gpg

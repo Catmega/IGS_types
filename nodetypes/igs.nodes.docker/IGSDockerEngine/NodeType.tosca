@@ -6,6 +6,7 @@ imports:
   - ../../../artifacttypes/igs.artifacts/Ansible/ArtifactType.tosca
   - ../../../capabilitytypes/igs.capabilities.container/DockerRuntime/CapabilityType.tosca
   - ../../../interfacetypes/igs.interfaces.node.lifecycle/Validation/InterfaceType.tosca
+  - ../../igs.nodes.abstract/IGSClusterNode/NodeType.tosca
 
 node_types:
   igs.nodes.docker.DockerEngine:
@@ -14,39 +15,39 @@ node_types:
       targetNamespace: "igs.nodes.docker"
       abstract: "false"
       final: "false"
-    attributes:
-      port:
-        type: integer
-        default: { get_attribute: [ SELF, docker, port ] }
+    # attributes:
+      # port:
+      #   type: integer
+      #   default: { get_attribute: [ SELF, docker, port ] }
 
     capabilities:
       host:
         occurrences: [ 1, UNBOUNDED ]
-        valid_source_types: [ igs.nodes.docker.DockerApplication, tosca.nodes.Compute ] #Compute node should be replaced with clusterNode
+        valid_source_types: [ igs.nodes.docker.DockerApplication, igs.nodes.abstract.ClusterNode ] #Compute node should be replaced with clusterNode
         type: igs.capabilities.container.DockerRuntime
     interfaces:
       Standard:
         type: tosca.interfaces.node.lifecycle.Standard
         operations:
           create:
-            inputs:
+            # inputs:
 
-              ANSIBLE_HOST_IP:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, ansible_host_ip  ] }
-              ANSIBLE_USER:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, ansible_user ] }
-              ANSIBLE_HOST_NAME:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, ansible_host_name ] } 
+              # ANSIBLE_HOST_IP:
+              #   type: string
+              #   required: true
+              #   default: { get_attribute: [SELF, ansible_host_ip  ] }
+              # ANSIBLE_USER:
+              #   type: string
+              #   required: true
+              #   default: { get_attribute: [SELF, ansible_user ] }
+              # ANSIBLE_HOST_NAME:
+              #   type: string
+              #   required: true
+              #   default: { get_attribute: [SELF, ansible_host_name ] } 
 
-            # implementation:
-            #   primary: files/create/create.yaml #create
-            #   timeout: 0
+            implementation:
+              primary: files/create/create.yaml #create
+              timeout: 0
 
           delete:
             inputs:

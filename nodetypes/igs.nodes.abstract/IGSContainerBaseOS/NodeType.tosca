@@ -13,7 +13,7 @@ node_types:
         type: version
         required: true
       os_name:
-        type: version
+        type: string
         required: true
 
     capabilities:

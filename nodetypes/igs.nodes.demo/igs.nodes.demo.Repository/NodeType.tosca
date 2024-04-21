@@ -1,11 +1,12 @@
 tosca_definitions_version: tosca_simple_yaml_1_3
 imports:
   - ../../igs.nodes.docker/IGSDockerApplication/NodeType.tosca
-  - ../../../artifacttypes/igs.artifacts/Jar/ArtifactType.tosca
-  - ../../igs.nodes.Tomcat/NodeType.tosca
+  - ../../igs.nodes.abstract/IGSWebAppServer/NodeType.tosca
+  - ../../../capabilitytypes/igs.capabilities/WebAppServer/CapabilityType.tosca
+  - ../../igs.nodes.abstract/IGSCustomizableWebApp/NodeType.tosca
 node_types:
   igs.nodes.demo.container.Repository:
-    derived_from: igs.nodes.abstract.ContainerApplication
+    derived_from: igs.nodes.abstract.ContainerApplication.CustomizableWebApp
     metadata:
       targetNamespace: "igs.nodes.demo.container"
       abstract: "false"
@@ -23,26 +24,34 @@ node_types:
       # image_version:
       #   type: version
       #   required: true
-      base_webapp_server_version:
-        type: version
-        required: true
-        default: { get_property: [SELF, webAppServer, webapp_server_version ] }
-      app_file_loc:
-        type: string
-        required: true
-        default: notGiven
-    requirements:
-      - webAppServer:  
-          capability: tosca.capabilities.Compute
-          node: igs.nodes.Tomcat
-          relationship: tosca.relationships.HostedOn
+      ##### inherited from igs.nodes.abstract.ContainerApplication.CustomizableWebApp #####
+      # base_webapp_server_version:
+      #   type: version
+      #   required: true
+      #   default: { get_property: [SELF, webAppServer, webapp_server_version ] }
+      # app_file_loc:
+      #   type: string
+      #   required: true
+      #   default: notGiven
+      #######################################################################################
+    ##### inherited from igs.nodes.abstract.ContainerApplication.CustomizableWebApp #####
+    # requirements:
+    #   - webAppServer:  
+    #       capability: igs.capabilities.WebAppServer
+    #       node: igs.nodes.abstract.WebAppServer
+    #       relationship: tosca.relationships.HostedOn
+    #######################################################################################
     interfaces:
       Standard:
         type: tosca.interfaces.node.lifecycle.Standard
         operations:
           create:
             inputs:
-              BASE_TOMCAT_VERSION:
+              BASE_WEBAPP_SERVER_NAME:
+                type: string
+                required: true
+                default: { get_property: [SELF, base_webapp_server_name ] }
+              BASE_WEBAPP_SERVER_VERSION:
                 type: string
                 required: true
                 default: { get_property: [SELF, base_webapp_server_version ] }
@@ -64,21 +73,3 @@ node_types:
                 default: { get_property: [ SELF, image_name] }
             implementation:
               primary: files/create/create.yaml 
-    #       start:
-    #         inputs:
-    #           REPOSITORY_VERSION:
-    #             type: string
-    #             required: true
-    #             default: { get_property: [SELF, image_version ] }
-    #           LABELS:
-    #             type: string
-    #             required: true
-    #             default: { get_property: [ SELF, labels] }
-    #         # implementation:
-    #         #   primary: files/start/start.yaml 
-    #           # create the image, then deploy in a docker stack
-
-    # artifacts:
-    #   repository:
-    #     type: igs.artifacts.JAR
-    #     file: files/create/Artifacts/igsRepository.jar

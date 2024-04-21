@@ -3,8 +3,8 @@
   gather_facts: false
 
   vars:
-    base_image: tomcat
-    base_version: '{{ BASE_TOMCAT_VERSION }}' # 9
+    base_image: '{{BASE_WEBAPP_SERVER_NAME}}' # tomcat
+    base_version: '{{ BASE_WEBAPP_SERVER_VERSION }}' # 9
     container_name: container_with_java_tomcat_repo
     image_namespace: '{{IMAGE_NAMESPACE}}' #igsrepo
     image_name: '{{IMAGE_NAME}}' #repository

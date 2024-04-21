@@ -1,0 +1,31 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../../../capabilitytypes/igs.capabilities/ContainerBaseOS/CapabilityType.tosca
+  - ../IGSContainerBaseOS/NodeType.tosca
+node_types:
+  igs.nodes.abstract.Runtime:
+    derived_from: tosca.nodes.SoftwareComponent
+    metadata:
+      targetNamespace: "igs.nodes.abstract"
+      abstract: "false"
+      final: "false"
+    properties:
+      runtime_version:
+        type: version
+        required: true
+      runtime_name:
+        type: string
+        required: true
+      base_OS_version:
+        type: version
+        required: true
+        default: { get_property: [SELF, host, os_version ] }
+      base_OS_name:
+        type: version
+        required: true
+        default: { get_property: [SELF, host, os_name ] }
+    requirements:
+      - host:
+          capability: igs.capabilities.ContainerBaseOS
+          node: igs.nodes.abstract.ContainerBaseOS
+          relationship: tosca.relationships.HostedOn

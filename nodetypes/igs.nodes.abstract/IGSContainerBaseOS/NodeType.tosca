@@ -1,0 +1,23 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../../../capabilitytypes/igs.capabilities/ContainerBaseOS/CapabilityType.tosca
+node_types:
+  igs.nodes.abstract.ContainerBaseOS:
+    derived_from: tosca.nodes.Root
+    metadata:
+      targetNamespace: "igs.nodes.abstract"
+      abstract: "false"
+      final: "false"
+    properties:
+      os_version:
+        type: version
+        required: true
+      os_name:
+        type: version
+        required: true
+
+    capabilities:
+      host: igs.capabilities.ContainerBaseOS
+
+
+

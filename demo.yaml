@@ -35,7 +35,7 @@ imports:
   - nodetypes/igs.nodes.demo/igs.nodes.demo.Proxy/NodeType.tosca
   - nodetypes/igs.nodes.demo/igs.nodes.demo.Repository/NodeType.tosca
   - nodetypes/igs.nodes.Tomcat/NodeType.tosca
-  - nodetypes/igs.nodes.Java/NodeType.tosca
+  - nodetypes/igs.nodes.Java.OpenJRE/NodeType.tosca
   - nodetypes/igs.nodes.demo/igs.nodes.container.OS/igs.nodes.container.OS.Ubuntu/NodeType.tosca
   - policytypes/igs.policies.validate.SwarmManager/PolicyType.tosca
   - policytypes/igs.policies.validate.SwarmWorker/PolicyType.tosca
@@ -171,7 +171,7 @@ topology_template:
         - recordsCatalog: Records-Catalog
         # - messageBroker: Message-Service
         # - transform: Transform-Service
-        - containerApplication: Demo-Repository-Container
+        - containerApplication: Repository-Container
         
     # Object-Service:
     #   type: igs.nodes.Component.ObejectService
@@ -285,7 +285,7 @@ topology_template:
           file: artifacts/portal-stack.yaml
       requirements:
         - repository: Repository
-        - containerApplication: Demo-Portal-Container
+        - containerApplication: Portal-Container
     
 
 
@@ -309,7 +309,7 @@ topology_template:
         os_version: latest
         os_name: ubuntu
     Java-Runtime-for-Portal:
-      type: igs.nodes.Java
+      type: igs.nodes.Java.OpenJRE
       properties:
         runtime_version: 8
         image_namespace: igsrepo
@@ -323,7 +323,7 @@ topology_template:
       requirements:
         - host: Java-Runtime-for-Portal
 
-    Demo-Portal-Container:
+    Portal-Container:
       type: igs.nodes.demo.container.Portal
       properties:
         image_namespace: igsrepo
@@ -347,7 +347,7 @@ topology_template:
         os_version: latest
         os_name: ubuntu
     Java-Runtime-for-Repository:
-      type: igs.nodes.Java
+      type: igs.nodes.Java.OpenJRE
       properties:
         runtime_version: 8
         image_namespace: igsrepo
@@ -361,7 +361,7 @@ topology_template:
       requirements:
         - host: Java-Runtime-for-Repository
 
-    Demo-Repository-Container:
+    Repository-Container:
       type: igs.nodes.demo.container.Repository
       properties:
         image_version: 1

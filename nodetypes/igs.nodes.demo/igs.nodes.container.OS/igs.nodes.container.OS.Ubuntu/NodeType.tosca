@@ -2,19 +2,24 @@ tosca_definitions_version: tosca_simple_yaml_1_3
 
 node_types:
   igs.nodes.container.OS.Ubuntu:
-    derived_from: tosca.nodes.Root
+    derived_from: igs.nodes.abstract.ContainerBaseOS
     metadata:
       targetNamespace: "igs.nodes.container.OS"
       abstract: "false"
       final: "false"
     properties:
-      os_version:
-        type: version
-        required: true
+      ##### inherited from igs.nodes.abstract.ContainerBaseOS ##########
+      # os_version:
+      #   type: version
+      #   required: true
+      ###################################################
+
+      ##### overwrite igs.nodes.abstract.ContainerBaseOS ###########
       os_name:
         type: version
         required: true
         default: ubuntu
+      #############################################################
 
 
 

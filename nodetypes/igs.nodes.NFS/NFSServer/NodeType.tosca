@@ -3,6 +3,7 @@ imports:
   - ../../igs.nodes.abstract/IGSBlockStorage/NodeType.tosca
   - ../../igs.nodes.abstract/IGSOSInstance/NodeType.tosca
   - ../../../artifacttypes/igs.artifacts/Ansible/ArtifactType.tosca
+  - ../../../interfacetypes/igs.interfaces.node.lifecycle/Validation/InterfaceType.tosca
 node_types:
   igs.nodes.NFS.NFSServer:
     derived_from: igs.nodes.abstract.BlockStorage
@@ -61,6 +62,19 @@ node_types:
             implementation:
               primary: files/create/create.yaml #create
             
+      Validation:
+        type: igs.interfaces.node.lifecycle.Validation 
+        operations:
+          validate: 
+            inputs:
+
+              log_file_loc:
+                type: string
+                required: true
+                default: /home/ubuntu/opera-root/git-project/IGS_types/validation.log
+                
+            implementation:
+              primary: files/validate/validate.yaml 
 
           # delete:
           #   inputs:

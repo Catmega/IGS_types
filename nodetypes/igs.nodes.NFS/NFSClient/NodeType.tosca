@@ -4,6 +4,7 @@ imports:
   - ../NFSServer/NodeType.tosca
   - ../../igs.nodes.abstract/IGSOSInstance/NodeType.tosca
   - ../../../relationshiptypes/igs.relationshipsn.NFS/ConnectsToNFSServer/RelationshipType.tosca
+  - ../../../interfacetypes/igs.interfaces.node.lifecycle/Validation/InterfaceType.tosca
 node_types:
   igs.nodes.NFS.NFSClient:
     derived_from: igs.nodes.abstract.BlockStorage
@@ -73,7 +74,18 @@ node_types:
                 default: { get_attribute: [SELF, client_mnt_path ] }               
             implementation:
               primary: files/configure/configure.yaml #create
-            
+      Validation:
+        type: igs.interfaces.node.lifecycle.Validation 
+        operations:
+          validate: 
+            inputs:
+
+              log_file_loc:
+                type: string
+                required: true
+                default: /home/ubuntu/opera-root/git-project/IGS_types/validation.log
+            implementation:
+              primary: files/validate/validate.yaml             
 
           # delete:
           #   inputs:

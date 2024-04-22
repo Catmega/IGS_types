@@ -21,7 +21,7 @@ node_types:
       #   default: { get_attribute: [ SELF, docker, port ] }
 
     capabilities:
-      host:
+      runtime:
         occurrences: [ 1, UNBOUNDED ]
         valid_source_types: [ igs.nodes.docker.DockerApplication, igs.nodes.abstract.ClusterNode ] #Compute node should be replaced with clusterNode
         type: igs.capabilities.container.DockerRuntime

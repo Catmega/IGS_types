@@ -12,6 +12,13 @@
     # - name: Print SSH address
     #   fail:
     #     msg: "SSH address is {{ ansible_host | default('Not defined') }}"
+    - name: execute docker info
+      ansible.builtin.shell: docker info
+      register: docker_info
+
+    - name: check the Swarm role for this node
+      meta: end_play
+      when: "'Swarm: active' in docker_info.stdout"
 
     - name: change permission
       command: sudo chmod 666 /var/run/docker.sock

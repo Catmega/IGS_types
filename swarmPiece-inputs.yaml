@@ -11,11 +11,11 @@ host_1_username: ubuntu
 host_1_hostname: ubu22vm03
 
 ## host_2 is a remote machine you want to opera on
-host_2_ip: 192.168.221.133 
+host_2_ip: 129.69.209.200 # 192.168.221.133 
 
-host_2_username: ubuntu
+host_2_username: jingyue # ubuntu
 
-host_2_hostname: igrepositopry
+host_2_hostname: pcss22task2vm4 # igrepositopry
 
 ## Further adjustments ######
 # you can add more hosts, but accordingly you need to add "workstation" in the Service Template "swarmPiece.yaml". Base other nodes properly on all the workstations

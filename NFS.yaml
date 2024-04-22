@@ -6,6 +6,8 @@ imports:
   - nodetypes/igs.nodes.NFS/NFSVolume/NodeType.tosca
   - nodetypes/igs.nodes.abstract/IGSOSInstance/NodeType.tosca
   - relationshiptypes/igs.relationshipsn.NFS/ConnectsToNFSServer/RelationshipType.tosca
+  - policytypes/igs.policies.validate.NFSServer/PolicyType.tosca
+  - policytypes/igs.policies.validate.NFSClient/PolicyType.tosca
 topology_template:
   relationship_templates:
     connectToNFSServer_relationship_1:
@@ -100,3 +102,11 @@ topology_template:
     #         node: nfs-server
     #         relationship: connectToNFSServer_relationship_2
     #     - host: workstation-2   
+
+  policies:
+    - validate-NFSServer:
+        type: igs.policies.validate.NFSServer
+        targets: [nfs-server]  
+    - validate-NFSClient:
+        type: igs.policies.validate.NFSClient
+        targets: [nfs-client-1]

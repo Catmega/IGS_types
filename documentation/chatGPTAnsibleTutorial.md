@@ -304,17 +304,11 @@ ChatGPT
 ChatGPT
 
 In the configuration provided, the data failover in the PostgreSQL cluster is organized through Docker Swarm's built-in high availability mechanisms. Here's how it works:
-
     Replication: The PostgreSQL service is deployed with three replicas (replicas: 3). Each replica is an instance of the PostgreSQL database running on a separate node in the Docker Swarm cluster.
-
     Swarm Management: Docker Swarm automatically manages the replicas of the PostgreSQL service across the nodes in the cluster. It ensures that each replica is distributed across different nodes to provide fault tolerance and high availability.
-
     Service Discovery: Docker Swarm provides service discovery capabilities, allowing clients to connect to the PostgreSQL service using a single virtual IP address or DNS name. When a client connects to the PostgreSQL service, Docker Swarm routes the connection to one of the available replicas.
-
     Failover Handling: If one of the nodes hosting a PostgreSQL replica fails, Docker Swarm automatically detects the failure and reschedules the replica on another healthy node in the cluster. This process ensures that the PostgreSQL service remains available even in the event of node failures.
-
     Data Synchronization: PostgreSQL itself handles data synchronization between replicas using its built-in streaming replication mechanism. Any changes made to the primary database (master) are replicated to the standby replicas asynchronously, ensuring data consistency across the cluster.
-
     Promotion of Standby Replicas: In the event of a failure of the primary database (master), one of the standby replicas is automatically promoted to the new primary database. Docker Swarm updates the routing to direct client connections to the new primary database, allowing the service to continue operating without interruption.
 
 Overall, Docker Swarm provides a robust infrastructure for orchestrating high availability PostgreSQL clusters, with automatic failover handling and data synchronization mechanisms built-in.

@@ -24,6 +24,7 @@
         client_mnt_path: "{{ CLIENT_MNT_DIR | default('undefined') }}"
         volume_dir: "{{ VOLUME_DIR | default('undefined') }}"
         container_data_dir: "{{ CONTAINER_DATA_DIR | default('undefined') }}"
+        replica_num: "{{ REPLICA_NUM }}"
 
   
 # - import_playbook: '{{t}}'

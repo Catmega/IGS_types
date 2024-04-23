@@ -50,7 +50,10 @@ node_types:
         type: string
         required: false
         default: { get_property: [SELF, containerApplication, container_data_dir ] }
-
+      replica_num:
+        type: integer
+        required: true
+        default: 1
     requirements:
 
       - containerApplication:
@@ -105,5 +108,10 @@ node_types:
                 type: string
                 required: false
                 default: { get_property: [ SELF, container_data_dir ] }
-            # implementation:
-            #   primary: files/start/start.yaml 
+                
+              REPLICA_NUM:
+                type: string
+                required: false
+                default: { get_property: [ SELF, replica_num ] }
+            implementation:
+              primary: files/start/start.yaml 

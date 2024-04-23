@@ -1,0 +1,59 @@
+- name: Convert string to integer
+  set_fact:
+    replica_integer: "{{ replica_num | int }}"
+# - name: Debug replica count
+#   fail:
+#     msg: "Replica count is {{ replica_num | int }}, and its type is {{ replica_num | int | type_debug }}"
+- name: Deploy stack - cluster postgres
+  community.docker.docker_stack:
+    state: present
+    name: igsstack
+    compose:
+      - version: '3.3'
+        services:
+          postgres:
+            hostname: 'primary'
+            image: crunchydata/crunchy-postgres:centos7-12.5-4.4.2 
+            environment:
+              - PGHOST=/tmp
+              - MAX_CONNECTIONS=10
+              - MAX_WAL_SENDERS=5
+              - PG_MODE=primary
+              - PG_PRIMARY_USER=igs
+              - PG_PRIMARY_PASSWORD=igs
+              - PG_DATABASE=igsdatabase
+              - PG_USER=igs
+              - PG_PASSWORD=igs
+              - PG_ROOT_PASSWORD=igs
+              - PG_PRIMARY_PORT=5432
+            deploy:
+              placement:
+                constraints:
+                # - node.labels.DBtype == primary
+                - node.role == manager
+
+
+          replica:
+            image: crunchydata/crunchy-postgres:centos7-12.5-4.4.2 
+            environment:
+              - PGHOST=/tmp
+              - MAX_CONNECTIONS=10
+              - MAX_WAL_SENDERS=5
+              - PG_MODE=replica
+              - PG_PRIMARY_HOST=primary
+              - PG_PRIMARY_PORT=5432
+              - PG_PRIMARY_USER=igs
+              - PG_PRIMARY_PASSWORD=igs
+              - PG_DATABASE=igsdatabase
+              - PG_USER=igs
+              - PG_PASSWORD=igs
+              - PG_ROOT_PASSWORD=igs
+
+            deploy:
+              replicas: 2
+              restart_policy:
+                condition: on-failure
+              placement:
+                constraints:
+                # - node.labels.DBtype != primary
+                - node.role == worker

@@ -1,0 +1,15 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+policy_types:
+  igs.policies.scaling.scaleOut.PostgresCluster:
+    derived_from: tosca.policies.Root
+    targets: [ igs.nodes.postgres.PostgresDBMSCluster ]
+    triggers:
+        igs.triggers.scaling.scaleOut.PostgresCluster:
+            description: A trigger for scale out
+            event: validation_trigger_scaleOut_PostgresCluster
+            target_filter:
+                node: igs.nodes.postgres.PostgresDBMSCluster
+            action:
+                - call_operation: Scaling.scaleOut
+

@@ -7,7 +7,7 @@ node_types:
   igs.nodes.abstract.ContainerApplication.CustomizableWebApp:
     derived_from: igs.nodes.abstract.ContainerApplication
     metadata:
-      targetNamespace: "igs.nodes.demo.container"
+      targetNamespace: "igs.nodes.abstract"
       abstract: "false"
       final: "false"
     properties:

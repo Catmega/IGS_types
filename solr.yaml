@@ -10,7 +10,7 @@ imports:
   - nodetypes/igs.nodes.abstract/IGSOSInstance/NodeType.tosca
   - nodetypes/igs.nodes.Solr.DocutmentSchema/NodeType.tosca
   - nodetypes/igs.nodes.Solr.Custom/NodeType.tosca
-  - nodetypes/igs.nodes.demo/igs.nodes.ContainerApplication.Solr/NodeType.tosca
+  - nodetypes/igs.nodes.ContainerApplication/igs.nodes.ContainerApplication.Solr/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSFTSearch/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSStorageService/NodeType.tosca
   - artifacttypes/igs.artifacts/Ansible/ArtifactType.tosca

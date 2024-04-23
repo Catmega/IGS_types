@@ -3,10 +3,10 @@ imports:
   - ../../igs.nodes.docker/IGSDockerApplication/NodeType.tosca
   - ../../../interfacetypes/igs.interfaces.node.lifecycle/Validation/InterfaceType.tosca
 node_types:
-  igs.nodes.demo.container.Postgres:
+  igs.nodes.ContainerApplication.Postgres:
     derived_from: igs.nodes.abstract.ContainerApplication
     metadata:
-      targetNamespace: "igs.nodes.demo.container"
+      targetNamespace: "igs.nodes.ContainerApplication"
       abstract: "false"
       final: "false"
 

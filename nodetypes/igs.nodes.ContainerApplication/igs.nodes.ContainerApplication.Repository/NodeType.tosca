@@ -5,10 +5,10 @@ imports:
   - ../../../capabilitytypes/igs.capabilities/WebAppServer/CapabilityType.tosca
   - ../../igs.nodes.abstract/IGSCustomizableWebApp/NodeType.tosca
 node_types:
-  igs.nodes.demo.container.Repository:
+  igs.nodes.ContainerApplication.Repository:
     derived_from: igs.nodes.abstract.ContainerApplication.CustomizableWebApp
     metadata:
-      targetNamespace: "igs.nodes.demo.container"
+      targetNamespace: "igs.nodes.ContainerApplication"
       abstract: "false"
       final: "false"
     properties:

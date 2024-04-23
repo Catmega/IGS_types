@@ -6,7 +6,7 @@ node_types:
   igs.nodes.ContainerApplication.Postgres:
     derived_from: igs.nodes.abstract.ContainerApplication
     metadata:
-      targetNamespace: "igs.nodes.demo.container"
+      targetNamespace: "igs.nodes.ContainerApplication"
       abstract: "false"
       final: "false"
     properties:

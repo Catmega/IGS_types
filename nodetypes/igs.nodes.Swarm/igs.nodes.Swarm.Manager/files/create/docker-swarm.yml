@@ -1,0 +1,49 @@
+# <!-- 
+# Me: Are you able to generate an ansible script to create a swarm cluster of one controller and 3 worker nodes on ubuntu 22.04
+# ChatGPT: Certainly! Below is an example Ansible playbook that you can use to set up a Docker Swarm cluster with one controller node and three worker nodes on Ubuntu 22.04. This playbook assumes you have Ansible installed and SSH access to the target nodes with sudo privileges.
+# This playbook installs Docker, initializes Docker Swarm on the controller node, retrieves the join token, 
+# and joins the worker nodes to the Swarm cluster. 
+# Make sure to replace 'controller' with the actual name of your controller node in your Ansible inventory file. 
+# Also, ensure that the SSH access and sudo privileges are correctly set up for all nodes.
+# You can run this playbook with the following command: ansible-playbook -i <inventory_file> setup_swarm_cluster.yaml
+#
+# Replace <inventory_file> with the path to your Ansible inventory file 
+# containing the IP addresses or hostnames of your controller and worker nodes.
+
+
+# generate yaml file  
+ # -->
+---
+- name: Setup Docker Swarm Cluster
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        update_cache: yes
+
+    - name: Install Docker Compose
+      apt:
+        name: docker-compose
+        update_cache: yes
+
+    - name: Ensure Docker service is started and enabled
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Initialize Docker Swarm on the Controller Node
+      command: docker swarm init --advertise-addr "{{ ansible_host }}"
+      when: inventory_hostname == 'controller'
+
+    - name: Retrieve Docker Swarm join-token
+      command: docker swarm join-token -q worker
+      register: swarm_token
+      when: inventory_hostname == 'controller'
+
+    - name: Join Worker Nodes to Docker Swarm
+      command: docker swarm join --token "{{ swarm_token.stdout }}" "{{ hostvars['controller'].ansible_host }}"
+      when: inventory_hostname != 'controller' and swarm_token is defined
+

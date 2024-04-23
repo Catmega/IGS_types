@@ -254,7 +254,7 @@ topology_template:
           type: igs.artifacts.Ansible.DockerCompose
           file: artifacts/postgres-stack.yaml
       requirements:
-        - containerApplication: Demo-Postgres-Container
+        - containerApplication: Postgres-Container
 
     Proxy-Service:
       type: igs.nodes.Component.ProxyService
@@ -267,7 +267,7 @@ topology_template:
           type: igs.artifacts.Ansible.DockerCompose
           file: artifacts/proxy-stack.yaml
       requirements:
-        - containerApplication: Demo-Nginx-Container
+        - containerApplication: Nginx-Container
         - portalService: Portal-Service
         # - recordsManagement: Records-Management
         # - repositoryAdministration: Repository-Administration
@@ -290,7 +290,7 @@ topology_template:
 
 
 ############containers###################################
-    Demo-Postgres-Container:
+    Postgres-Container:
       type: igs.nodes.ContainerApplication.Postgres
       properties:
         image_namespace: docker.io
@@ -379,7 +379,7 @@ topology_template:
         - storage: MockStorage
         - webAppServer: Tomcat-AppServer-for-Repository
 
-    Demo-Nginx-Container:
+    Nginx-Container:
       type: igs.nodes.ContainerApplication.Proxy
       properties:
         image_name: nginx
@@ -428,5 +428,5 @@ topology_template:
         targets: [swarm-worker-1 ]
     - validate-Postgres:
         type: igs.policies.validate.Postgres
-        targets: [Demo-Postgres-Container]
+        targets: [Postgres-Container]
         

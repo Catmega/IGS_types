@@ -260,7 +260,7 @@ topology_template:
           type: igs.artifacts.Ansible.DockerCompose
           file: artifacts/clustered-postgres-stack.yaml
       requirements:
-        - containerApplication: Demo-Crunchy-Postgres-Container
+        - containerApplication: Crunchy-Postgres-Container
 
     Proxy-Service:
       type: igs.nodes.Component.ProxyService
@@ -273,7 +273,7 @@ topology_template:
           type: igs.artifacts.Ansible.DockerCompose
           file: artifacts/proxy-stack.yaml
       requirements:
-        - containerApplication: Demo-Nginx-Container
+        - containerApplication: Nginx-Container
         - portalService: Portal-Service
         # - recordsManagement: Records-Management
         # - repositoryAdministration: Repository-Administration
@@ -296,7 +296,7 @@ topology_template:
 
 
 ############containers###################################
-    Demo-Crunchy-Postgres-Container:
+    Crunchy-Postgres-Container:
       type: igs.nodes.ContainerApplication.CrunchyPostgres
       properties:
         image_namespace: crunchydata
@@ -385,7 +385,7 @@ topology_template:
         - storage: MockStorage
         - webAppServer: Tomcat-AppServer-for-Repository
 
-    Demo-Nginx-Container:
+    Nginx-Container:
       type: igs.nodes.ContainerApplication.Proxy
       properties:
         image_name: nginx

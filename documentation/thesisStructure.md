@@ -14,10 +14,14 @@
 	- Orchestration Model  
 - Chap-4 Implementation
 	- Dev/Test Environment
-	- IGS artifacts  (nodes, service and topology templates )
+	- IGS artifacts  by Types
+ 	- nodes
+  	- service templates
+  	- topology templates
 - Chap-5 Prototype 
-	- Use Case 
-	- Demo 
+	- Use Cases evaluated  
+	- Demo -
+ 		- The Algfresco Governance Services delivered by Alfresco ECM Solution 
 - Chap-6 Summary 
 	- Conclusions 
 	- Outlook 

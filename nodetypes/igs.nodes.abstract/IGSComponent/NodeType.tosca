@@ -52,7 +52,7 @@ node_types:
         default: { get_property: [SELF, containerApplication, container_data_dir ] }
       replica_num:
         type: integer
-        required: true
+        required: false
         default: 1
     requirements:
 

@@ -43,7 +43,7 @@
       apt:
         upgrade: yes
         update_cache: yes
-      when: ansible_os_family == "Debian"
+      # when: ansible_os_family == "Debian"
 
 
     - name: Install required packages
@@ -51,7 +51,7 @@
         pkg:
           - nfs-kernel-server
 
-      when: ansible_os_family == "Debian"
+      # when: ansible_os_family == "Debian"
 
     - name: Create directory= mkdir -p
       ansible.builtin.file:

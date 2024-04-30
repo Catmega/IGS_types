@@ -1,16 +1,11 @@
 tosca_definitions_version: tosca_simple_yaml_1_3
 
 relationship_types:
-  igs.relationships.RequireCatalog:
-    derived_from: tosca.relationships.ConnectsTo
+  igs.relationships.IsAdministratedBy:
+    derived_from: tosca.relationships.DependsOn
     metadata:
       targetNamespace: "igs.relationships"
       abstract: "false"
       final: "false"
-    properties:
-      interactions:
-        type: list
-        required: false
-        entry_schema:
-          type: igs.datatypes.Interaction
-    valid_target_types: [ igs.capabilities.Catalog ]
+
+

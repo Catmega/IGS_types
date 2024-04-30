@@ -3,7 +3,7 @@ imports:
   - ../IGSContainerRuntime/NodeType.tosca
 
 node_types:
-  igs.nodes.abstract.BlockStorage:
+  igs.nodes.abstract.Volume:
     derived_from: tosca.nodes.Abstract.Storage
     properties:
       name: # this is a required field from tosca.nodes.Abstract.Storage

@@ -49,7 +49,8 @@ imports:
   - artifacttypes/igs.artifacts/DockerCompose/ArtifactType.tosca
   - artifacttypes/igs.artifacts/Html/ArtifactType.tosca
   - artifacttypes/igs.artifacts/Jar/ArtifactType.tosca
-  
+  - nodetypes/igs.nodes.docker/IGSDockerTempararyVolume/NodeType.tosca
+  - nodetypes/igs.nodes.docker/IGSDockerAutoOverlayNetwork/NodeType.tosca
 topology_template:
 
   node_templates:
@@ -170,16 +171,16 @@ topology_template:
           file: artifacts/repository-stack.yaml
       requirements:
         # - fedSearch: Fed-Search
-        # - obejectService: Object-Service
+        # - objectService: Object-Service
         - catalog: Catalog     
-        - objectCatalog: Obeject-Catalog
+        - objectCatalog: Object-Catalog
         - recordsCatalog: Records-Catalog
         # - messageBroker: Message-Service
         # - transform: Transform-Service
         - containerApplication: Repository-Container
         
     # Object-Service:
-    #   type: igs.nodes.Component.ObejectService
+    #   type: igs.nodes.Component.ObjectService
     #   requirements:
     #     - FTSearchEngine: Solr
     # Fed-Search:
@@ -209,7 +210,7 @@ topology_template:
     # Storage-Service:
     #   type: igs.nodes.Component.StorageService
     #   requirements:
-    #     - BlockStorage: nfs-client-1
+    #     - FileStorage: nfs-client-1
     postgres-volume:
       type: igs.nodes.NFS.Volume
       properties:
@@ -220,25 +221,16 @@ topology_template:
 
     Catalog:
       type: igs.nodes.postgres.PostgresCatalog
-      properties:
-        name: alfresco-catalog
       requirements:
         - endpoint: Postgres-Database
-        - host: Postgres-DBMS-Cluster
-    Obeject-Catalog:
+    Object-Catalog:
       type: igs.nodes.postgres.PostgresObjectCatalog
-      properties:
-        name: alfresco-object-catalog
       requirements:
         - endpoint: Postgres-Database
-        - host: Postgres-DBMS-Cluster
     Records-Catalog:
       type: igs.nodes.postgres.PostgresRecordsCatalog
-      properties:
-        name: alfresco-records-catalog
       requirements:
         - endpoint: Postgres-Database
-        - host: Postgres-DBMS-Cluster
     Postgres-Database:
       type: igs.nodes.postgres.PostgresDatabase
       properties:

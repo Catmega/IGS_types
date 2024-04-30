@@ -4,9 +4,10 @@ imports:
   - ../../igs.nodes.abstract/IGSOSInstance/NodeType.tosca
   - ../../igs.nodes.docker/IGSDockerEngine/NodeType.tosca
   - ../../../capabilitytypes/igs.capabilities.container/DockerRuntime/CapabilityType.tosca
+  - ../../igs.nodes.abstract/IGSVolume/NodeType.tosca
 node_types:
   igs.nodes.NFS.Volume:
-    derived_from: igs.nodes.abstract.BlockStorage
+    derived_from: igs.nodes.abstract.Volume
     metadata:
       targetNamespace: "igs.nodes.NFS"
       abstract: "false"
@@ -15,7 +16,7 @@ node_types:
 
 
     properties:
-      # name: inherits from igs.nodes.abstract.BlockStorage <- tosca.nodes.abstract.BlockStorage
+      # name: inherits from igs.nodes.abstract.Volume <- tosca.nodes.abstract.Storage
       client_mnt_path:
         type: string
         required: true

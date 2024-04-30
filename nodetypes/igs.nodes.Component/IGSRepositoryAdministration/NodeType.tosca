@@ -5,6 +5,8 @@ imports:
   - ../../../capabilitytypes/igs.capabilities.container/RepositoryUI/CapabilityType.tosca
   - ../../igs.nodes.abstract/IGSContainerApplication/NodeType.tosca
   - ../IGSSecurityService/NodeType.tosca
+  - ../../../capabilitytypes/igs.capabilities/Administration/CapabilityType.tosca
+  - ../../../capabilitytypes/igs.capabilities/Security/CapabilityType.tosca
 node_types:
   igs.nodes.Component.RepositoryAdministration:
     derived_from: igs.nodes.abstract.Component
@@ -14,9 +16,18 @@ node_types:
       final: "false"
     requirements:
       - securityService:
-          capability: tosca.capabilities.Compute
-          node: igs.nodes.Component.SecurityService
+          capability: igs.capabilities.Security
+          node: igs.nodes.abstract.Component
           relationship: tosca.relationships.DependsOn
           occurrences: [ 1, 1 ]
-
+      - containerApplication:
+          capability: igs.capabilities.container.Security
+          node: igs.nodes.abstract.ContainerApplication
+          relationship: tosca.relationships.DependsOn
+          occurrences: [ 1, 1 ]
+    capabilities:
+      administration:
+        occurrences: [ 1, UNBOUNDED ]
+        valid_source_types: [ igs.nodes.abstract.Component ]
+        type: igs.capabilities.Administration
 

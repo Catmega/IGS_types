@@ -12,7 +12,6 @@ node_types:
     requirements:
       - host:
           capability: tosca.capabilities.Compute
-          node: igs.nodes.postgres.PostgresDBMS
           relationship: tosca.relationships.HostedOn
           occurrences: [ 1, 1 ]
     capabilities:

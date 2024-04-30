@@ -1,5 +1,6 @@
 tosca_definitions_version: tosca_simple_yaml_1_3
-
+imports:
+    - ../../nodetypes/igs.nodes.ContainerApplication/igs.nodes.ContainerApplication.Postgres/NodeType.tosca
 policy_types:
   igs.policies.validate.Postgres:
     derived_from: tosca.policies.Root

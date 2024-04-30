@@ -113,5 +113,5 @@ node_types:
                 type: string
                 required: false
                 default: { get_property: [ SELF, replica_num ] }
-            implementation:
-              primary: files/start/start.yaml 
+            # implementation:
+            #   primary: files/start/start.yaml 

@@ -36,7 +36,9 @@ imports:
   - nodetypes/Alfresco.nodes.ContainerApplication/transformCore/NodeType.tosca
   - nodetypes/Alfresco.nodes.ContainerApplication/nginx/NodeType.tosca
   - nodetypes/igs.nodes.abstract/IGSOSInstance/NodeType.tosca
-  - nodetypes/igs.nodes.demo/igs.nodes.ContainerApplication.Postgres/NodeType.tosca
+  - nodetypes/igs.nodes.ContainerApplication/igs.nodes.ContainerApplication.Postgres/NodeType.tosca
+  - nodetypes/igs.nodes.docker/IGSDockerTempararyVolume/NodeType.tosca
+  - nodetypes/igs.nodes.docker/IGSDockerAutoOverlayNetwork/NodeType.tosca
   - capabilitytypes/igs.capabilities.container/Solr/CapabilityType.tosca
   - capabilitytypes/igs.capabilities.container/PostgresDBMS/CapabilityType.tosca
   - capabilitytypes/igs.capabilities.container/RepositoryUI/CapabilityType.tosca
@@ -229,16 +231,19 @@ topology_template:
           file: alfresco_artifacts/alfresco_stack.yaml
       requirements:
         - fedSearch: Fed-Search
-        - obejectService: Object-Service
+        - objectService: Object-Service
         - catalog: Catalog     
-        - objectCatalog: Obeject-Catalog
+        - objectCatalog: Object-Catalog
         - recordsCatalog: Records-Catalog
         - messageBroker: Message-Service
         - transform: Transform-Service
         - containerApplication: Alfresco-Repository-Container
+        - recordsManagement: Records-Management
+        - repositoryAdministration: Repository-Administration
+        
         
     Object-Service:
-      type: igs.nodes.Component.ObejectService
+      type: igs.nodes.Component.ObjectService
       requirements:
         - FTSearchEngine: Solr
         - containerApplication: MockContainer
@@ -247,6 +252,7 @@ topology_template:
       requirements:
         - FTSearch: FT-Search-Service
         - containerApplication: MockContainer
+        - database: Postgres-Database
     FT-Search-Service:
       type: igs.nodes.Component.FTSearchService
       requirements:
@@ -288,30 +294,21 @@ topology_template:
     Storage-Service:
       type: igs.nodes.Component.StorageService
       requirements:
-        - BlockStorage: nfs-client-1
+        - FileStorage: nfs-client-1
         - containerApplication: MockContainer
     
     Catalog:
       type: igs.nodes.postgres.PostgresCatalog
-      properties:
-        name: alfresco-catalog
       requirements:
         - endpoint: Postgres-Database
-        - host: Postgres-DBMS
-    Obeject-Catalog:
+    Object-Catalog:
       type: igs.nodes.postgres.PostgresObjectCatalog
-      properties:
-        name: alfresco-object-catalog
       requirements:
         - endpoint: Postgres-Database
-        - host: Postgres-DBMS
     Records-Catalog:
       type: igs.nodes.postgres.PostgresRecordsCatalog
-      properties:
-        name: alfresco-records-catalog
       requirements:
         - endpoint: Postgres-Database
-        - host: Postgres-DBMS
     Postgres-Database:
       type: igs.nodes.postgres.PostgresDatabase
       properties:
@@ -348,8 +345,6 @@ topology_template:
       requirements:
         - containerApplication: Alfresco-Nginx-Container
         - portalService: Portal-Service
-        - recordsManagement: Records-Management
-        - repositoryAdministration: Repository-Administration
         - contentAppService: ContentApp-Service
     
     Portal-Service:
@@ -370,7 +365,6 @@ topology_template:
     Records-Management:
       type: igs.nodes.Component.RecordsManagement
       requirements:
-        - repository: Repository
         - containerApplication: MockContainer
     
     Repository-Administration:
@@ -391,7 +385,7 @@ topology_template:
     Security-Service:
       type: igs.nodes.Component.SecurityService
       requirements:
-        - containerApplication: Alfresco-ControlCenter-Container
+        - containerApplication: MockContainer
 
     Message-Service:
       type: igs.nodes.Component.MessageService

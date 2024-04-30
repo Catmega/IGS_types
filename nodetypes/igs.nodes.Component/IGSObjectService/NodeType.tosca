@@ -3,8 +3,9 @@ imports:
   - ../../igs.nodes.abstract/IGSComponent/NodeType.tosca
   - ../../../capabilitytypes/igs.capabilities/FTSearchEngine/CapabilityType.tosca 
   - ../../../relationshiptypes/igs.relationships/RequireFTSearchEngine/RelationshipType.tosca
+  - ../../../capabilitytypes/igs.capabilities/ObjectManagement/CapabilityType.tosca
 node_types:
-  igs.nodes.Component.ObejectService:
+  igs.nodes.Component.ObjectService:
     derived_from: igs.nodes.abstract.Component
     metadata:
       targetNamespace: "igs.nodes.Component"
@@ -18,3 +19,8 @@ node_types:
           relationship: igs.relationships.RequireFTSearchEngine
 
           occurrences: [ 1, 1 ]
+    capabilities:
+      objectManagement:
+        occurrences: [ 1, UNBOUNDED ]
+        valid_source_types: [ igs.nodes.abstract.Component ]
+        type: igs.capabilities.ObjectManagement

@@ -50,10 +50,12 @@
               - PG_ROOT_PASSWORD=igs
 
             deploy:
-              replicas: 2
+              replicas: 1
               restart_policy:
                 condition: on-failure
               placement:
                 constraints:
                 # - node.labels.DBtype != primary
                 - node.role == worker
+# - name: scale 
+#   ansible.builtin.shell: "docker service scale replica={{REPLICA_NUM:}}"

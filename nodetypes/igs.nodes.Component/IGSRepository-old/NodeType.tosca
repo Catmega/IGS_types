@@ -26,9 +26,9 @@ node_types:
           node: igs.nodes.Component.FedSearch
           relationship: tosca.relationships.DependsOn
           occurrences: [ 1, 1 ]
-      - obejectService:
+      - objectService:
           capability: tosca.capabilities.Compute
-          node: igs.nodes.Component.ObejectService
+          node: igs.nodes.Component.ObjectService
           relationship: tosca.relationships.DependsOn
           occurrences: [ 1, 1 ]
       - catalog:

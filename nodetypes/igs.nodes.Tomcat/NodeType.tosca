@@ -7,7 +7,7 @@ node_types:
   igs.nodes.Tomcat:
     derived_from: igs.nodes.abstract.WebAppServer
     metadata:
-      targetNamespace: "igs.nodes.Tomcat"
+      targetNamespace: "igs.nodes"
       abstract: "false"
       final: "false"
     properties:

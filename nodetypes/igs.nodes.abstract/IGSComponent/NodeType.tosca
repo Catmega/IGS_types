@@ -61,6 +61,10 @@ node_types:
           node: igs.nodes.abstract.ContainerApplication
           relationship: tosca.relationships.DependsOn
           occurrences: [ 1, 1 ]
+      # - host:
+      #     capability: tosca.capabilities.Node
+      #     node: tosca.nodes.Compute
+      #     relationship: tosca.relationships.HostedOn
     interfaces:
       Standard:
         type: tosca.interfaces.node.lifecycle.Standard
@@ -113,5 +117,5 @@ node_types:
                 type: string
                 required: false
                 default: { get_property: [ SELF, replica_num ] }
-            # implementation:
-            #   primary: files/start/start.yaml 
+            implementation:
+              primary: files/start/start.yaml 

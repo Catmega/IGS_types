@@ -1,9 +1,7 @@
 tosca_definitions_version: tosca_simple_yaml_1_3
 imports:
-  - ../../igs.nodes.abstract/IGSContainerApplication/NodeType.tosca
-  - ../IGSDockerEngine/NodeType.tosca
-  - ../../../capabilitytypes/igs.capabilities.container/DockerRuntime/CapabilityType.tosca
-  - ../../igs.nodes.abstract/IGSVolume/NodeType.tosca
+
+  - ../../igs.nodes.Swarm/igs.nodes.Swarm.Manager/NodeType.yaml
   - ../../igs.nodes.abstract/IGSPrivateNetwork/NodeType.tosca
 node_types:
   igs.nodes.docker.AutoOverlayNetwork:
@@ -13,4 +11,8 @@ node_types:
       targetNamespace: "igs.nodes.docker"
       abstract: "false"
       final: "false"
-
+    requirements:
+      - host:
+          capability: tosca.capabilities.Compute
+          node: igs.nodes.Swarm.Manager
+          relationship: tosca.relationships.HostedOn 

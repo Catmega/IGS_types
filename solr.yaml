@@ -27,7 +27,7 @@ topology_template:
         public_address: 192.168.221.163
         username: ubuntu
         name: localhost
-        tier: frontend
+        # tier: frontend
         host_name: ubu22vm03
 
     workstation-2: # for backend
@@ -37,7 +37,7 @@ topology_template:
         public_address: 129.69.209.200
         username: jingyue
         name: remote_host
-        tier: backend
+        # tier: backend
         host_name: pcss22task2vm4
 
     swarm-manager: # for frontend
@@ -90,8 +90,7 @@ topology_template:
         volume_dir: undefined
         networkName: undefined
       requirements:
-        - host: workstation-1
-        - runtime: docker-engine-1
+        - host: swarm-manager
         - network: MockNetwork
         - storage: MockStorage
 
@@ -140,8 +139,7 @@ topology_template:
         # group: backend
         # labels: [node.labels.tile==backend]
       requirements:
-        - host: workstation-1
-        - runtime: docker-engine-1
+        - host: swarm-manager
         - network: MockNetwork
         - storage: MockStorage
         # - docSchema: Solr-Schema

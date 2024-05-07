@@ -50,7 +50,7 @@
               - PG_ROOT_PASSWORD=igs
 
             deploy:
-              replicas: 1
+              replicas: 2
               restart_policy:
                 condition: on-failure
               placement:

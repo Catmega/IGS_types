@@ -87,8 +87,8 @@ node_types:
         valid_source_types: [ igs.nodes.Component.ProxyService ]
         type: igs.capabilities.container.Proxy
 
-    requirements:
+    # requirements:
 
-      - dependency_1:
-          capability: tosca.capabilities.Compute
-          relationship: tosca.relationships.DependsOn
+    #   - dependency_1:
+    #       capability: tosca.capabilities.Compute
+    #       relationship: tosca.relationships.DependsOn

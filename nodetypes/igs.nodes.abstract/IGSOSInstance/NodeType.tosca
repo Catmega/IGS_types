@@ -11,9 +11,11 @@ node_types:
     attributes:
       username:
         type: string
-      tier:
-        type: string
+      # tier:
+      #   type: string
       name:
+        type: string
+      os:
         type: string
       host_name:
         type: string
@@ -25,4 +27,4 @@ node_types:
       host:
         occurrences: [ 1, UNBOUNDED ]
         valid_source_types: [igs.nodes.abstract.FileStorage, igs.nodes.abstract.ContainerRuntime]
-        type: tosca.capabilities.Container
+        type: tosca.capabilities.Compute

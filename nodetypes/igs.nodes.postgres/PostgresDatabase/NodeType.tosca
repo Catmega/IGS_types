@@ -1,6 +1,7 @@
 tosca_definitions_version: tosca_simple_yaml_1_3
 imports:
   - ../../igs.nodes.abstract/IGSDatabase/NodeType.tosca
+  - ../PostgresCatalog/NodeType.tosca
 node_types:
   igs.nodes.postgres.PostgresDatabase:
     derived_from: igs.nodes.abstract.Database
@@ -17,6 +18,6 @@ node_types:
     capabilities:
       endpoint:
         occurrences: [ 1, UNBOUNDED ]
-        valid_source_types: [ igs.nodes.postgres.PostgresDatabase ]
+        valid_source_types: [ igs.nodes.postgres.PostgresCatalog, igs.nodes.postgres.PostgresObjectCatalog, igs.nodes.postgres.PostgresRecordsCatalog ]
         type: tosca.capabilities.Endpoint.Database
 

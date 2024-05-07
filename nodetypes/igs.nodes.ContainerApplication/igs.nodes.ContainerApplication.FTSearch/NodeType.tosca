@@ -1,0 +1,75 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../../igs.nodes.docker/IGSDockerApplication/NodeType.tosca
+  - ../../igs.nodes.abstract/IGSWebAppServer/NodeType.tosca
+  - ../../../capabilitytypes/igs.capabilities/WebAppServer/CapabilityType.tosca
+  - ../../igs.nodes.abstract/IGSCustomizableWebApp/NodeType.tosca
+node_types:
+  igs.nodes.ContainerApplication.FTSearch:
+    derived_from: igs.nodes.abstract.ContainerApplication.CustomizableWebApp
+    metadata:
+      targetNamespace: "igs.nodes.ContainerApplication"
+      abstract: "false"
+      final: "false"
+    properties:
+      client_mnt_path:
+        type: string
+        required: false
+        default: undefined
+      volume_dir:
+        type: string
+        required: false
+        default: undefined
+      ##### inherited #####
+      # image_version:
+      #   type: version
+      #   required: true
+      ##### inherited from igs.nodes.abstract.ContainerApplication.CustomizableWebApp #####
+      # base_webapp_server_version:
+      #   type: version
+      #   required: true
+      #   default: { get_property: [SELF, webAppServer, webapp_server_version ] }
+      # app_file_loc:
+      #   type: string
+      #   required: true
+      #   default: notGiven
+      #######################################################################################
+    ##### inherited from igs.nodes.abstract.ContainerApplication.CustomizableWebApp #####
+    # requirements:
+    #   - webAppServer:  
+    #       capability: igs.capabilities.WebAppServer
+    #       node: igs.nodes.abstract.WebAppServer
+    #       relationship: tosca.relationships.HostedOn
+    #######################################################################################
+    interfaces:
+      Standard:
+        type: tosca.interfaces.node.lifecycle.Standard
+        operations:
+          create:
+            inputs:
+              BASE_WEBAPP_SERVER_NAME:
+                type: string
+                required: true
+                default: { get_property: [SELF, base_webapp_server_name ] }
+              BASE_WEBAPP_SERVER_VERSION:
+                type: string
+                required: true
+                default: { get_property: [SELF, base_webapp_server_version ] }
+              REPOSITORY_VERSION:
+                type: string
+                required: true
+                default: { get_property: [SELF, image_version ] }
+              REPOSITORY_ARTIFACT:
+                type: string
+                required: true
+                default: { get_property: [SELF, app_file_loc ] }
+              IMAGE_NAMESPACE:
+                type: string
+                required: false
+                default: { get_property: [ SELF, image_namespace] }
+              IMAGE_NAME:
+                type: string
+                required: false
+                default: { get_property: [ SELF, image_name] }
+            implementation:
+              primary: files/create/create.yaml 

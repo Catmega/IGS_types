@@ -119,3 +119,13 @@ node_types:
                 default: { get_property: [ SELF, replica_num ] }
             implementation:
               primary: files/start/start.yaml 
+          delete:
+            inputs:
+
+              STACK_NAME:
+                type: string
+                required: false
+                default: { get_property: [ SELF, stack_name] }
+
+            implementation:
+              primary: files/delete/delete.yaml 

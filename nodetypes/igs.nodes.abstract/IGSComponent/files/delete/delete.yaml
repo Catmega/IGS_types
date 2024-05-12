@@ -1,0 +1,8 @@
+- name: delete the docker stack
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Remove stack
+      community.docker.docker_stack:
+        name: '{{STACK_NAME}}'
+        state: absent

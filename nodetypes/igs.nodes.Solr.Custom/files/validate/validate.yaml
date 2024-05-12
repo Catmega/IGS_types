@@ -1,6 +1,6 @@
 ---
 - name: add hosts to Ansible 
-  hosts: localhost
+  hosts: all
   gather_facts: true  
   vars:
     log_file_loc: /home/ubuntu/opera-root/git-project/IGS_types/validation.log
@@ -11,14 +11,16 @@
     id_found : false
   tasks:
 
-
+    - name: get validating machines's ip
+      set_fact:
+        current_machine_ip: "{{ ansible_ssh_host }}"
     - name: write a banner
       delegate_to: localhost
-      ansible.builtin.shell: echo "*********Validating Solr on machine $(hostname -I | awk '{ print $1 }')****{{ ansible_date_time.date }} {{ ansible_date_time.time }}*****" >> '{{log_file_loc}}'
+      ansible.builtin.shell: echo "*********Validating Solr on machine "{{ ansible_ssh_host }}"****{{ ansible_date_time.date }} {{ ansible_date_time.time }}*****" >> '{{log_file_loc}}'
 
     - name: check if Solr is ready
       uri:
-        url: "http://localhost:{{host_port}}/solr"
+        url: "http://{{ ansible_ssh_host }}:{{host_port}}/solr"
         method: GET
         return_content: yes
         status_code: 200
@@ -39,7 +41,7 @@
 
     - name: upload a json doc for this core
       uri:
-        url: "http://localhost:{{host_port}}/solr/{{core_name}}/update"
+        url: "http://{{ ansible_ssh_host }}:{{host_port}}/solr/{{core_name}}/update"
         method: POST
         body: '[{
     "id" : "001-232401",
@@ -66,7 +68,7 @@
 
     - name: query the json doc
       uri:
-        url: "http://localhost:{{host_port}}/solr/{{core_name}}/select?q=author%3ANancy"
+        url: "http://{{ ansible_ssh_host }}:{{host_port}}/solr/{{core_name}}/select?q=author%3ANancy"
         method: GET
         status_code: 200
         return_content: yes

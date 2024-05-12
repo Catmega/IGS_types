@@ -49,25 +49,25 @@ node_types:
               primary: files/create/create.yaml #create
               timeout: 0
 
-          delete:
-            inputs:
+          # delete:
+          #   inputs:
 
-              ANSIBLE_HOST_IP:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, ansible_host_ip ] }
-              ANSIBLE_USER:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, ansible_user ] }
-              ANSIBLE_HOST_NAME:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, ansible_host_name ] } 
+          #     ANSIBLE_HOST_IP:
+          #       type: string
+          #       required: true
+          #       default: { get_attribute: [SELF, ansible_host_ip ] }
+          #     ANSIBLE_USER:
+          #       type: string
+          #       required: true
+          #       default: { get_attribute: [SELF, ansible_user ] }
+          #     ANSIBLE_HOST_NAME:
+          #       type: string
+          #       required: true
+          #       default: { get_attribute: [SELF, ansible_host_name ] } 
 
-            # implementation:
-            #   primary: files/delete/delete.yaml #delete
-            #   timeout: 0
+          #   implementation:
+          #     primary: files/delete/delete.yaml #delete
+          #     timeout: 0
       Validation:
         type: igs.interfaces.node.lifecycle.Validation 
         operations:

@@ -1,0 +1,22 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../../igs.nodes.abstract/IGSOSInstance/NodeType.tosca
+node_types:
+#### this nodetype is not deployable yet, needs to add further implementation ####
+  igs.nodes.VM.Openstack:
+    derived_from: igs.nodes.abstract.OSInstance
+    metadata:
+      targetNamespace: "igs.nodes.VM"
+      abstract: "false"
+      final: "false"
+
+    properties:
+      flavor:
+        type: string
+        required: false
+      os:
+        type: string
+        required: false
+
+
+

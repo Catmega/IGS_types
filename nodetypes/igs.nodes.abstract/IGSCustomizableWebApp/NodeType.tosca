@@ -23,6 +23,12 @@ node_types:
         type: string
         required: true
         default: notGiven
+      start_command:
+        type: string
+        required: true
+      server_app_loc:
+        type: string
+        required: true
     requirements:
       - webAppServer:  
           capability: igs.capabilities.WebAppServer

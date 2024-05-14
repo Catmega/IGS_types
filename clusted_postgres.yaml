@@ -90,7 +90,7 @@ topology_template:
       properties:
         replica_num: 2
         stack_name: igsstack
-        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.DatabaseTile==true
       artifacts:
         docker_compose_file:

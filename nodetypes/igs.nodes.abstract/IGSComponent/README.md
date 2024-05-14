@@ -21,7 +21,7 @@ Abstract node type representing IG Service Components.
 | volume_dir | false | string |  `containerApplication`'s volume_dir | sub directory of storage for its container app|
 | container_data_dir | false | string |  `containerApplication`'s container_data_dir | which data inside its container app needs to be volumed |
 | replica_num | false | integer | 1  | how many replicas of container app should running in this IGS componennt |
-| docker_compose_file_loc | false | string |  notGiven | location of the artifact defining how to run this component on certain platform |
+| service_launcher_def_loc | false | string |  notGiven | location of the artifact defining how to run this component on certain platform |
 
 ### Requirements
 
@@ -33,4 +33,4 @@ Abstract node type representing IG Service Components.
 
 | Operation | Interface | description |
 |:---- |:--------------- |:-------------------- |
-| start | Standard | starting this IGS component directly using the artifact given in `docker_compose_file_loc` | tosca.relationships.DependsOn |
+| start | Standard | starting this IGS component directly using the artifact given in `service_launcher_def_loc` | tosca.relationships.DependsOn |

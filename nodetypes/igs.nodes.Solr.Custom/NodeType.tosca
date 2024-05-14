@@ -9,9 +9,10 @@ imports:
   - ../../relationshiptypes/igs.relationships/RequireDocumentSchema/RelationshipType.tosca
   - ../../capabilitytypes/igs.capabilities/DocumentSchema/CapabilityType.tosca
   - ../../interfacetypes/igs.interfaces.node.lifecycle/Validation/InterfaceType.tosca
+  - ../igs.nodes.Component/IGSFTSearchEngine/NodeType.tosca
 node_types:
   igs.nodes.Solr.Custom:
-    derived_from: igs.nodes.abstract.Component
+    derived_from: igs.nodes.Component.FTSearchEngine
     metadata:
       targetNamespace: "igs.nodes.Solr"
       abstract: "false"
@@ -35,11 +36,11 @@ node_types:
           node: igs.nodes.abstract.ContainerApplication
           relationship: tosca.relationships.DependsOn
           occurrences: [ 1, 1 ]
-      - storageService:
-          capability: igs.capabilities.StorageService
-          node: igs.nodes.abstract.Component
-          relationship: tosca.relationships.DependsOn
-          occurrences: [ 1, 1 ]
+      # - storageService:
+      #     capability: igs.capabilities.StorageService
+      #     node: igs.nodes.abstract.Component
+      #     relationship: tosca.relationships.DependsOn
+      #     occurrences: [ 1, 1 ]
       - docSchema:
           capability: igs.capabilities.DocumentSchema
           node: igs.nodes.Solr.DocumentSchema
@@ -57,10 +58,10 @@ node_types:
           configure:
             inputs:
 
-              DOCKER_COMPOSE_FILE_LOC:
+              SERVICE_LAUNCHER_DEF_LOC:
                 type: string
                 required: false
-                default: { get_property: [SELF, docker_compose_file_loc ] }
+                default: { get_property: [SELF, service_launcher_def_loc ] }
               LABELS:
                 type: string
                 required: false

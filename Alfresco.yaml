@@ -49,12 +49,13 @@ imports:
   - relationshiptypes/igs.relationships/ConnectsToManager/RelationshipType.tosca
   - relationshiptypes/igs.relationshipsn.NFS/ConnectsToNFSServer/RelationshipType.tosca
   - artifacttypes/igs.artifacts/DockerCompose/ArtifactType.tosca
+  - nodetypes/igs.nodes.VM/igs.nodes.VM.Openstack/NodeType.tosca
 topology_template:
 
   node_templates:
 
-    workstation-1: # for frontend
-      type: igs.nodes.abstract.OSInstance
+    workstation-1: 
+      type: igs.nodes.VM.Openstack
       attributes:
         private_address: localhost
         public_address: 192.168.221.163
@@ -62,8 +63,8 @@ topology_template:
         name: localhost
         host_name: ubu22vm03
 
-    workstation-2: # for backend
-      type: igs.nodes.abstract.OSInstance
+    workstation-2: 
+      type: igs.nodes.VM.Openstack
       attributes:
         private_address: 129.69.209.200
         public_address: 129.69.209.200
@@ -71,32 +72,16 @@ topology_template:
         name: remote_host
         host_name: pcss22task2vm4
 
-    swarm-manager: # for frontend
+    swarm-manager: 
       type: igs.nodes.Swarm.Manager
-      # attributes:
-      #   network_name: remote_network
-      #   driver: overlay
-      #   private_address: localhost
-      #   public_address: 192.168.221.163
-      #   username: ubuntu
-      #   name: localhost
-      #   tier: frontend
-      #   host_name: ubu22vm03
       properties:
         node_lables: {tile: frontend, isNfsClient: "true"}
       requirements:
         - runtimeHost: docker-engine-1
         - host: workstation-1
 
-    swarm-worker-1: # for backend
+    swarm-worker-1: 
       type: igs.nodes.Swarm.Worker
-      # attributes:
-      #   private_address: 129.69.209.200
-      #   public_address: 129.69.209.200
-      #   username: jingyue
-      #   name: remote_host
-      #   tier: backend
-      #   host_name: pcss22task2vm4
       properties:
         node_lables: {tile: backend, isNfsClient: "false"}
       requirements:
@@ -106,18 +91,9 @@ topology_template:
         - runtimeHost: docker-engine-2
         - host: workstation-2
 
-    # swarm-worker-2: # for backend
-    #   type: igs.nodes.Swarm.Worker
-    #   properties:
-    #     node_lables: {tile: backend, isNfsClient: "false"}
-    #   requirements:
-    #     - manager:
-    #         node: swarm-manager
-    #         relationship: connectToManager_relationship
-    #     - runtimeHost: docker-engine-3
 
     workstation-3: # for nfs
-      type: igs.nodes.abstract.OSInstance
+      type: igs.nodes.VM.Openstack
       attributes:
         private_address: 192.168.221.133 #192.168.221.234
         public_address: 192.168.221.133 #192.168.221.234
@@ -134,10 +110,7 @@ topology_template:
     #     - storageServer: nfs-server
     #     - host: workstation-2    
 
-    # docker-engine-3:
-    #   type: igs.nodes.docker.DockerEngine
-    #   requirements:
-    #     - host: workstation-3
+
 
     docker-engine-2:
       type: igs.nodes.docker.DockerEngine
@@ -150,19 +123,10 @@ topology_template:
         - host: workstation-1
 
 
-    # nfs-server: #old one
-    #   type: igs.nodes.NFS.NFSServer
-    #   attributes:
-    #     clients_ips: [192.168.221.163]
-    #   properties:
-    #     server_mnt_path: /mnt/nfsdir
-    #   requirements:
-    #     - host: workstation-2
-
-    nfs-server: #/home/ubuntu/mntnfs #/mnt/nfsdir
+    nfs-server: 
       type: igs.nodes.NFS.NFSServer
       properties:
-        server_mnt_path: /home/ubuntu/mntnfs #/var/share 
+        server_mnt_path: /home/ubuntu/mntnfs 
       requirements:
         - host: workstation-3
     repository-volume:
@@ -192,7 +156,7 @@ topology_template:
     nfs-client-1:
       type: igs.nodes.NFS.NFSClient
       attributes:
-        client_mnt_path: /mount/nfs #/mount/nfsshare
+        client_mnt_path: /mount/nfs 
       requirements:
         - storageServer:
             node: nfs-server
@@ -206,7 +170,7 @@ topology_template:
       properties:
         stack_name: alfstack
         service_name: content-app
-        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.tile==frontend
       artifacts:
         docker_compose_file:
@@ -220,7 +184,7 @@ topology_template:
       properties:
         stack_name: alfstack
         service_name: alfresco
-        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.isNfsClient==true
       artifacts:
         docker_compose_file:
@@ -261,7 +225,7 @@ topology_template:
       properties:
         stack_name: alfstack
         service_name: solr6
-        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.isNfsClient==true
       artifacts:
         docker_compose_file:
@@ -269,7 +233,6 @@ topology_template:
           file: alfresco_artifacts/solr6_stack.yaml
       requirements:
         - containerApplication: Alfresco-Solr-Container
-        # - storageService: Storage-Service
 
     docker-temp-volume:
       type: igs.nodes.docker.TempararyVolume
@@ -320,7 +283,7 @@ topology_template:
       type: igs.nodes.postgres.PostgresDBMS
       properties:
         stack_name: alfstack
-        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.isNfsClient==true
       artifacts:
         docker_compose_file:
@@ -334,7 +297,7 @@ topology_template:
       properties:
         stack_name: alfstack
         service_name: proxy
-        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.tile==frontend
       artifacts:
         docker_compose_file:
@@ -350,7 +313,7 @@ topology_template:
       properties:
         stack_name: alfstack
         service_name: share
-        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.tile==frontend
       artifacts:
         docker_compose_file:
@@ -370,7 +333,7 @@ topology_template:
       properties:
         stack_name: alfstack
         service_name: control-center
-        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.tile==frontend
       artifacts:
         docker_compose_file:
@@ -390,7 +353,7 @@ topology_template:
       properties:
         stack_name: alfstack
         service_name: activemq
-        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.tile==backend
       artifacts:
         docker_compose_file:
@@ -405,7 +368,7 @@ topology_template:
       properties:
         stack_name: alfstack
         service_name: transform-core-aio
-        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.tile==backend
       artifacts:
         docker_compose_file:
@@ -429,7 +392,6 @@ topology_template:
         - host: swarm-manager
         - network: docker-stack-autogenerated-network
         - storage: docker-temp-volume
-        # - frontend: Alfresco-ContentApp-Container
 
     Alfresco-ContentApp-Container:
       type: Alfresco.nodes.ContainerApplication.ContentApp
@@ -487,10 +449,6 @@ topology_template:
         - host: swarm-manager
         - network: docker-stack-autogenerated-network
         - storage: docker-temp-volume
-        # - dependency_1: Alfresco-Share-Container
-        # - dependency_2: Alfresco-ContentApp-Container
-        # - dependency_3: Alfresco-Repository-Container
-        # - dependency_4: Alfresco-ControlCenter-Container
 
     Alfresco-Postgres-Container:
       type: igs.nodes.ContainerApplication.Postgres
@@ -525,7 +483,6 @@ topology_template:
         - host: swarm-manager
         - network: docker-stack-autogenerated-network
         - storage: docker-temp-volume
-        # - frontend: Alfresco-ContentApp-Container
 
   relationship_templates:
     connectToManager_relationship:

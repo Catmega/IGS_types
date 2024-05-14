@@ -111,7 +111,7 @@ topology_template:
       type: igs.nodes.Component.FTSearchService
       properties:
         stack_name: solrstack
-        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.applicationTile==backend
       artifacts:
         docker_compose_file:
@@ -126,7 +126,7 @@ topology_template:
       type: igs.nodes.Solr.Custom
       properties:
         stack_name: solrstack
-        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.applicationTile==backend
         document_schema_file_loc: { get_property: [SELF, docSchema, absolute_loc_schema_file ] }
         core_name: IGS

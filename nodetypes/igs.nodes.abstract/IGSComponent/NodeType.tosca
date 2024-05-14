@@ -9,7 +9,7 @@ node_types:
       final: "false"
 
     properties:
-      docker_compose_file_loc:
+      service_launcher_def_loc:
         type: string
         required: false
         default: notGiven
@@ -71,10 +71,10 @@ node_types:
         operations:
           start:
             inputs:
-              DOCKER_COMPOSE_FILE_LOC:
+              SERVICE_LAUNCHER_DEF_LOC:
                 type: string
                 required: false
-                default: { get_property: [SELF, docker_compose_file_loc ] }
+                default: { get_property: [SELF, service_launcher_def_loc ] }
               LABELS:
                 type: string
                 required: false

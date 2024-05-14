@@ -3,7 +3,7 @@
   gather_facts: no
 
   vars:
-    given_file: "{{DOCKER_COMPOSE_FILE_LOC}}"
+    given_file: "{{SERVICE_LAUNCHER_DEF_LOC}}"
 
   tasks:
 
@@ -14,7 +14,7 @@
     - name: Dynamically include tasks based on a variable
       include_tasks: "{{ file_path }}"
       vars:
-        file_path: "{{DOCKER_COMPOSE_FILE_LOC}}"    
+        file_path: "{{SERVICE_LAUNCHER_DEF_LOC}}"    
         image_namespace: "{{IMAGE_NAMESPACE}}"
         image_name: "{{IMAGE_NAME}}"
         image_version: "{{IMAGE_VERSION}}" #'{{ REPOSITORY_VERSION }}'

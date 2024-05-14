@@ -43,15 +43,15 @@
       meta: end_play
       when: local_image_info.images|length > 0 or not docker_hub_image_response.status == 404
 
-    - name: Start a container with os base image
+    - name: Start a container with gunicorn base image
       community.docker.docker_container:
         name: '{{ container_name }}'
         image: '{{image_namespace}}/{{base_image}}:{{base_version}}'
         command: sleep infinity
         working_dir: /app
         state: started
-        published_ports:
-          - "8080:8080"
+        # published_ports:
+        #   - "8080:8080"
         detach: true
 
     - name: Add the newly created container to the inventory.

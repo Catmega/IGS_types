@@ -19,6 +19,7 @@ node_types:
           relationship: igs.relationships.RequireFTSearchEngine
 
           occurrences: [ 1, 1 ]
+          # add storageSerivce
     capabilities:
       objectManagement:
         occurrences: [ 1, UNBOUNDED ]

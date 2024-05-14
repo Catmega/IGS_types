@@ -8,11 +8,8 @@ imports:
   - nodetypes/igs.nodes.NFS/NFSVolume/NodeType.tosca
   - nodetypes/igs.nodes.NFS/NFSClient/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSRepository/NodeType.tosca
-  - nodetypes/igs.nodes.Component/IGSFedSearch/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSFTSearch/NodeType.tosca
   - nodetypes/igs.nodes.Solr/NodeType.tosca
-  - nodetypes/igs.nodes.Component/IGSStorageService/NodeType.tosca
-  - nodetypes/igs.nodes.Component/IGSObjectService/NodeType.tosca
   - nodetypes/igs.nodes.docker/IGSDockerApplication/NodeType.tosca
   - nodetypes/igs.nodes.postgres/PostgresDatabase/NodeType.tosca
   - nodetypes/igs.nodes.postgres/PostgresDBMS/NodeType.tosca
@@ -21,19 +18,13 @@ imports:
   - nodetypes/igs.nodes.postgres/PostgresRecordsCatalog/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSProxyService/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSPortalService/NodeType.tosca
-  - nodetypes/igs.nodes.Component/IGSRecordsManagement/NodeType.tosca
-  - nodetypes/igs.nodes.Component/IGSRepositoryAdministration/NodeType.tosca
-  - nodetypes/igs.nodes.Component/IGSSecurityService/NodeType.tosca
-  - nodetypes/igs.nodes.Component/IGSTransformServices/NodeType.tosca
-  - nodetypes/igs.nodes.Component/IGSMessageService/NodeType.tosca
-  - nodetypes/igs.nodes.Component/IGSContentAppService/NodeType.tosca
+
   - nodetypes/igs.nodes.abstract/IGSOSInstance/NodeType.tosca
+  - nodetypes/igs.nodes.Component/IGSFTSearchEngine/NodeType.tosca
 
-
-  - nodetypes/igs.nodes.ContainerApplication/igs.nodes.ContainerApplication.PortalUI/NodeType.tosca
   - nodetypes/igs.nodes.ContainerApplication/igs.nodes.ContainerApplication.Postgres/NodeType.tosca
-  - nodetypes/igs.nodes.ContainerApplication/igs.nodes.ContainerApplication.Proxy/NodeType.tosca
-  - nodetypes/igs.nodes.ContainerApplication/igs.nodes.ContainerApplication.Repository/NodeType.tosca
+  - nodetypes/igs.nodes.ContainerApplication/igs.nodes.ContainerApplication.Nginx/NodeType.tosca
+
   - nodetypes/igs.nodes.Tomcat/NodeType.tosca
   - nodetypes/igs.nodes.Java.OpenJRE/NodeType.tosca
   - nodetypes/igs.nodes.ContainerApplication/igs.nodes.container.OS/igs.nodes.container.OS.Ubuntu/NodeType.tosca
@@ -62,6 +53,8 @@ imports:
   - nodetypes/igs.nodes.Python.slim/NodeType.tosca
 
   - nodetypes/igs.nodes.Gunicorn/NodeType.tosca
+  - nodetypes/igs.nodes.ContainerApplication.CustomizableWebApp/igs.nodes.ContainerApplication.CustomizableWebApp.TomcatApp/NodeType.tosca
+  - nodetypes/igs.nodes.VM/igs.nodes.VM.Openstack/NodeType.tosca
   - artifacttypes/igs.artifacts/txt/ArtifactType.tosca
   - artifacttypes/igs.artifacts/Python/ArtifactType.tosca
   - nodetypes/igs.nodes.ContainerApplication.CustomizableWebApp/igs.nodes.ContainerApplication.CustomizableWebApp.GunicornApp/NodeType.tosca
@@ -71,7 +64,7 @@ topology_template:
   node_templates:
 
     workstation-1: 
-      type: igs.nodes.abstract.OSInstance
+      type: igs.nodes.VM.Openstack
       attributes:
         private_address: localhost
         public_address: 192.168.221.163
@@ -81,7 +74,7 @@ topology_template:
         host_name: ubu22vm03
 
     workstation-2: 
-      type: igs.nodes.abstract.OSInstance
+      type: igs.nodes.VM.Openstack
       attributes:
         private_address: 129.69.209.200
         public_address: 129.69.209.200
@@ -108,7 +101,7 @@ topology_template:
         - runtimeHost: docker-engine-2
         - host: workstation-2
     workstation-3: # for nfs
-      type: igs.nodes.abstract.OSInstance
+      type: igs.nodes.VM.Openstack
       attributes:
         private_address: 192.168.221.133 #192.168.221.234
         public_address: 192.168.221.133 #192.168.221.234
@@ -127,17 +120,17 @@ topology_template:
       type: igs.nodes.docker.DockerEngine
       requirements:
         - host: workstation-2
-    nfs-server: #/home/ubuntu/mntnfs #/mnt/nfsdir
+    nfs-server: 
       type: igs.nodes.NFS.NFSServer
       properties:
-        server_mnt_path: /home/ubuntu/mntnfs #/var/share 
+        server_mnt_path: /home/ubuntu/mntnfs 
       requirements:
         - host: workstation-3
 
     nfs-client-1:
       type: igs.nodes.NFS.NFSClient
       attributes:
-        client_mnt_path: /mount/nfs #/mount/nfsshare
+        client_mnt_path: /mount/nfs 
       requirements:
         - storageServer:
             node: nfs-server
@@ -151,7 +144,7 @@ topology_template:
       type: igs.nodes.Component.FTSearchService
       properties:
         stack_name: igsstack
-        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.applicationTile==backend
       artifacts:
         docker_compose_file:
@@ -166,7 +159,7 @@ topology_template:
       type: igs.nodes.Solr.Custom
       properties:
         stack_name: igsstack
-        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.applicationTile==backend
         document_schema_file_loc: { get_property: [SELF, docSchema, absolute_loc_schema_file ] }
         core_name: IGS
@@ -177,68 +170,9 @@ topology_template:
           file: artifacts/solr-stack.yaml
       requirements:
         - containerApplication: Solr-Container
-        # - storageService: Mock-Storage-Service
         - docSchema: Solr-Schema
 
-    Mock-OS-Base-for-FTSearch:
-      type: igs.nodes.abstract.ContainerBaseOS
-      properties:
-        os_version: mock
-        os_name: mock
-    Python-Runtime-for-FTSearch:
-      type: igs.nodes.Python.slim
-      properties:
-        runtime_version: 3.8-slim
-        image_namespace: docker.io
-      requirements:
-        - host: Mock-OS-Base-for-FTSearch
-    Gunicorn-AppServer-for-FTSearch:
-      type: igs.nodes.Gunicorn
-      properties:
-        webapp_server_version: 20.1.0
-        image_namespace: igsrepo
-      requirements:
-        - host: Python-Runtime-for-FTSearch
 
-    FTSearch-Container:
-      type: igs.nodes.ContainerApplication.CustomizableWebApp.GunicornApp
-      properties:
-        image_namespace: igsrepo
-        image_name: search-service
-        image_version: 3
-        app_file_loc: { get_artifact: [ SELF, ftsearch_app_file ] }
-        requirements_file_loc: { get_artifact: [ SELF, requirements_file ] }
-      artifacts:
-        ftsearch_app_file:
-          type: igs.artifacts.Python
-          file: artifacts/search_service_app.py
-        requirements_file:
-          type: igs.artifacts.txt
-          file: artifacts/requirements.txt
-      requirements:
-        - host: swarm-manager
-        # - runtime: docker-engine-1
-        - network: docker-stack-autogenerated-network
-        - storage: docker-temp-volume
-        - webAppServer: Gunicorn-AppServer-for-FTSearch
-
-    Solr-Container:
-      type: igs.nodes.ContainerApplication.Solr
-      properties:
-        image_name: solr
-        image_namespace: docker.io
-        image_version: latest
-
-        # solr_version: latest
-        # host_port: 8086
-        # core_name: IGS
-        # group: backend
-        # labels: [node.labels.tile==backend]
-      requirements:
-        - host: swarm-manager
-        - network: docker-stack-autogenerated-network
-        - storage: docker-temp-volume
-        # - docSchema: Solr-Schema
 
     Solr-Schema:
       type: igs.nodes.Solr.DocumentSchema
@@ -249,7 +183,7 @@ topology_template:
       type: igs.nodes.Component.Repository
       properties:
         stack_name: igsstack
-        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.applicationTile==backend
       artifacts:
         docker_compose_file:
@@ -265,24 +199,6 @@ topology_template:
         # - transform: Transform-Service
         - containerApplication: Repository-Container
         
-    # Object-Service:
-    #   type: igs.nodes.Component.ObjectService
-    #   requirements:
-    #     - FTSearchEngine: Solr
-    # Fed-Search:
-    #   type: igs.nodes.Component.FedSearch
-    #   requirements:
-    #     - FTSearch: FT-Search-Service
-    # FT-Search-Service:
-    #   type: igs.nodes.Component.FTSearchService
-    #   requirements:
-    #     - FTSearchEngine: Solr
-
-    # Solr:
-    #   type: igs.nodes.SolrSearch
-    #   requirements:
-    #     - containerApplication: Alfresco-Solr-Container
-    #     - storageService: Storage-Service
 
 
     docker-temp-volume:
@@ -292,10 +208,7 @@ topology_template:
       type: igs.nodes.docker.AutoOverlayNetwork
       requirements:
         - host: swarm-manager
-    # Storage-Service:
-    #   type: igs.nodes.Component.StorageService
-    #   requirements:
-    #     - FileStorage: nfs-client-1
+
     postgres-volume:
       type: igs.nodes.NFS.Volume
       properties:
@@ -330,7 +243,7 @@ topology_template:
       properties:
         replica_num: 2
         stack_name: igsstack
-        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.applicationTile==backend
       artifacts:
         docker_compose_file:
@@ -343,7 +256,7 @@ topology_template:
       type: igs.nodes.Component.ProxyService
       properties:
         stack_name: igsstack
-        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.applicationTile==frontend
       artifacts:
         docker_compose_file:
@@ -358,7 +271,7 @@ topology_template:
       type: igs.nodes.Component.PortalService
       properties:
         stack_name: igsstack
-        docker_compose_file_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
         labels: node.labels.applicationTile==frontend
       artifacts:
         docker_compose_file:
@@ -371,6 +284,48 @@ topology_template:
 
 
 ############containers###################################
+    Mock-OS-Base-for-FTSearch:
+      type: igs.nodes.abstract.ContainerBaseOS
+      properties:
+        os_version: mock
+        os_name: mock
+    Python-Runtime-for-FTSearch:
+      type: igs.nodes.Python.slim
+      properties:
+        runtime_version: 3.8-slim
+        image_namespace: docker.io
+      requirements:
+        - host: Mock-OS-Base-for-FTSearch
+    Gunicorn-AppServer-for-FTSearch:
+      type: igs.nodes.Gunicorn
+      properties:
+        webapp_server_version: 20.1.0
+        image_namespace: igsrepo
+      requirements:
+        - host: Python-Runtime-for-FTSearch
+
+    FTSearch-Container:
+      type: igs.nodes.ContainerApplication.CustomizableWebApp.GunicornApp
+      properties:
+        image_namespace: igsrepo
+        image_name: search-service
+        image_version: 3
+        start_command: gunicorn -b 0.0.0.0:8080 app:app
+        server_app_loc: /app/app.py
+        app_file_loc: { get_artifact: [ SELF, ftsearch_app_file ] }
+        requirements_file_loc: { get_artifact: [ SELF, requirements_file ] }
+      artifacts:
+        ftsearch_app_file:
+          type: igs.artifacts.Python
+          file: artifacts/search_service_app.py
+        requirements_file:
+          type: igs.artifacts.txt
+          file: artifacts/requirements.txt
+      requirements:
+        - host: swarm-manager
+        - network: docker-stack-autogenerated-network
+        - storage: docker-temp-volume
+        - webAppServer: Gunicorn-AppServer-for-FTSearch
     Crunchy-Postgres-Container:
       type: igs.nodes.ContainerApplication.CrunchyPostgres
       properties:
@@ -382,33 +337,18 @@ topology_template:
         - host: swarm-manager
         - network: docker-stack-autogenerated-network
         - storage: postgres-volume
-    ###
-    Ubuntu-OS-Base-for-Portal:
-      type: igs.nodes.container.OS.Ubuntu
-      properties:
-        os_version: latest
-        os_name: ubuntu
-    Java-Runtime-for-Portal:
-      type: igs.nodes.Java.OpenJRE
-      properties:
-        runtime_version: 8
-        image_namespace: igsrepo
-      requirements:
-        - host: Ubuntu-OS-Base-for-Portal
-    Tomcat-AppServer-for-Portal:
-      type: igs.nodes.Tomcat
-      properties:
-        webapp_server_version: 9
-        image_namespace: igsrepo
-      requirements:
-        - host: Java-Runtime-for-Portal
+   
+
+
 
     Portal-Container:
-      type: igs.nodes.ContainerApplication.Portal
+      type: igs.nodes.ContainerApplication.CustomizableWebApp.TomcatApp #igs.nodes.ContainerApplication.Portal
       properties:
         image_namespace: igsrepo
         image_name: portal
-        image_version: 1
+        image_version: test2
+        start_command: /usr/local/bin/start-tomcat.sh
+        server_app_loc: /var/lib/tomcat9/webapps/ROOT/index.html
         app_file_loc: { get_artifact: [ SELF, portal_UI_app_file ] }
       artifacts:
         portal_UI_app_file:
@@ -419,12 +359,36 @@ topology_template:
         - network: docker-stack-autogenerated-network
         - storage: docker-temp-volume
         - webAppServer: Tomcat-AppServer-for-Portal
+        
+    Tomcat-AppServer-for-Portal:
+      type: igs.nodes.Tomcat
+      properties:
+        webapp_server_version: 9
+        image_namespace: igsrepo
+      requirements:
+        - host: Java-Runtime-for-Portal
+
+    Java-Runtime-for-Portal:
+      type: igs.nodes.Java.OpenJRE
+      properties:
+        runtime_version: 8
+        image_namespace: igsrepo
+      requirements:
+        - host: Ubuntu-OS-Base-for-Portal
+
+    Ubuntu-OS-Base-for-Portal:
+      type: igs.nodes.container.OS.Ubuntu
+      properties:
+        os_version: latest
+        os_name: ubuntu
 
     Ubuntu-OS-Base-for-Repository:
       type: igs.nodes.container.OS.Ubuntu
       properties:
         os_version: latest
         os_name: ubuntu
+
+
     Java-Runtime-for-Repository:
       type: igs.nodes.Java.OpenJRE
       properties:
@@ -441,11 +405,13 @@ topology_template:
         - host: Java-Runtime-for-Repository
 
     Repository-Container:
-      type: igs.nodes.ContainerApplication.Repository
+      type: igs.nodes.ContainerApplication.CustomizableWebApp.TomcatApp #igs.nodes.ContainerApplication.Repository
       properties:
-        image_version: 1
         image_namespace: igsrepo
         image_name: repository
+        image_version: test2
+        start_command: java -jar $CATALINA_BASE/webapps/app.jar
+        server_app_loc: /var/lib/tomcat9/webapps/app.jar
         app_file_loc: { get_artifact: [ SELF, repository_app_file ] }
       artifacts:
         repository_app_file:
@@ -458,10 +424,22 @@ topology_template:
         - webAppServer: Tomcat-AppServer-for-Repository
 
     Nginx-Container:
-      type: igs.nodes.ContainerApplication.Proxy
+      type: igs.nodes.ContainerApplication.Nginx
       properties:
         image_name: nginx
         image_namespace: igsrepo
+        image_version: latest
+      requirements:
+        - host: swarm-manager
+        - network: docker-stack-autogenerated-network
+        - storage: docker-temp-volume
+
+
+    Solr-Container:
+      type: igs.nodes.ContainerApplication.Solr
+      properties:
+        image_name: solr
+        image_namespace: docker.io
         image_version: latest
       requirements:
         - host: swarm-manager
@@ -497,7 +475,7 @@ topology_template:
         targets: [ swarm-manager ]
     - validate-DockerEngine-1:
         type: igs.policies.validate.DockerEngine
-        targets: [docker-engine-1] # [docker-engine-1,docker-engine-2] not working
+        targets: [docker-engine-1] 
     - validate-DockerEngine-2:
         type: igs.policies.validate.DockerEngine
         targets: [docker-engine-2]

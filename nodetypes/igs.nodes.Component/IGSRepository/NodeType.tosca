@@ -7,6 +7,16 @@ imports:
   - ../../../relationshiptypes/igs.relationships/RequireObjectCatalog/RelationshipType.tosca
   - ../../../relationshiptypes/igs.relationships/RequireRecordsCatalog/RelationshipType.tosca
   - ../../../capabilitytypes/igs.capabilities.container/Repository/CapabilityType.tosca
+  - ../../../capabilitytypes/igs.capabilities.container/Repository/CapabilityType.tosca
+  - ../../../capabilitytypes/igs.capabilities/Administration/CapabilityType.tosca
+  - ../../../capabilitytypes/igs.capabilities/RecordLifecycleManagement/CapabilityType.tosca
+  - ../../../capabilitytypes/igs.capabilities/ObjectManagement/CapabilityType.tosca
+  - ../../../capabilitytypes/igs.capabilities/FederatedSearch/CapabilityType.tosca
+  - ../../../relationshiptypes/igs.relationships/IsAdministeredBy/RelationshipType.tosca
+  - ../IGSFedSearch/NodeType.tosca
+  - ../IGSObjectService/NodeType.tosca
+  - ../IGSRepositoryAdministration/NodeType.tosca
+  - ../IGSRecordsManagement/NodeType.tosca
 # reduced version of igs.nodes.Component.Repository, leave out the requirements for:
 # fedSearch, messageBroker, objectService, transform
 node_types:
@@ -26,14 +36,34 @@ node_types:
           capability: tosca.capabilities.Endpoint.Database
           node: igs.nodes.abstract.Database
           relationship: igs.relationships.requireObjectCatalog
-          occurrences: [ 1, 1 ]
+          occurrences: [ 0, 1 ]
       - recordsCatalog:
           capability: tosca.capabilities.Endpoint.Database
           node: igs.nodes.abstract.Database
           relationship: igs.relationships.RequireRecordsCatalog
-          occurrences: [ 1, 1 ]
+          occurrences: [ 0, 1 ]
+      - recordsManagement:
+          capability: igs.capabilities.RecordLifecycleManagement
+          node: igs.nodes.Component.RecordsManagement
+          relationship: tosca.relationships.DependsOn
+          occurrences: [ 0, 1 ]  
+      - repositoryAdministration:
+          capability: igs.capabilities.Administration
+          node: igs.nodes.Component.RepositoryAdministration
+          relationship: igs.relationships.IsAdministratedBy
+          occurrences: [ 0, 1 ]  
+      - fedSearch:
+          capability: igs.capabilities.FederatedSearch
+          node: igs.nodes.Component.FedSearch
+          relationship: tosca.relationships.DependsOn
+          occurrences: [ 0, 1 ]
+      - objectService:
+          capability: igs.capabilities.ObjectManagement
+          node: igs.nodes.Component.ObjectService
+          relationship: tosca.relationships.DependsOn
+          occurrences: [ 0, 1 ]
       - containerApplication:
           capability: igs.capabilities.container.Repository
           node: igs.nodes.abstract.ContainerApplication
           relationship: tosca.relationships.DependsOn
-          occurrences: [ 1, 1 ]
+          occurrences: [ 0, 1 ]

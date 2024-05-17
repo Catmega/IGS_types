@@ -1,7 +1,7 @@
 - name: Deploy stack - proxy
   community.docker.docker_stack:
     state: present
-    name: igsstack
+    name: '{{stack_name}}'
     compose:
       - version: '3'
         services:

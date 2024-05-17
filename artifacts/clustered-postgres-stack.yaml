@@ -31,7 +31,8 @@
                 constraints:
                 # - node.labels.DBtype == primary
                 - node.role == manager
-
+            volumes:
+              - pg-primary-vol:/pgdata
 
           replica:
             image: crunchydata/crunchy-postgres:centos7-12.5-4.4.2 
@@ -48,7 +49,8 @@
               - PG_USER=igs
               - PG_PASSWORD=igs
               - PG_ROOT_PASSWORD=igs
-
+            volumes:
+              - pg-replica-vol:/pgdata
             deploy:
               replicas: 2
               restart_policy:
@@ -57,5 +59,8 @@
                 constraints:
                 # - node.labels.DBtype != primary
                 - node.role == worker
+        volumes:
+          pg-primary-vol:
+          pg-replica-vol:
 # - name: scale 
 #   ansible.builtin.shell: "docker service scale replica={{REPLICA_NUM:}}"

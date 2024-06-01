@@ -165,7 +165,9 @@ topology_template:
       properties:
         image_namespace: igsrepo
         image_name: search-service
-        image_version: 3
+        image_version: test6
+        start_command: gunicorn -b 0.0.0.0:8080 app:app
+        server_app_loc: /app/app.py
         app_file_loc: { get_artifact: [ SELF, ftsearch_app_file ] }
         requirements_file_loc: { get_artifact: [ SELF, requirements_file ] }
       artifacts:

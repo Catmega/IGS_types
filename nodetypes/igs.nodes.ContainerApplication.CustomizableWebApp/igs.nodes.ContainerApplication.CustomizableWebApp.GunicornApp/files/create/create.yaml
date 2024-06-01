@@ -1,0 +1,115 @@
+---
+- hosts: localhost
+  gather_facts: false
+
+  vars:
+    base_image_namespace: igsrepo
+    base_image: '{{BASE_WEBAPP_SERVER_NAME}}' # gunicorn
+    base_version: '{{ BASE_WEBAPP_SERVER_VERSION }}' # 20.1.0
+    container_name: container_with_search_service
+    image_namespace: '{{IMAGE_NAMESPACE}}' #igsrepo
+    image_name: '{{IMAGE_NAME}}' #search-service
+    image_version: '{{ APP_VERSION }}' # 2
+    container_start_command: gunicorn -b 0.0.0.0:8080 app:app
+    my_app_path: '{{APP_ARTIFACT}}'  #/home/ubuntu/opera-root/git-project/ma-jingyue2023/templates/igs_types/nodetypes/igs.nodes.ContainerApplication/igs.nodes.ContainerApplication.Repository/files/create/Artifacts/igsRepository.jar
+    my_app_requirements_path: '{{REQUIREMENTS_ARTIFACT}}'
+    webserver_webapp_path: /app/app.py
+
+  pre_tasks:
+
+    # - name: Check for if this Docker image already exists
+    #   community.docker.docker_image_info:
+    #     name: '{{image_namespace}}/{{image_name}}:{{image_version}}'  
+    #   register: image_info
+
+    # - name: End play if the image exists
+    #   meta: end_play
+    #   when: image_info.images | length > 0
+
+    - name: Check if image is available locally
+      docker_image_info:
+        name: '{{image_namespace}}/{{image_name}}:{{image_version}}'  
+      register: local_image_info
+
+    - name: Check for Docker image on Docker Hub
+      uri:
+        url: "https://hub.docker.com/v2/repositories/{{ image_namespace }}/{{ image_name }}/tags/{{ image_version }}/"
+        method: GET
+        return_content: yes
+        status_code: 200,404
+      register: docker_hub_image_response
+
+    - name: Skip the rest of the tasks if image is found
+      meta: end_play
+      when: local_image_info.images|length > 0 or not docker_hub_image_response.status == 404
+
+    - name: Start a container with gunicorn base image
+      community.docker.docker_container:
+        name: '{{ container_name }}'
+        image: '{{image_namespace}}/{{base_image}}:{{base_version}}'
+        command: sleep infinity
+        working_dir: /app
+        state: started
+        # published_ports:
+        #   - "8080:8080"
+        detach: true
+
+    - name: Add the newly created container to the inventory.
+      add_host:
+        hostname: '{{ container_name }}'
+        ansible_connection: docker
+        ansible_python_interpreter: /usr/bin/python3
+
+    - name: install Python to make ansible runnable in the container.
+      raw: >
+        mkdir -p /app
+      changed_when: true
+      delegate_to: '{{ container_name }}'
+
+  tasks:
+
+    # - name: Create requirements.txt
+    #   copy:
+    #     dest: "./requirements.txt"
+    #     content: |
+    #       requests
+    #       flask
+    #       gunicorn==20.1.0
+    #       flask_cors
+    - name: Copy requirements.txt to the container
+      community.docker.docker_container_copy_into:
+        container: '{{container_name}}'
+        path: '{{my_app_requirements_path}}' # "./requirements.txt"
+        container_path: "/app/requirements.txt"
+
+    - name: Copy my jar application into tomcat container
+      community.docker.docker_container_copy_into:
+        container: '{{container_name}}'
+        path: '{{ my_app_path }}'
+        container_path: '{{ webserver_webapp_path }}'
+    - name: install Python to make ansible runnable in the container.
+      raw: >
+        cd /app && pip install -r /app/requirements.txt
+      changed_when: true
+      delegate_to: '{{ container_name }}'
+  post_tasks:
+    
+    - name: Commit the container.
+      command: >
+        docker commit
+        -c 'CMD {{ container_start_command }}'
+        {{ container_name }} {{ image_namespace }}/{{ image_name }}:'{{image_version}}'
+      changed_when: true
+
+    - name: Remove the container.
+
+      docker_container:
+        name: '{{ container_name }}'
+        state: absent
+
+    - name: Push the Docker image to Docker Hub
+      community.docker.docker_image:
+        name: "{{image_namespace}}/{{ image_name }}"
+        tag: "{{ image_version }}"
+        push: yes
+        source: local

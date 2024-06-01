@@ -1,0 +1,49 @@
+---
+- name: add NFS export information on the server
+  hosts: all
+  gather_facts: true
+  vars:
+    log_file_loc: /home/ubuntu/opera-root/git-project/IGS_types/validation.log
+    SERVER_IP: 192.168.221.133
+    CLIENT_MNT_PATH: /mount/nfs
+  tasks:  
+
+    - name: get validating machines's ip
+      set_fact:
+        current_machine_ip: "{{ ansible_ssh_host }}"
+
+
+    # - name: if the output is not empty, it's mounted, skip the rest
+    #   debug:
+    #     msg: "NFS mount from {{ SERVER_IP }} on {{ CLIENT_MNT_PATH }} is mounted."
+    #   when: nfs_client_mount_result.stdout != ""
+    
+    - name: write a banner
+      delegate_to: localhost
+      ansible.builtin.shell: echo "\n *********Validating NFS Client on machine {{current_machine_ip}}****{{ ansible_date_time.date }} {{ ansible_date_time.time }}*****" >> '{{log_file_loc}}'
+
+    - name: check NFS mount output with NFS server ip address
+      ansible.builtin.shell: mount | grep -i nfs | grep -w '{{SERVER_IP}}' | grep -w '{{CLIENT_MNT_PATH}}'
+      register: nfs_client_mount_result
+      ignore_errors: true
+
+    - name: if failed, write msg back to a file in the controller node
+      delegate_to: localhost
+      ansible.builtin.shell: echo " Failure! NFS mount from server:{{ SERVER_IP }} on this machines's {{ CLIENT_MNT_PATH }} is NOT mounted." >> '{{log_file_loc}}'
+      when: nfs_client_mount_result.stdout == ""
+
+
+    - name: if succeed, write msg back to a file in the controller node
+      delegate_to: localhost
+      ansible.builtin.shell: echo " Success! This client's {{ CLIENT_MNT_PATH }} is mounted on the server:{{ SERVER_IP }}." >> '{{log_file_loc}}'
+      when: nfs_client_mount_result.stdout != ""
+
+      
+    - name: Create a test file on NFS client
+      file:
+        path: "{{ CLIENT_MNT_PATH }}/test.txt"
+        state: touch
+
+
+
+ 

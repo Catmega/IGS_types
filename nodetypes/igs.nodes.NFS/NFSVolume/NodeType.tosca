@@ -4,9 +4,10 @@ imports:
   - ../../igs.nodes.abstract/IGSOSInstance/NodeType.tosca
   - ../../igs.nodes.docker/IGSDockerEngine/NodeType.tosca
   - ../../../capabilitytypes/igs.capabilities.container/DockerRuntime/CapabilityType.tosca
+  - ../../igs.nodes.abstract/IGSVolume/NodeType.tosca
 node_types:
   igs.nodes.NFS.Volume:
-    derived_from: igs.nodes.abstract.BlockStorage
+    derived_from: igs.nodes.abstract.Volume
     metadata:
       targetNamespace: "igs.nodes.NFS"
       abstract: "false"
@@ -15,7 +16,7 @@ node_types:
 
 
     properties:
-      # name: inherits from igs.nodes.abstract.BlockStorage <- tosca.nodes.abstract.BlockStorage
+      # name: inherits from igs.nodes.abstract.Volume <- tosca.nodes.abstract.Storage
       client_mnt_path:
         type: string
         required: true
@@ -67,28 +68,28 @@ node_types:
                 type: string
                 required: true
                 default: { get_property: [SELF, client_mnt_path ] }                  
-            # implementation:
-            #   primary: files/create/create.yaml #create
+            implementation:
+              primary: files/create/create.yaml #create
             
 
-          delete:
-            inputs:
+          # delete:
+          #   inputs:
 
-              ANSIBLE_HOST_IP:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, host, private_address ] }
-              ANSIBLE_USER:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, host, username ] }
-              ANSIBLE_HOST_NAME:
-                type: string
-                required: true
-                default: { get_attribute: [SELF, host, name ] } 
+          #     ANSIBLE_HOST_IP:
+          #       type: string
+          #       required: true
+          #       default: { get_attribute: [SELF, host, private_address ] }
+          #     ANSIBLE_USER:
+          #       type: string
+          #       required: true
+          #       default: { get_attribute: [SELF, host, username ] }
+          #     ANSIBLE_HOST_NAME:
+          #       type: string
+          #       required: true
+          #       default: { get_attribute: [SELF, host, name ] } 
 
-            # implementation:
-            #   primary: files/delete/delete.yaml #delete
+          #   implementation:
+          #     primary: files/delete/delete.yaml #delete
           
     artifacts:
       create:

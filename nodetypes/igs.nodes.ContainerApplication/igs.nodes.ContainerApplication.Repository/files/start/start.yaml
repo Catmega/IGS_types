@@ -1,0 +1,42 @@
+- name: Run Tomcat Docker Container with igs repostiory Web application
+  hosts: all
+  gather_facts: no
+
+  vars:
+    image_namespace: igsrepo
+    image_name: repository
+    image_version: '{{ REPOSITORY_VERSION }}' # 1
+    stack_name: igsstack
+    labels: '{{ LABELS }}'
+  tasks:
+    # - name: Build Docker Image
+    #   community.docker.docker_image:
+    #     name: igs-repository-spring
+    #     source: build
+    #     tag: latest
+    #     build:
+    #       path: "."
+
+
+    # - name: Ensure jsondiff is installed
+    #   pip:
+    #     name: jsondiff
+    #     state: present       
+
+    - name: Deploy stack - repostiory
+      community.docker.docker_stack:
+        state: present
+        name: '{{stack_name}}'
+        compose:
+          - version: '3'
+            services:
+              igsrepository:
+                image: '{{image_namespace}}/{{image_name}}:{{image_version}}' # igs/repository:1 # igs-repository-spring:latest
+                ports:
+                  - "8080:8080"
+                deploy:
+                  placement:
+                    constraints:
+                      - "{{ item }}"
+      loop:
+        "{{ labels }}"

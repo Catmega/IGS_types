@@ -5,6 +5,7 @@ imports:
   - ../IGSMessageService/NodeType.tosca
   - ../../../capabilitytypes/igs.capabilities.container/Transform/CapabilityType.tosca
   - ../../../capabilitytypes/igs.capabilities/MessageBrokerService/CapabilityType.tosca
+  - ../../../capabilitytypes/igs.capabilities/TransformService/CapabilityType.tosca
   - ../../igs.nodes.abstract/IGSContainerApplication/NodeType.tosca
 
 node_types:
@@ -26,3 +27,8 @@ node_types:
           relationship: tosca.relationships.DependsOn
           occurrences: [ 1, 1 ]
 
+    capabilities:
+      transform:
+        occurrences: [ 1, UNBOUNDED ]
+        valid_source_types: [ igs.nodes.abstract.Component ]
+        type: igs.capabilities.TransformService

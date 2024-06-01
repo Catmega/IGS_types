@@ -1,0 +1,66 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../../igs.nodes.docker/IGSDockerApplication/NodeType.tosca
+  - ../../../artifacttypes/igs.artifacts/Json/ArtifactType.tosca
+  - ../../igs.nodes.Solr.DocutmentSchema/NodeType.tosca
+  - ../../../relationshiptypes/igs.relationships/RequireDocumentSchema/RelationshipType.tosca
+  - ../../../interfacetypes/igs.interfaces.node.lifecycle/Validation/InterfaceType.tosca
+node_types:
+  igs.nodes.ContainerApplication.Solr:
+    derived_from: igs.nodes.abstract.ContainerApplication
+    metadata:
+      targetNamespace: "igs.nodes.ContainerApplication"
+      abstract: "false"
+      final: "false"
+    properties:
+      client_mnt_path:
+        type: string
+        required: false
+        default: undefined
+      volume_dir:
+        type: string
+        required: false
+        default: undefined
+
+
+    interfaces:
+      # Standard:
+      #   type: tosca.interfaces.node.lifecycle.Standard
+      #   operations:
+      #     start:
+      #       inputs:
+      #         SOLR_VERSION:
+      #           type: string
+      #           required: true
+      #           default: { get_property: [SELF, solr_version ] }
+      #         HOST_PORT:
+      #           type: string
+      #           required: true
+      #           default: { get_property: [SELF, host_port ] }
+      #         CORE_NAME:
+      #           type: string
+      #           required: true
+      #           default: { get_property: [SELF, core_name ] }
+      #         DOCUMENT_SCHEMA_LOCATION:
+      #           type: string
+      #           required: true
+      #           default: { get_property: [SELF, docSchema, absolute_loc_schema_file ] }
+            
+      #       implementation:
+      #         primary: files/start/start.yaml 
+
+      Validation:
+        type: igs.interfaces.node.lifecycle.Validation 
+        operations:
+          validate: 
+            implementation:
+              primary: files/validate/validate.yaml 
+    # requirements:
+    #   - docSchema:
+    #       capability: igs.capabilities.DocumentSchema
+    #       node: igs.nodes.Solr.DocumentSchema
+    #       relationship: igs.relationships.RequireDocumentSchema
+    # artifacts:
+    #   doc_schema:
+    #     type: igs.artifacts.Json
+    #     file: files/start/Artifacts/doc_schema.json

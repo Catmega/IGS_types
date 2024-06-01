@@ -22,15 +22,19 @@ node_types:
     properties:
       group:
         type: string
-        required: true
+        required: false
         constraints:
           - valid_values: [ frontend, backend ]
+        default: undefined
       labels:
         type: list
+        required: false
         entry_schema:
           type: string 
+        default: undefined
       networkName:
         type: string
+        required: false
         default: { get_attribute: [SELF, network, name ] }
 
       client_mnt_path:
@@ -44,15 +48,32 @@ node_types:
       container_data_dir:
         type: string
         required: false
+        default: undefined
+
+      image_namespace:
+        type: list
+        required: false
+        default: undefined
+      image_name:
+        type: string
+        required: false
+        default: undefined
+      image_version:
+        type: string
+        required: false
+        default: undefined
 
     requirements:
-      - runtime:
-          node: igs.nodes.abstract.ContainerRuntime
-          capability: tosca.capabilities.Compute
-          relationship: tosca.relationships.HostedOn
+      # - host:
+      #     node: igs.nodes.abstract.ContainerRuntime
+      #     capability: tosca.capabilities.Compute
+      #     relationship: tosca.relationships.HostedOn
+      # - host:
+      #     capability: tosca.capabilities.Node
+      #     node: tosca.nodes.Compute
+      #     relationship: tosca.relationships.HostedOn
       - host:
-          capability: tosca.capabilities.Node
-          node: igs.nodes.abstract.OSInstance
+          capability: tosca.capabilities.Compute
           relationship: tosca.relationships.HostedOn
       - network:
           capability: tosca.capabilities.Endpoint

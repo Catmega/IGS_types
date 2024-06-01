@@ -1,0 +1,15 @@
+- name: Deploy stack contentservice
+  community.docker.docker_stack:
+    state: present
+    name: '{{stack_name}}'
+    compose:
+      - version: '3'
+        services:
+          content-app:
+            image: '{{image_namespace}}/{{image_name}}:{{image_version}}'
+            deploy:
+              placement:
+                constraints:
+                  - "{{ labels }}"
+            environment:
+              APP_BASE_SHARE_URL: "http://localhost:8080/aca/#/preview/s"

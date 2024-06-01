@@ -1,10 +1,10 @@
 tosca_definitions_version: tosca_simple_yaml_1_3
 imports:
-    - ../../nodetypes/igs.nodes.demo/igs.nodes.container.Solr/NodeType.tosca
+    - ../../nodetypes/igs.nodes.Solr.Custom/NodeType.tosca
 policy_types:
   igs.policies.validate.Solr:
     derived_from: tosca.policies.Root
-    targets: [ igs.nodes.container.Solr ]
+    targets: [ igs.nodes.Solr.Custom ]
     triggers:
         igs.triggers.validate.Solr:
             description: A trigger for validation

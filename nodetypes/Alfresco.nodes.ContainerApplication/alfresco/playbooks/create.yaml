@@ -1,0 +1,164 @@
+---
+- name: add hosts to Ansible 
+  hosts: localhost
+  gather_facts: true  
+  vars:
+      host_ip: "{{ ANSIBLE_HOST_IP }}"
+      container_group: "{{ CONTAINER_GROUP }}"
+      host_tier: "{{ HOST_TIER }}"
+  tasks:
+    - name: Check if this node is going to be hosted on the correct tier vm
+      fail:
+        msg: "Alfresco is an {{ CONTAINER_GROUP }} node, but it's hosted on a machine defined for {{ HOST_TIER }}"
+      when: container_group != host_tier
+    - name: Add host 
+      add_host:
+        name: "{{ ANSIBLE_HOST_NAME }}"
+        ansible_host: "{{ ANSIBLE_HOST_IP }}"
+        ansible_user: "{{ ANSIBLE_USER }}"
+      when: 
+        - host_ip != "localhost"
+
+- name: docker playbook
+  vars:
+    host_ip: "{{ ANSIBLE_HOST_IP }}"
+  hosts: 
+    - "{{ ANSIBLE_HOST_NAME }}"
+  gather_facts: false
+
+  tasks:
+        
+    - name: docker compose alfresco
+      community.docker.docker_compose:
+        project_name: alfresco
+        definition:
+          version: '2'
+          services:
+            alfresco:
+              image: docker.io/alfresco/alfresco-content-repository-community:7.4.1.1
+              mem_limit: "{{ MEM_LIMIT }}"
+              environment:
+                JAVA_TOOL_OPTIONS: >-
+                  -Dencryption.keystore.type="{{ ENCRYPTION_KEYSTORE_TYPE }}"
+                  -Dencryption.cipherAlgorithm="{{ ENCRYPTION_CIPHER_ALG }}"
+                  -Dencryption.keyAlgorithm="{{ ENCRYPTION_KEY_ALG }}"
+                  -Dencryption.keystore.location="{{ ENCRYPTION_KEYSTORE_LOCATION }}"
+                  -Dmetadata-keystore.password="{{ METADATA_KEYSTORE_PASSWORD }}"
+                  -Dmetadata-keystore.aliases="{{ METADATA_KEYSTORE_ALIASES }}"
+                  -Dmetadata-keystore.metadata.password="{{ METADATA_PASSWORD }}"
+                  -Dmetadata-keystore.metadata.algorithm="{{ METADATA_ALGORITHM }}"
+                JAVA_OPTS: >-
+                  -Ddb.driver="{{ DDB_DRIVER }}"
+                  -Ddb.username="{{ DDB_USERNAME }}"
+                  -Ddb.password="{{ DDB_PASSWORD }}"
+                  -Ddb.url="{{ DDB_URL }}"
+                  -Dsolr.host="{{ SOLR_HOST_NAME }}"
+                  -Dsolr.port="{{ SOLR_PORT }}"
+                  -Dsolr.http.connection.timeout="{{ SOLR_PORT }}"
+                  -Dsolr.secureComms="{{ SOLR_SECURE_COMMS }}"
+                  -Dsolr.sharedSecret="{{ SOLR_SHARED_SECRET }}"
+                  -Dsolr.base.url="{{ SOLR_BASE_URL }}"
+                  -Dindex.subsystem.name="{{ INDEX_SUBSYSTEM_NAME }}"
+                  -Dshare.host="{{ SHARE_HOST }}"
+                  -Dshare.port="{{ SHARE_PORT }}"
+                  -Dalfresco.host="{{ ALFRESCO_HOST }}"
+                  -Dalfresco.port="{{ ALFRESCO_PORT }}"
+                  -Dcsrf.filter.enabled="{{ CSRF_FILTER_ENABLED }}"
+                  -Daos.baseUrlOverwrite="{{ BASE_URL_OVERWRITE }}"
+                  -Dmessaging.broker.url="{{ MESSAGING_BROKER_URL }}"
+                  -Ddeployment.method="{{ DEPLOYMENT_METHOD }}"
+                  -DlocalTransform.core-aio.url="{{ TRANSFORM_URL }}"
+                  -XX:MinRAMPercentage=50
+                  -XX:MaxRAMPercentage=80
+              networks:
+                - remote_network
+              ############## attach to NFS volumes with NOCOPY##############
+              # volumes:
+              #   - type: volume
+              #     source: alf-repo-data-nfs1
+              #     target: /usr/local/tomcat/alf_data
+              #     volume:
+              #       nocopy: true
+              #   - type: volume
+              #     source: alf-repo-logs-nfs1
+              #     target: /usr/local/tomcat/logs
+              #     volume:
+              #       nocopy: true
+              #   - type: volume
+              #     source: alf-repo-ocr-input-nfs1
+              #     target: /ocr_input
+              #     volume:
+              #       nocopy: true
+              #   - type: volume
+              #     source: alf-repo-ocr-output-nfs1
+              #     target: /ocr_output
+              #     volume:
+              #       nocopy: true
+
+              # ############## attach to LOCAL volumes ##############
+              # volumes:
+              #   - alf-repo-data-local:/usr/local/tomcat/alf_data
+                  
+              #   - alf-repo-logs-local:/usr/local/tomcat/logs
+                 
+              #   - alf-repo-ocr-input-local:/ocr_input
+                 
+              #   - alf-repo-ocr-output-local:/ocr_output
+
+              ############### attach to LOCAL dir which mounted on NFS volumes ##############
+              volumes:
+              
+                - /mount/nfs/alfdata:/usr/local/tomcat/alf_data # inside of container, nobody nogroup
+                  
+                # - /mount/nfs/alflogs:/usr/local/tomcat/logs
+                 
+                # - /mount/nfs/ocrinput:/ocr_input
+                 
+                # - /mount/nfs/ocroutput:/ocr_output
+
+          # ############## claim LOCAL volumes ##############
+          # volumes:
+          #   alf-repo-data-local:
+          #     # external: true
+          #   alf-repo-logs-local:
+          #     # external: true
+          #   alf-repo-ocr-input-local:
+          #     # external: true
+          #   alf-repo-ocr-output-local:
+          #     # external: true
+             
+          ############### claim NFS volumes ##############
+          # volumes:
+          #   alfresco_alf-repo-data-nfs:
+          #     external: true
+          #     # driver_opts:
+          #     #   type: "nfs"
+          #     #   o: "addr=192.168.221.133,nolock,soft,rw" # 129.69.209.200
+          #     #   device: ":/mnt/nfsdir/alf-repo-data"
+          #   alfresco_alf-repo-logs-nfs:
+          #     external: true
+          #     # driver_opts:
+          #     #   type: "nfs"
+          #     #   o: "addr=192.168.221.133,nolock,soft,rw" # 129.69.209.200
+          #     #   device: ":/mnt/nfsdir/alf-repo-logs"
+          #   alfresco_alf-repo-ocr-input-nfs:
+          #     external: true
+          #     # driver_opts:
+          #     #   type: "nfs"
+          #     #   o: "addr=192.168.221.133,nolock,soft,rw" # 129.69.209.200
+          #     #   device: ":/mnt/nfsdir/alf-repo-ocr-input"
+          #   alfresco_alf-repo-ocr-output-nfs:
+          #     external: true
+          #     # driver_opts:
+          #     #   type: "nfs"
+          #     #   o: "addr=192.168.221.133,nolock,soft,rw" # 129.69.209.200
+          #     #   device: ":/mnt/nfsdir/alf-repo-ocr-output"
+
+# defined the volumes according to this:
+# https://github.com/Alfresco/alfresco-docker-installer/blob/master/generators/app/templates/7.0/docker-compose.yml
+
+          networks:
+            remote_network:
+              external: true
+              driver: overlay 
+# templates/igs_types/nodetypes/Alfresco.nodes.ContainerApplication/alfresco/playbooks/create.yaml

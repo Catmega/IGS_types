@@ -100,8 +100,8 @@ node_types:
                 type: string
                 required: false
                 default: { get_property: [ SELF, node_lables ] }  
-            # implementation:
-            #   primary: files/configure/configure.yaml 
+            implementation:
+              primary: files/configure/configure.yaml 
       Validation:
         type: igs.interfaces.node.lifecycle.Validation 
         operations:

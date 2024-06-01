@@ -3,6 +3,7 @@ imports:
   - ../IGSContainerApplication/NodeType.tosca
   - ../IGSOSInstance/NodeType.tosca
   - ../../igs.nodes/Workstation/NodeType.tosca
+  - ../IGSClusterNode/NodeType.tosca
 node_types:
   igs.nodes.abstract.ContainerRuntime:
     derived_from: tosca.nodes.Container.Runtime
@@ -10,34 +11,34 @@ node_types:
       targetNamespace: "igs.nodes.abstract"
       abstract: "false"
       final: "false"
-    attributes:
-      ansible_host_ip:
-        type: string
-        default: { get_attribute: [SELF, host, private_address ] }
-      ansible_user:
-        type: string
-        default: { get_attribute: [SELF, host, username ] }
-      ansible_host_name:
-        type: string
-        default: { get_attribute: [SELF, host, name ] } 
-      tier:
-        type: string
-        default: { get_attribute: [SELF, host, tier ] } 
+    # attributes:
+      # ansible_host_ip:
+      #   type: string
+      #   default: { get_attribute: [SELF, host, private_address ] }
+      # ansible_user:
+      #   type: string
+      #   default: { get_attribute: [SELF, host, username ] }
+      # ansible_host_name:
+      #   type: string
+      #   default: { get_attribute: [SELF, host, name ] } 
+      # tier:
+      #   type: string
+      #   default: { get_attribute: [SELF, host, tier ] } 
 
-      public_address: 
-        type: string
-        default: { get_attribute: [SELF, host, public_address ] } 
-      host_name:
-        type: string
-        default: { get_attribute: [SELF, host, host_name ] } 
-    properties:
-      name:
-        type: string
-        required: false
+      # public_address: 
+      #   type: string
+      #   default: { get_attribute: [SELF, host, public_address ] } 
+      # host_name:
+      #   type: string
+      #   default: { get_attribute: [SELF, host, host_name ] } 
+    # properties:
+    #   name:
+    #     type: string
+    #     required: false
     capabilities:
-      host:
+      runtime:
         occurrences: [ 1, UNBOUNDED ]
-        valid_source_types: [ igs.nodes.abstract.ContainerApplication ]
+        valid_source_types: [ igs.nodes.abstract.ContainerApplication, igs.nodes.abstract.ClusterNode ]
         type: tosca.capabilities.Compute
     requirements:
       - host:

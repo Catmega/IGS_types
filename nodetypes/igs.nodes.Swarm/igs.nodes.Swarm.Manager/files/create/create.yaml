@@ -4,16 +4,24 @@
   gather_facts: false
 
   tasks:
-    - name: change permission
+
+    # - name: execute docker info
+    #   ansible.builtin.shell: docker info
+    #   register: docker_info
+
+    # - name: check the Swarm role for this node
+    #   meta: end_play
+    #   when: "'Swarm: active' in docker_info.stdout and 'Is Manager: true' in docker_info.stdout"
+
+    - name: change permission to rw-rw-rw-
       command: sudo chmod 666 /var/run/docker.sock
 
     - name: Initial swarm
       community.docker.docker_swarm:
         state: present
-
       register: swarm_init_output
 
-    - name: Set join_token attribute (in tosca network type)
+    - name: Set join_token attribute 
       set_stats:
         data:
           join_token: "{{ swarm_init_output.swarm_facts.JoinTokens.Worker }}"

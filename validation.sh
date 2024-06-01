@@ -4,7 +4,11 @@ opera notify -e validation_trigger_DockerEngine
 opera notify -e validation_trigger_SwarmManager
 opera notify -e validation_trigger_SwarmWorker
 opera notify -e validation_trigger_Postgres
-cat /home/ubuntu/opera-root/git-project/IGS_types/validation.log
+opera notify -e validation_trigger_Solr
+opera notify -e validation_trigger_NFSServer
+# opera notify -e validation_trigger_scaleOut_PostgresCluster
+opera notify -e validation_trigger_scaleIn_PostgresCluster
+# cat /home/ubuntu/opera-root/git-project/IGS_types/validation.log
 
 
 

@@ -20,7 +20,7 @@
 
     - name: write a banner
       delegate_to: localhost
-      ansible.builtin.shell: echo "*********Validating Docker Engine on machine $(hostname -I | awk '{ print $1 }')*********" >> '{{log_file_loc}}'
+      ansible.builtin.shell: echo "*********Validating Docker Engine on machine $(hostname -I | awk '{ print $1 }')****{{ ansible_date_time.date }} {{ ansible_date_time.time }}*****" >> '{{log_file_loc}}'
 
 
     - name: start hello-world Docker container to test if docker enginee is functioning well
@@ -38,5 +38,5 @@
 
     - name: if succeed, write msg back to a file in the controller node
       delegate_to: localhost
-      ansible.builtin.shell: echo " Success! Docker Enginee is functioning well" >> '{{log_file_loc}}'
+      ansible.builtin.shell: echo " Success! Docker Enginee is functioning well, successfully created a test container" >> '{{log_file_loc}}'
       when: container_result is not failed

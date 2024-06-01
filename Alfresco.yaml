@@ -7,7 +7,7 @@ imports:
   - nodetypes/igs.nodes.NFS/NFSServer/NodeType.tosca
   - nodetypes/igs.nodes.NFS/NFSVolume/NodeType.tosca
   - nodetypes/igs.nodes.NFS/NFSClient/NodeType.tosca
-  - nodetypes/igs.nodes.Component/IGSRepository/NodeType.tosca
+  - nodetypes/igs.nodes.Component/AlfrescoRepository/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSFedSearch/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSFTSearch/NodeType.tosca
   - nodetypes/igs.nodes.Solr/NodeType.tosca
@@ -19,24 +19,26 @@ imports:
   - nodetypes/igs.nodes.postgres/PostgresCatalog/NodeType.tosca
   - nodetypes/igs.nodes.postgres/PostgresObjectCatalog/NodeType.tosca
   - nodetypes/igs.nodes.postgres/PostgresRecordsCatalog/NodeType.tosca
-  - nodetypes/igs.nodes.Component/ProxyService/NodeType.tosca
-  - nodetypes/igs.nodes.Component/IGSRepositoryService/NodeType.tosca
+  - nodetypes/igs.nodes.Component/AlfrescoProxyService/NodeType.tosca
+  - nodetypes/igs.nodes.Component/IGSPortalService/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSRecordsManagement/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSRepositoryAdministration/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSSecurityService/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSTransformServices/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSMessageService/NodeType.tosca
-  - nodetypes/Alfresco.nodes.DockerContainer/solr/NodeType.tosca
-  - nodetypes/Alfresco.nodes.DockerContainer/activemq/NodeType.tosca
-  - nodetypes/Alfresco.nodes.DockerContainer/alfresco/NodeType.tosca
+  - nodetypes/Alfresco.nodes.ContainerApplication/solr/NodeType.tosca
+  - nodetypes/Alfresco.nodes.ContainerApplication/activemq/NodeType.tosca
+  - nodetypes/Alfresco.nodes.ContainerApplication/alfresco/NodeType.tosca
   - nodetypes/igs.nodes.Component/IGSContentAppService/NodeType.tosca
-  - nodetypes/Alfresco.nodes.DockerContainer/contentApp/NodeType.tosca
-  - nodetypes/Alfresco.nodes.DockerContainer/controlCenter/NodeType.tosca
-  - nodetypes/Alfresco.nodes.DockerContainer/share/NodeType.tosca
-  - nodetypes/Alfresco.nodes.DockerContainer/transformCore/NodeType.tosca
-  - nodetypes/Alfresco.nodes.DockerContainer/postgres/NodeType.tosca
-  - nodetypes/Alfresco.nodes.DockerContainer/nginx/NodeType.tosca
+  - nodetypes/Alfresco.nodes.ContainerApplication/contentApp/NodeType.tosca
+  - nodetypes/Alfresco.nodes.ContainerApplication/controlCenter/NodeType.tosca
+  - nodetypes/Alfresco.nodes.ContainerApplication/share/NodeType.tosca
+  - nodetypes/Alfresco.nodes.ContainerApplication/transformCore/NodeType.tosca
+  - nodetypes/Alfresco.nodes.ContainerApplication/nginx/NodeType.tosca
   - nodetypes/igs.nodes.abstract/IGSOSInstance/NodeType.tosca
+  - nodetypes/igs.nodes.ContainerApplication/igs.nodes.ContainerApplication.Postgres/NodeType.tosca
+  - nodetypes/igs.nodes.docker/IGSDockerTempararyVolume/NodeType.tosca
+  - nodetypes/igs.nodes.docker/IGSDockerAutoOverlayNetwork/NodeType.tosca
   - capabilitytypes/igs.capabilities.container/Solr/CapabilityType.tosca
   - capabilitytypes/igs.capabilities.container/PostgresDBMS/CapabilityType.tosca
   - capabilitytypes/igs.capabilities.container/RepositoryUI/CapabilityType.tosca
@@ -46,56 +48,40 @@ imports:
   - capabilitytypes/igs.capabilities/MessageBrokerService/CapabilityType.tosca
   - relationshiptypes/igs.relationships/ConnectsToManager/RelationshipType.tosca
   - relationshiptypes/igs.relationshipsn.NFS/ConnectsToNFSServer/RelationshipType.tosca
+  - artifacttypes/igs.artifacts/DockerCompose/ArtifactType.tosca
+  - nodetypes/igs.nodes.VM/igs.nodes.VM.Openstack/NodeType.tosca
 topology_template:
 
   node_templates:
 
-    workstation-1: # for frontend
-      type: igs.nodes.abstract.OSInstance
+    workstation-1: 
+      type: igs.nodes.VM.Openstack
       attributes:
         private_address: localhost
         public_address: 192.168.221.163
         username: ubuntu
         name: localhost
-        tier: frontend
         host_name: ubu22vm03
 
-    workstation-2: # for backend
-      type: igs.nodes.abstract.OSInstance
+    workstation-2: 
+      type: igs.nodes.VM.Openstack
       attributes:
         private_address: 129.69.209.200
         public_address: 129.69.209.200
         username: jingyue
         name: remote_host
-        tier: backend
         host_name: pcss22task2vm4
 
-    swarm-manager: # for frontend
+    swarm-manager: 
       type: igs.nodes.Swarm.Manager
-      # attributes:
-      #   network_name: remote_network
-      #   driver: overlay
-      #   private_address: localhost
-      #   public_address: 192.168.221.163
-      #   username: ubuntu
-      #   name: localhost
-      #   tier: frontend
-      #   host_name: ubu22vm03
       properties:
         node_lables: {tile: frontend, isNfsClient: "true"}
       requirements:
         - runtimeHost: docker-engine-1
         - host: workstation-1
 
-    swarm-worker-1: # for backend
+    swarm-worker-1: 
       type: igs.nodes.Swarm.Worker
-      # attributes:
-      #   private_address: 129.69.209.200
-      #   public_address: 129.69.209.200
-      #   username: jingyue
-      #   name: remote_host
-      #   tier: backend
-      #   host_name: pcss22task2vm4
       properties:
         node_lables: {tile: backend, isNfsClient: "false"}
       requirements:
@@ -105,24 +91,14 @@ topology_template:
         - runtimeHost: docker-engine-2
         - host: workstation-2
 
-    # swarm-worker-2: # for backend
-    #   type: igs.nodes.Swarm.Worker
-    #   properties:
-    #     node_lables: {tile: backend, isNfsClient: "false"}
-    #   requirements:
-    #     - manager:
-    #         node: swarm-manager
-    #         relationship: connectToManager_relationship
-    #     - runtimeHost: docker-engine-3
 
     workstation-3: # for nfs
-      type: igs.nodes.abstract.OSInstance
+      type: igs.nodes.VM.Openstack
       attributes:
         private_address: 192.168.221.133 #192.168.221.234
         public_address: 192.168.221.133 #192.168.221.234
         username: ubuntu
         name: remote_host
-        tier: backend
         host_name: igrepositopry
 
     # nfs-client-2: # this machine not able to access through port 111&2049 yet
@@ -134,10 +110,7 @@ topology_template:
     #     - storageServer: nfs-server
     #     - host: workstation-2    
 
-    # docker-engine-3:
-    #   type: igs.nodes.docker.DockerEngine
-    #   requirements:
-    #     - host: workstation-3
+
 
     docker-engine-2:
       type: igs.nodes.docker.DockerEngine
@@ -150,21 +123,10 @@ topology_template:
         - host: workstation-1
 
 
-    # nfs-server: #old one
-    #   type: igs.nodes.NFS.NFSServer
-    #   attributes:
-    #     clients_ips: [192.168.221.163]
-    #   properties:
-    #     server_mnt_path: /mnt/nfsdir
-    #   requirements:
-    #     - host: workstation-2
-
-    nfs-server: #/home/ubuntu/mntnfs #/mnt/nfsdir
+    nfs-server: 
       type: igs.nodes.NFS.NFSServer
-      attributes:
-        clients_ips: [192.168.221.163, 129.69.209.200]
       properties:
-        server_mnt_path: /home/ubuntu/mntnfs #/var/share 
+        server_mnt_path: /home/ubuntu/mntnfs 
       requirements:
         - host: workstation-3
     repository-volume:
@@ -194,7 +156,7 @@ topology_template:
     nfs-client-1:
       type: igs.nodes.NFS.NFSClient
       attributes:
-        client_mnt_path: /mount/nfs #/mount/nfsshare
+        client_mnt_path: /mount/nfs 
       requirements:
         - storageServer:
             node: nfs-server
@@ -205,75 +167,109 @@ topology_template:
 ##############components part#############################
     ContentApp-Service:
       type: igs.nodes.Component.ContentAppService
+      properties:
+        stack_name: alfstack
+        service_name: content-app
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        labels: node.labels.tile==frontend
+      artifacts:
+        docker_compose_file:
+          type: igs.artifacts.Ansible.DockerCompose
+          file: alfresco_artifacts/contentApp_stack.yaml
       requirements:
         - containerApplication: Alfresco-ContentApp-Container
         
     Repository:
-      type: igs.nodes.Component.Repository
+      type: Alfresco.nodes.Component.Repository
+      properties:
+        stack_name: alfstack
+        service_name: alfresco
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        labels: node.labels.isNfsClient==true
+      artifacts:
+        docker_compose_file:
+          type: igs.artifacts.Ansible.DockerCompose
+          file: alfresco_artifacts/alfresco_stack.yaml
       requirements:
         - fedSearch: Fed-Search
-        - obejectService: Object-Service
+        - objectService: Object-Service
         - catalog: Catalog     
-        - objectCatalog: Obeject-Catalog
+        - objectCatalog: Object-Catalog
         - recordsCatalog: Records-Catalog
         - messageBroker: Message-Service
         - transform: Transform-Service
         - containerApplication: Alfresco-Repository-Container
+        - recordsManagement: Records-Management
+        - repositoryAdministration: Repository-Administration
+        
         
     Object-Service:
-      type: igs.nodes.Component.ObejectService
+      type: igs.nodes.Component.ObjectService
       requirements:
         - FTSearchEngine: Solr
+        - containerApplication: MockContainer
     Fed-Search:
       type: igs.nodes.Component.FedSearch
       requirements:
         - FTSearch: FT-Search-Service
+        - containerApplication: MockContainer
+        - database: Postgres-Database
     FT-Search-Service:
       type: igs.nodes.Component.FTSearchService
       requirements:
         - FTSearchEngine: Solr
+        - containerApplication: MockContainer
 
     Solr:
       type: igs.nodes.SolrSearch
+      properties:
+        stack_name: alfstack
+        service_name: solr6
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        labels: node.labels.isNfsClient==true
+      artifacts:
+        docker_compose_file:
+          type: igs.artifacts.Ansible.DockerCompose
+          file: alfresco_artifacts/solr6_stack.yaml
       requirements:
         - containerApplication: Alfresco-Solr-Container
-        - storageService: Storage-Service
 
-    MockStorage:
-      type: tosca.nodes.Storage.ObjectStorage
+    docker-temp-volume:
+      type: igs.nodes.docker.TempararyVolume
+
+    docker-stack-autogenerated-network:   
+      type: igs.nodes.docker.AutoOverlayNetwork
+      requirements:
+        - host: swarm-manager
+        
+    MockContainer: 
+      type: igs.nodes.abstract.ContainerApplication
       properties:
-          name: mock-storage
-    MockNetwork:
-      # properties:
-      #     name: remote_network      
-      type: tosca.nodes.network.Network
-
+        client_mnt_path: undefined 
+        volume_dir: undefined
+        networkName: undefined
+      requirements:
+        - host: swarm-manager
+        - network: docker-stack-autogenerated-network
+        - storage: docker-temp-volume
     Storage-Service:
       type: igs.nodes.Component.StorageService
       requirements:
-        - BlockStorage: nfs-client-1
+        - FileStorage: nfs-client-1
+        - containerApplication: MockContainer
     
     Catalog:
       type: igs.nodes.postgres.PostgresCatalog
-      properties:
-        name: alfresco-catalog
       requirements:
         - endpoint: Postgres-Database
-        - host: Postgres-DBMS
-    Obeject-Catalog:
+    Object-Catalog:
       type: igs.nodes.postgres.PostgresObjectCatalog
-      properties:
-        name: alfresco-object-catalog
       requirements:
         - endpoint: Postgres-Database
-        - host: Postgres-DBMS
     Records-Catalog:
       type: igs.nodes.postgres.PostgresRecordsCatalog
-      properties:
-        name: alfresco-records-catalog
       requirements:
         - endpoint: Postgres-Database
-        - host: Postgres-DBMS
     Postgres-Database:
       type: igs.nodes.postgres.PostgresDatabase
       properties:
@@ -286,22 +282,43 @@ topology_template:
     Postgres-DBMS:
       type: igs.nodes.postgres.PostgresDBMS
       properties:
-          name: Postgres-DBMS
-          port: 5432
+        stack_name: alfstack
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        labels: node.labels.isNfsClient==true
+      artifacts:
+        docker_compose_file:
+          type: igs.artifacts.Ansible.DockerCompose
+          file: alfresco_artifacts/postgres_stack.yaml
       requirements:
-        - host: Alfresco-Postgres-Container
+        - containerApplication: Alfresco-Postgres-Container
 
     Proxy-Service:
-      type: igs.nodes.Component.ProxyService
+      type: Alfresco.nodes.Component.ProxyService
+      properties:
+        stack_name: alfstack
+        service_name: proxy
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        labels: node.labels.tile==frontend
+      artifacts:
+        docker_compose_file:
+          type: igs.artifacts.Ansible.DockerCompose
+          file: alfresco_artifacts/proxy_stack.yaml
       requirements:
         - containerApplication: Alfresco-Nginx-Container
-        - repositoryService: Repository-Service
-        - recordsManagement: Records-Management
-        - repositoryAdministration: Repository-Administration
+        - portalService: Portal-Service
         - contentAppService: ContentApp-Service
     
-    Repository-Service:
-      type: igs.nodes.Component.RepositoryService
+    Portal-Service:
+      type: igs.nodes.Component.PortalService
+      properties:
+        stack_name: alfstack
+        service_name: share
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        labels: node.labels.tile==frontend
+      artifacts:
+        docker_compose_file:
+          type: igs.artifacts.Ansible.DockerCompose
+          file: alfresco_artifacts/share_stack.yaml
       requirements:
         - repository: Repository
         - containerApplication: Alfresco-Share-Container
@@ -309,28 +326,56 @@ topology_template:
     Records-Management:
       type: igs.nodes.Component.RecordsManagement
       requirements:
-        - repository: Repository
+        - containerApplication: MockContainer
     
     Repository-Administration:
       type: igs.nodes.Component.RepositoryAdministration
+      properties:
+        stack_name: alfstack
+        service_name: control-center
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        labels: node.labels.tile==frontend
+      artifacts:
+        docker_compose_file:
+          type: igs.artifacts.Ansible.DockerCompose
+          file: alfresco_artifacts/controlCenter_stack.yaml
       requirements:
         - securityService: Security-Service
+        - containerApplication: Alfresco-ControlCenter-Container
 
     Security-Service:
       type: igs.nodes.Component.SecurityService
       requirements:
-        - containerApplication: Alfresco-ControlCenter-Container
+        - containerApplication: MockContainer
 
     Message-Service:
       type: igs.nodes.Component.MessageService
+      properties:
+        stack_name: alfstack
+        service_name: activemq
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        labels: node.labels.tile==backend
+      artifacts:
+        docker_compose_file:
+          type: igs.artifacts.Ansible.DockerCompose
+          file: alfresco_artifacts/activemq_stack.yaml
       requirements:
         - containerApplication: Alfresco-ActiveMQ-Container
    
 
     Transform-Service:
       type: igs.nodes.Component.TransformService
+      properties:
+        stack_name: alfstack
+        service_name: transform-core-aio
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        labels: node.labels.tile==backend
+      artifacts:
+        docker_compose_file:
+          type: igs.artifacts.Ansible.DockerCompose
+          file: alfresco_artifacts/transformCoreAio_stack.yaml
       requirements:
-        - containerApplication:  Alfresco-TransformCore-Container
+        - containerApplication: Alfresco-TransformCore-Container
         - messageBroker: Message-Service
 
 
@@ -338,112 +383,106 @@ topology_template:
 
 ############containers###################################
     Alfresco-ActiveMQ-Container:
-        type: Alfresco.nodes.DockerContainer.ActiveMQ
-        properties:
-            group: backend
-            labels: [node.labels.tile==backend]
-        requirements:
-          - host: workstation-1
-          - runtime: docker-engine-1
-          - network: MockNetwork
-          - storage: MockStorage
-          - frontend: Alfresco-ContentApp-Container
+      type: Alfresco.nodes.ContainerApplication.ActiveMQ
+      properties:
+        image_name: alfresco-activemq
+        image_namespace: alfresco
+        image_version: 5.17.1-jre11-rockylinux8
+      requirements:
+        - host: swarm-manager
+        - network: docker-stack-autogenerated-network
+        - storage: docker-temp-volume
 
     Alfresco-ContentApp-Container:
-        type: Alfresco.nodes.DockerContainer.ContentApp
-        properties:
-            group: frontend
-            labels: [node.labels.tile==frontend]
-        requirements:
-          - host: workstation-1
-          - runtime: docker-engine-1
-          - network: MockNetwork
-          - storage: MockStorage
+      type: Alfresco.nodes.ContainerApplication.ContentApp
+      properties:
+        image_name: alfresco-content-app
+        image_namespace: alfresco
+        image_version: 3.1.0
+      requirements:
+        - host: swarm-manager
+        - network: docker-stack-autogenerated-network
+        - storage: docker-temp-volume
 
     Alfresco-ControlCenter-Container:
-      type: Alfresco.nodes.DockerContainer.ControlCenter
+      type: Alfresco.nodes.ContainerApplication.ControlCenter
       properties:
-          group: frontend
-          labels: [node.labels.tile==frontend]
+        image_name: alfresco-control-center
+        image_namespace: quay.io/alfresco
+        image_version: 8.2.0
       requirements:
-        - host: workstation-1
-        - runtime: docker-engine-1
-        - network: MockNetwork
-        - storage: MockStorage
+        - host: swarm-manager
+        - network: docker-stack-autogenerated-network
+        - storage: docker-temp-volume
 
     Alfresco-Solr-Container:
-      type: Alfresco.nodes.DockerContainer.Solr
+      type: Alfresco.nodes.ContainerApplication.Solr
       properties:
-          group: frontend
-          labels: [node.labels.isNfsClient==true]
-          container_data_dir: /opt/alfresco-search-services/data
+        image_name: alfresco-search-services
+        image_namespace: alfresco
+        image_version: 2.0.6
+        container_data_dir: /opt/alfresco-search-services/data
       requirements:
-        - host: workstation-1
-        - runtime: docker-engine-1
-        - network: MockNetwork
+        - host: swarm-manager
+        - network: docker-stack-autogenerated-network
         - storage: solr-volume
 
     Alfresco-Repository-Container:
-      type: Alfresco.nodes.DockerContainer.ContentRepository
+      type: Alfresco.nodes.ContainerApplication.ContentRepository
       properties:
-          group: frontend
-          labels: [node.labels.tile==frontend, node.labels.isNfsClient==true]
-          container_data_dir: /usr/local/tomcat/alf_data
+        image_namespace: alfresco
+        image_name: alfresco-governance-repository-community
+        image_version: 7.4.0-M3
+        container_data_dir: /usr/local/tomcat/alf_data
       requirements:
-        - host: workstation-1
-        - runtime: docker-engine-1
-        - network: MockNetwork
+        - host: swarm-manager
+        - network: docker-stack-autogenerated-network
         - storage: repository-volume
 
     Alfresco-Nginx-Container:
-      type: Alfresco.nodes.DockerContainer.Proxy
+      type: Alfresco.nodes.ContainerApplication.Proxy
       properties:
-          group: frontend
-          labels: [node.labels.tile==frontend]
+        image_namespace: alfresco
+        image_name: alfresco-acs-nginx
+        image_version: 3.4.2
       requirements:
-        - host: workstation-1
-        - runtime: docker-engine-1
-        - network: MockNetwork
-        - storage: MockStorage
-        - dependency_1: Alfresco-Share-Container
-        # - dependency_2: Alfresco-ContentApp-Container
-        # - dependency_3: Alfresco-Repository-Container
-        # - dependency_4: Alfresco-ControlCenter-Container
+        - host: swarm-manager
+        - network: docker-stack-autogenerated-network
+        - storage: docker-temp-volume
 
     Alfresco-Postgres-Container:
-      type: Alfresco.nodes.DockerContainer.Postgres
+      type: igs.nodes.ContainerApplication.Postgres
       properties:
-          group: frontend
-          labels: [node.labels.isNfsClient==true]
-          container_data_dir:  /var/lib/postgresql/data
+        image_namespace: docker.io
+        image_name: postgres
+        image_version: 14.4
+        container_data_dir: /var/lib/postgresql/data
       requirements:
-        - host: workstation-1
-        - runtime: docker-engine-1
-        - network: MockNetwork
+        - host: swarm-manager
+        - network: docker-stack-autogenerated-network
         - storage: postgres-volume
 
     Alfresco-Share-Container:
-      type: Alfresco.nodes.DockerContainer.Share
+      type: Alfresco.nodes.ContainerApplication.Share
       properties:
-          group: frontend
-          labels: [node.labels.tile==frontend]
+        image_namespace: alfresco
+        image_name: alfresco-governance-share-community
+        image_version: 7.4.0-M3
       requirements:
-        - host: workstation-1
-        - runtime: docker-engine-1
-        - network: MockNetwork
-        - storage: MockStorage
+        - host: swarm-manager
+        - network: docker-stack-autogenerated-network
+        - storage: docker-temp-volume
 
     Alfresco-TransformCore-Container:
-      type: Alfresco.nodes.DockerContainer.TransformCore
+      type: Alfresco.nodes.ContainerApplication.TransformCore
       properties:
-          group: backend
-          labels: [node.labels.tile==backend]
+        image_namespace: alfresco
+        image_name: alfresco-transform-core-aio
+        image_version: 3.0.0
       requirements:
-        - host: workstation-1
-        - runtime: docker-engine-1
-        - network: MockNetwork
-        - storage: MockStorage
-        - frontend: Alfresco-ContentApp-Container
+        - host: swarm-manager
+        - network: docker-stack-autogenerated-network
+        - storage: docker-temp-volume
 
   relationship_templates:
     connectToManager_relationship:
@@ -459,190 +498,3 @@ topology_template:
           port: 2049
           commu_method: tcp
           
-#########deploy single container, for testing only########
-#     workstation-1: # for frontend
-#       type: igs.nodes.Swarm.Manager
-#       attributes:
-#         private_address: localhost
-#         public_address: 192.168.221.163
-#         username: ubuntu
-#         name: localhost
-#         tier: frontend
-#         network_name: remote_network
-
-#     workstation-2: # for backend
-#       type: igs.nodes.Swarm.Worker
-#       attributes:
-#         private_address: 129.69.209.200
-#         public_address: 129.69.209.200
-#         username: jingyue
-#         name: remote_host
-#         tier: backend
-#       requirements:
-#         - manager: workstation-1
-
-#     mock-docker-engine-2:
-#       type: igs.nodes.docker.DockerEngine
-#       requirements:
-#         - host: workstation-2
-
-#     mock-docker-engine-1:
-#       type: igs.nodes.docker.DockerEngine
-#       requirements:
-#         - host: workstation-1
-#     MockStorage:
-#       type: tosca.nodes.Storage.ObjectStorage
-#       properties:
-#           name: storage
-#     MockNetwork:
-#       # properties:
-#       #     name: remote_network      
-#       type: tosca.nodes.network.Network
-
-#     # Alfresco-Nginx-Container:
-#     #   type: Alfresco.nodes.DockerContainer.Proxy
-#     #   properties:
-#     #       group: frontend
-#     #   requirements:
-#     #     - host: mock-docker-engine-1
-#     #     - network: MockNetwork
-#     #     - storage: MockStorage
-
-#     Alfresco-Postgres-Container:
-#       type: Alfresco.nodes.DockerContainer.Postgres
-#       properties:
-#           group: frontend
-#       requirements:
-#         - host: mock-docker-engine-1
-#         - network: MockNetwork
-#         - storage: MockStorage
-
-#     Alfresco-Repository-Container:
-#       type: Alfresco.nodes.DockerContainer.ContentRepository
-#       properties:
-#           group: frontend
-#       requirements:
-#         - host: mock-docker-engine-1
-#         - network: MockNetwork
-#         - storage: MockStorage
-
-#     Alfresco-Solr-Container:
-#       type: Alfresco.nodes.DockerContainer.Solr
-#       properties:
-#           group: frontend
-#       requirements:
-#         - host: mock-docker-engine-1
-#         - network: MockNetwork
-#         - storage: MockStorage
-# # postgres in machine2 is running on host port 5431
-
-#############deploy single machine with volume, for testing###############
-    # workstation-1: # for frontend
-    #   type: igs.nodes.Swarm.Manager
-    #   attributes:
-    #     private_address: localhost
-    #     public_address: 192.168.221.163
-    #     username: ubuntu
-    #     name: localhost
-    #     tier: frontend
-    #     network_name: remote_network
-
-    # workstation-2: # for backend
-    #   type: igs.nodes.Swarm.Worker
-    #   attributes:
-    #     private_address: 129.69.209.200
-    #     public_address: 129.69.209.200
-    #     username: jingyue
-    #     name: remote_host
-    #     tier: backend
-    #   requirements:
-    #     - manager: workstation-1
-
-    # workstation-3: # for nfs
-    #   type: igs.nodes.abstract.OSInstance
-    #   attributes:
-    #     private_address: 192.168.221.133 #192.168.221.234
-    #     public_address: 192.168.221.133 #192.168.221.234
-    #     username: ubuntu
-    #     name: remote_host
-    #     tier: backend
-
-    # nfs-server: #/home/ubuntu/mntnfs #/mnt/nfsdir
-    #   type: igs.nodes.NFS.NFSServer
-    #   attributes:
-    #     clients_ips: [192.168.221.163, 129.69.209.200]
-    #   properties:
-    #     server_mnt_path: /home/ubuntu/mntnfs #/var/share 
-    #   requirements:
-    #     - host: workstation-3
-
-    # docker-engine-2:
-    #   type: igs.nodes.docker.DockerEngine
-    #   requirements:
-    #     - host: workstation-2
-
-    # docker-engine-1:
-    #   type: igs.nodes.docker.DockerEngine
-    #   requirements:
-    #     - host: workstation-1
-    
-    # # repository-volume:
-    # #   type: igs.nodes.NFS.Volume
-    # #   properties:
-    # #     name: alfdata-volume
-    # #   requirements:
-    # #     - host: workstation-1
-    # #     - storageClient: nfs-client-1
-
-    # MockStorage:
-    #   type: tosca.nodes.Storage.ObjectStorage
-    #   properties:
-    #       name: storage
-    # MockNetwork:
-    #   # properties:
-    #   #     name: remote_network      
-    #   type: tosca.nodes.network.Network
-    # nfs-client-1:
-    #   type: igs.nodes.NFS.NFSClient
-    #   attributes:
-    #     client_mnt_path: /mount/nfs #/mount/nfsshare
-    #   requirements:
-    #     - storageServer: nfs-server
-    #     - host: workstation-1
-
-
-    # Alfresco-ActiveMQ-Container:
-    #     type: Alfresco.nodes.DockerContainer.ActiveMQ
-    #     properties:
-    #         group: backend
-    #     requirements:
-    #       - host: docker-engine-1
-    #       - network: MockNetwork
-    #       - storage: MockStorage
-    #       - frontend: Alfresco-ContentApp-Container
-
-    # Alfresco-ContentApp-Container:
-    #     type: Alfresco.nodes.DockerContainer.ContentApp
-    #     properties:
-    #         group: frontend
-    #         labels: [node.labels.tile==frontend]
-    #         # [node.labels.isNfsClient==true, node.labels.tile==frontend]
-    #     requirements:
-    #       - host: docker-engine-1
-    #       - network: MockNetwork
-    #       - storage: MockStorage
-
-    # Alfresco-Postgres-Container:
-    #   type: Alfresco.nodes.DockerContainer.Postgres
-    #   properties:
-    #       group: frontend
-    #       container_data_dir:  /var/lib/postgresql/data
-    #   requirements:
-    #     - host: docker-engine-1
-    #     - network: MockNetwork
-    #     - storage: MockStorage
-
-
-     
-
-    

@@ -1,0 +1,15 @@
+- name: Deploy stack - proxy
+  community.docker.docker_stack:
+    state: present
+    name: '{{stack_name}}'
+    compose:
+      - version: '3'
+        services:
+          search-service:
+            image: '{{image_namespace}}/{{image_name}}:{{image_version}}' # igsrepo/search-service:2
+            ports:
+              - 8000:8080
+            deploy:
+              placement:
+                constraints:
+                  - "{{ labels }}"

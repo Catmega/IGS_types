@@ -2,9 +2,10 @@ tosca_definitions_version: tosca_simple_yaml_1_3
 imports:
   - ../PostgresDatabase/NodeType.tosca
   - ../../igs.nodes.abstract/IGSComponent/NodeType.tosca
+  - ../../igs.nodes.abstract/IGSCatalog/NodeType.tosca
 node_types:
   igs.nodes.postgres.PostgresObjectCatalog:
-    derived_from: igs.nodes.postgres.PostgresDatabase
+    derived_from: igs.nodes.abstract.Catalog
     metadata:
       targetNamespace: "igs.nodes.postgres"
       abstract: "false"

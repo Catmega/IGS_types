@@ -1,7 +1,10 @@
 tosca_definitions_version: tosca_simple_yaml_1_3
 imports:
   - ../../igs.nodes.abstract/IGSComponent/NodeType.tosca
+  - ../../igs.nodes.abstract/IGSDatabase/NodeType.tosca
   - ../IGSFTSearch/NodeType.tosca
+  - ../../../capabilitytypes/igs.capabilities/FederatedSearch/CapabilityType.tosca
+  - ../../../capabilitytypes/igs.capabilities/FTSearchService/CapabilityType.tosca
 node_types:
   igs.nodes.Component.FedSearch:
     derived_from: igs.nodes.abstract.Component
@@ -11,7 +14,17 @@ node_types:
       final: "false"
     requirements:
       - FTSearch:
-          capability: tosca.capabilities.Compute
+          capability: igs.capabilities.FTSearchService
           node: igs.nodes.Component.FTSearchService
-          relationship: tosca.relationships.DependsOn
+          relationship: tosca.relationships.RoutesTo
           occurrences: [ 1, 1 ]
+      - database:
+          capability: tosca.capabilities.Endpoint.Database
+          node: igs.nodes.abstract.Database
+          relationship: tosca.relationships.RoutesTo
+          occurrences: [ 1, 1 ]
+    capabilities:
+      federatedSearch:
+        occurrences: [ 1, UNBOUNDED ]
+        valid_source_types: [ igs.nodes.abstract.Component ]
+        type: igs.capabilities.FederatedSearch

@@ -1,0 +1,64 @@
+---
+- name: add NFS export information on the server
+  hosts: all
+  gather_facts: true
+  vars:
+    log_file_loc: /home/ubuntu/opera-root/git-project/IGS_types/validation.log
+    SERVER_IP: 192.168.221.133
+    CLIENT_MNT_PATH: /mount/nfs
+    SERVER_MNT_PATH: /home/ubuntu/mntnfs
+  tasks:  
+
+    # - name: check NFS mount output with NFS server ip address
+    #   ansible.builtin.shell: mount | grep -i nfs | grep -w '{{SERVER_IP}}' | grep -w '{{CLIENT_MNT_PATH}}'
+    #   register: nfs_client_mount_result
+    #   ignore_errors: true
+
+
+    # - name: if the output is not empty, it's mounted, skip the rest
+    #   debug:
+    #     msg: "NFS mount from {{ SERVER_IP }} on {{ CLIENT_MNT_PATH }} is mounted."
+    #   when: nfs_client_mount_result.stdout != ""
+    - name: get validating machines's ip
+      set_fact:
+        current_machine_ip: "{{ ansible_ssh_host }}"
+
+    - name: write a banner
+      delegate_to: localhost
+      ansible.builtin.shell: echo "\n *********Validating NFS Server on machine {{current_machine_ip}}****{{ ansible_date_time.date }} {{ ansible_date_time.time }}*****" >> '{{log_file_loc}}'
+
+    - name: Check NFS server service status
+      systemd:
+        name: nfs-server
+        state: started
+      register: nfs_service
+
+    - name: Check if mount directory exists
+      stat:
+        path: "{{ SERVER_MNT_PATH }}"
+      register: mnt_dir_existence
+
+    - name: if failed, write msg back to a file in the controller node
+      delegate_to: localhost
+      ansible.builtin.shell: echo " Failure! NFS Server's deployment is failed." >> '{{log_file_loc}}'
+      when: nfs_service.status.ActiveState != 'active' or not mnt_dir_existence.stat.exists
+
+
+    - name: if succeed, write msg back to a file in the controller node
+      delegate_to: localhost
+      ansible.builtin.shell: echo " Success! NFS Server has been successfully deployed." >> '{{log_file_loc}}'
+      when: nfs_service.status.ActiveState == 'active' and mnt_dir_existence.stat.exists
+
+    - name: check on NFS Server if the test file has been created
+      stat:
+        path: "{{ SERVER_MNT_PATH }}/test.txt"
+      register: file_mount_result
+      
+    - name: Display file creation status
+      delegate_to: localhost
+      ansible.builtin.shell: echo " Success! NFS Server can successfully sync with NFS Client." >> '{{log_file_loc}}'
+      when: file_mount_result.stat.exists
+
+
+
+ 

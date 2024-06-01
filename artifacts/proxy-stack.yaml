@@ -1,0 +1,20 @@
+- name: Deploy stack - proxy
+  community.docker.docker_stack:
+    state: present
+    name: '{{stack_name}}'
+    compose:
+      - version: '3'
+        services:
+          proxy:
+            image: '{{image_namespace}}/{{image_name}}:{{image_version}}'
+            ports:
+              - "80:80"
+            ### dependency is expressed by Tosca ###
+            # depends_on:
+            #   - igsrepository
+            #   - igsportal
+            ########################################
+            deploy:
+              placement:
+                constraints:
+                  - "{{ labels }}"

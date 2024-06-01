@@ -1,6 +1,6 @@
 tosca_definitions_version: tosca_simple_yaml_1_3
 # imports:
-#   - ../IGSBlockStorage/NodeType.tosca
+#   - ../IGSFileStorage/NodeType.tosca
 node_types:
   igs.nodes.abstract.OSInstance:
     derived_from: tosca.nodes.Compute
@@ -24,5 +24,5 @@ node_types:
     # capabilities:
     #   host:
     #     occurrences: [ 1, UNBOUNDED ]
-    #     valid_source_types: [igs.nodes.abstract.BlockStorage, igs.nodes.abstract.ContainerRuntime]
+    #     valid_source_types: [igs.nodes.abstract.FileStorage, igs.nodes.abstract.ContainerRuntime]
     #     type: tosca.capabilities.Container

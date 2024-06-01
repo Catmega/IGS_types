@@ -1,0 +1,22 @@
+
+- name: Deploy stack - postgres
+  community.docker.docker_stack:
+    state: present
+    name: '{{stack_name}}'
+    compose:
+      - version: '3'
+        services:
+          postgres:
+            image: postgres:14.4
+            environment:
+              POSTGRES_DB: igsdatabase
+              POSTGRES_USER: igs
+              POSTGRES_PASSWORD: igs
+            ports:
+              - "5432:5432"
+            deploy:
+              placement:
+                constraints:
+                  - "{{ labels }}"
+            volumes:
+              - "{{ client_mnt_path }}/{{volume_dir}}:{{ container_data_dir }}"

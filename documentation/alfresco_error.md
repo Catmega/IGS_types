@@ -49,3 +49,6 @@ Permmison issue of postgres's volume can leads to JDBC connection refused error.
 
 # troubleshooting Postgres
 Permmison issue of postgres's volume can leads to JDBC connection refused error.
+
+
+![alt text](image-23.png)

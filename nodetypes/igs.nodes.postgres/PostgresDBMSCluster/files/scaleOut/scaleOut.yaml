@@ -1,0 +1,27 @@
+---
+- name: scale out plus 1
+  hosts: all
+  gather_facts: false
+  become: true
+  vars:
+    service_name: igsstack_replica
+    primary_service_name: igsstack_postgres
+  tasks:
+    - name: Get current number of replicas
+      community.docker.docker_swarm_service_info:
+        name: "{{ service_name }}"
+      register: service_info
+
+    - name: Calculate new number of replicas
+      set_fact:
+        new_replicas: "{{ service_info.service.Spec.Mode.Replicated.Replicas | int + 1 }}"
+
+    - name: scale in
+      ansible.builtin.shell: "docker service scale {{ service_name }}={{new_replicas}}"
+
+    - name: restart the primary - step 1
+      # a method taken from this quesion:
+      # https://stackoverflow.com/questions/44811886/restart-one-service-in-docker-swarm-stack
+      ansible.builtin.shell: "docker service scale {{ primary_service_name }}=0"
+    - name: restart the primary - step 2
+      ansible.builtin.shell: "docker service scale {{ primary_service_name }}=1"

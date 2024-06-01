@@ -4,7 +4,7 @@ imports:
   - ../IGSRepository/NodeType.tosca
   - ../../../capabilitytypes/igs.capabilities.container/RepositoryUI/CapabilityType.tosca
   - ../../igs.nodes.abstract/IGSContainerApplication/NodeType.tosca
-
+  - ../../../capabilitytypes/igs.capabilities/RecordLifecycleManagement/CapabilityType.tosca
 node_types:
   igs.nodes.Component.RecordsManagement:
     derived_from: igs.nodes.abstract.Component
@@ -12,11 +12,15 @@ node_types:
       targetNamespace: "igs.nodes.Component"
       abstract: "false"
       final: "false"
-    requirements:
-      - repository:
-          capability: tosca.capabilities.Compute
-          node: igs.nodes.Component.Repository
-          relationship: tosca.relationships.DependsOn
-          occurrences: [ 1, 1 ]
+    # requirements:
+    #   - repository:
+    #       capability: tosca.capabilities.Compute
+    #       node: igs.nodes.Component.Repository
+    #       relationship: tosca.relationships.DependsOn
+    #       occurrences: [ 1, 1 ]
 
-
+    capabilities:
+      recordLifecycleManagement:
+        occurrences: [ 1, UNBOUNDED ]
+        valid_source_types: [ igs.nodes.abstract.Component ]
+        type: igs.capabilities.RecordLifecycleManagement

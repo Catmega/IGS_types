@@ -1,0 +1,14 @@
+- name: docker compose control-center
+  community.docker.docker_stack:
+    state: present
+    name: '{{stack_name}}'
+    compose:
+      - version: '3'
+        services:
+          control-center:
+            image: '{{image_namespace}}/{{image_name}}:{{image_version}}' #quay.io/alfresco/alfresco-control-center:8.2.0
+
+            environment:
+              APP_CONFIG_PROVIDER: "ECM"
+              APP_CONFIG_AUTH_TYPE: "BASIC"
+              BASE_PATH: ./

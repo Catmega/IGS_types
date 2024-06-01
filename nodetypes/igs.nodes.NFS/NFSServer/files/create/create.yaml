@@ -1,41 +1,49 @@
 ---
-- name: add remote machine
-  hosts: localhost
-  become: yes
-  vars:
-      host_ip: "{{ ANSIBLE_HOST_IP }}"
+# - name: add remote machine
+#   hosts: localhost
+#   become: yes
+#   vars:
+#       host_ip: "{{ ANSIBLE_HOST_IP }}"
+#   tasks:
+#     - name: Add targets 
+#       add_host:
+#         name: "{{ ANSIBLE_HOST_NAME }}"
+#         ansible_host: "{{ ANSIBLE_HOST_IP }}"
+#         ansible_user: "{{ ANSIBLE_USER }}"
+#       when: 
+#         - host_ip != "localhost"
+
+
+# - name: create
+#   hosts: 
+#     - "{{ ANSIBLE_HOST_NAME }}"
+#   gather_facts: true
+#   become: true
+#   become_method: sudo
+- name: add NFS export information on the server
+  hosts: all
+  gather_facts: false
   tasks:
-    - name: Add targets 
-      add_host:
-        name: "{{ ANSIBLE_HOST_NAME }}"
-        ansible_host: "{{ ANSIBLE_HOST_IP }}"
-        ansible_user: "{{ ANSIBLE_USER }}"
-      when: 
-        - host_ip != "localhost"
+    - name: Check NFS server service status
+      systemd:
+        name: nfs-server
+        state: started
+      register: nfs_service
 
+    - name: Check if mount directory exists
+      stat:
+        path: "{{ SERVER_MNT_PATH }}"
+      register: mnt_dir_existence
 
-- name: create
-  hosts: 
-    - "{{ ANSIBLE_HOST_NAME }}"
-  gather_facts: true
-  become: true
-  become_method: sudo
-
-    # clientIPs: "{{ CLIENTS_IPS }}"
-    # clientIPs:
-    #   - 192.168.221.163
-    #   - 192.168.221.133
-  tasks:
-    # - name: use this task to check if your os belong to the Debian family
-    #   debug:
-    #     msg: ansible_os_family == "{{ ansible_os_family }}"
-
+    - name: Display NFS service status
+      meta: end_play
+      when: nfs_service.status.ActiveState == 'active'and mnt_dir_existence.stat.exists
 
     - name: Update and upgrade apt packages
       apt:
         upgrade: yes
         update_cache: yes
-      when: ansible_os_family == "Debian"
+      # when: ansible_os_family == "Debian"
 
 
     - name: Install required packages
@@ -43,7 +51,7 @@
         pkg:
           - nfs-kernel-server
 
-      when: ansible_os_family == "Debian"
+      # when: ansible_os_family == "Debian"
 
     - name: Create directory= mkdir -p
       ansible.builtin.file:

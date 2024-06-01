@@ -1,0 +1,131 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../igs.nodes.abstract/IGSComponent/NodeType.tosca
+  - ../igs.nodes.abstract/IGSContainerApplication/NodeType.tosca
+  - ../../capabilitytypes/igs.capabilities.container/Solr/CapabilityType.tosca
+  - ../../capabilitytypes/igs.capabilities/StorageService/CapabilityType.tosca
+  - ../../capabilitytypes/igs.capabilities/FTSearchEngine/CapabilityType.tosca 
+  - ../igs.nodes.Solr.DocutmentSchema/NodeType.tosca
+  - ../../relationshiptypes/igs.relationships/RequireDocumentSchema/RelationshipType.tosca
+  - ../../capabilitytypes/igs.capabilities/DocumentSchema/CapabilityType.tosca
+  - ../../interfacetypes/igs.interfaces.node.lifecycle/Validation/InterfaceType.tosca
+  - ../igs.nodes.Component/IGSFTSearchEngine/NodeType.tosca
+node_types:
+  igs.nodes.Solr.Custom:
+    derived_from: igs.nodes.Component.FTSearchEngine
+    metadata:
+      targetNamespace: "igs.nodes.Solr"
+      abstract: "false"
+      final: "false"
+    properties:
+      document_schema_file_loc:
+        type: string
+        required: false
+        default: notGiven
+      core_name:
+        type: string
+        required: false
+        default: notGiven
+      port:
+        type: string
+        required: false
+        default: 8085
+    requirements:
+      - containerApplication:
+          capability: igs.capabilities.container.Solr
+          node: igs.nodes.abstract.ContainerApplication
+          relationship: tosca.relationships.DependsOn
+          occurrences: [ 1, 1 ]
+      # - storageService:
+      #     capability: igs.capabilities.StorageService
+      #     node: igs.nodes.abstract.Component
+      #     relationship: tosca.relationships.DependsOn
+      #     occurrences: [ 1, 1 ]
+      - docSchema:
+          capability: igs.capabilities.DocumentSchema
+          node: igs.nodes.Solr.DocumentSchema
+          relationship: igs.relationships.RequireDocumentSchema
+    capabilities:
+      FTSearchEngine:
+        occurrences: [ 1, UNBOUNDED ]
+        valid_source_types: [ igs.nodes.abstract.Component ]
+        type: igs.capabilities.FTSearchEngine
+    interfaces:
+      Standard:
+        type: tosca.interfaces.node.lifecycle.Standard
+        operations:
+
+          configure:
+            inputs:
+
+              SERVICE_LAUNCHER_DEF_LOC:
+                type: string
+                required: false
+                default: { get_property: [SELF, service_launcher_def_loc ] }
+              LABELS:
+                type: string
+                required: false
+                default: { get_property: [ SELF, labels] }
+              IMAGE_NAMESPACE:
+                type: string
+                required: false
+                default: { get_property: [ SELF, image_namespace] }
+              IMAGE_NAME:
+                type: string
+                required: false
+                default: { get_property: [ SELF, image_name] }
+              IMAGE_VERSION:
+                type: string
+                required: false
+                default: { get_property: [ SELF, image_version] }
+              STACK_NAME:
+                type: string
+                required: false
+                default: { get_property: [ SELF, stack_name] }
+              SERVICE_NAME:
+                type: string
+                required: false
+                default: { get_property: [ SELF, service_name] } 
+
+              CLIENT_MNT_DIR:
+                type: string
+                required: false
+                default: { get_property: [ SELF, client_mnt_path ] } 
+              VOLUME_DIR:
+                type: string
+                required: false
+                default: { get_property: [ SELF, volume_dir ] }
+              CONTAINER_DATA_DIR:
+                type: string
+                required: false
+                default: { get_property: [ SELF, container_data_dir ] }
+              CORE_NAME:
+                type: string
+                required: false
+                default: { get_property: [ SELF, core_name] }
+
+              DOCUMENT_SCHEMA_FILE_LOC:
+                type: string
+                required: false
+                default: { get_property: [SELF, document_schema_file_loc ] }
+              HOST_PORT:
+                type: string
+                required: false
+                default: { get_property: [SELF, port ] }
+            implementation:
+              primary: files/configure/configure.yaml 
+      Validation:
+        type: igs.interfaces.node.lifecycle.Validation 
+        operations:
+          validate: 
+            inputs:
+              CORE_NAME:
+                type: string
+                required: false
+                default: { get_property: [ SELF, core_name] }
+              HOST_PORT:
+                type: string
+                required: false
+                default: { get_property: [ SELF, port ] }
+            implementation:
+              primary: files/validate/validate.yaml 

@@ -1,0 +1,126 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:      
+  - ../../igs.nodes.docker/IGSDockerApplication/NodeType.tosca
+  - ../../../capabilitytypes/igs.capabilities.container/MessageBroker/CapabilityType.tosca
+  - ../../igs.nodes.Component/IGSMessageService/NodeType.tosca
+node_types:
+  Alfresco.nodes.ContainerApplication.ActiveMQ:
+    derived_from: igs.nodes.abstract.ContainerApplication
+        
+    properties:
+      client_mnt_path:
+        type: string
+        required: false
+        default: undefined
+      volume_dir:
+        type: string
+        required: false
+        default: undefined
+    #     mem_limit: 
+    #       type:  scalar-unit.size
+    #       default: 1g
+    #       constraints:
+    #         - less_or_equal: 1g
+    #     WebConsole_port:
+    #       type: string
+    #       default: 8161
+    #     AMQP_port:
+    #       type: string
+    #       default: 5672
+    #     OpenWire_port:
+    #       type: string
+    #       default: 61616
+    #     STOMP_port:
+    #       type: string
+    #       default: 61613
+    #     image:
+    #       type: string
+    #       default: alfresco/alfresco-activemq
+
+    # interfaces:
+    #   Standard:
+    #     type: tosca.interfaces.node.lifecycle.Standard
+    #     operations:
+    #       create: 
+    #         inputs:
+    #             MEM_LIMIT:
+    #               type: integer
+    #               required: true
+    #               default: { get_property: [ SELF, mem_limit ] }
+                
+    #             WEBCONSOLE_PORT:
+    #               type: string
+    #               required: true
+    #               default: { get_property: [ SELF, WebConsole_port ] }
+
+    #             AMPQ_PORT:
+    #               type: string
+    #               required: true
+    #               default: { get_property: [ SELF, AMQP_port ] }
+                
+    #             OPENWIRE_PORT:
+    #               type: string
+    #               required: true
+    #               default: { get_property: [ SELF, OpenWire_port ] }
+                
+    #             STOMP_PORT:
+    #               type: string
+    #               required: true
+    #               default: { get_property: [ SELF, STOMP_port ] }
+                
+    #             IMAGE:
+    #               type: string
+    #               required: true
+    #               default: { get_property: [ SELF, image] }
+                  
+    #             CONTAINER_GROUP:
+    #               type: string
+    #               required: true
+    #               default: { get_property: [ SELF, group] }
+    #             LABELS:
+    #               type: string
+    #               required: true
+    #               default: { get_property: [ SELF, labels] }
+
+    #             ## ERROR! unable to direcly execute docker-compose file with ansible
+    #             # DOCKER_COMPOSE_FILE:
+    #             #   type: string
+    #             #   required: true
+    #             #   default: { get_artifact: [ SELF, docker-compose] }
+
+    #             ## ERROR! unable to retrieve artifact's property
+    #             # DOCKER_IMAGE_NAME:
+    #             #   type: string
+    #             #   required: true
+    #             #   default: { get_property: [ SELF, docker-compose, image_name] }
+    #             ## ERROR! unable to retrieve artifact's property
+    #             # DOCKER_IMAGE_VERSION:
+    #             #   type: string
+    #             #   required: true
+    #             #   default: { get_property: [ SELF, docker-compose, version] }
+    #         implementation:
+    #           primary: playbooks/test.yaml 
+
+    # artifacts:
+    #   docker-compose:
+    #     type: Alfresco.artifacts.Image
+
+    #     # file: docker-compose/docker-compose.yaml 
+    #     file: playbooks/create.yaml 
+
+    #     properties:
+    #       image_name: alfresco/alfresco-activemq
+    #       version: 5.17.1-jre11-rockylinux8
+          
+
+    capabilities:
+      containerApplication:
+        valid_source_types: [ igs.nodes.Component.MessageService ]
+        type: igs.capabilities.container.MessageBroker
+    # requirements: 
+    #   - frontend:
+    #       capability: tosca.capabilities.Compute
+    #       node: igs.nodes.abstract.ContainerApplication
+    #       relationship: tosca.relationships.DependsOn
+    #       occurrences: [ 1, 1 ]
+

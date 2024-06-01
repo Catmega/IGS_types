@@ -6,6 +6,8 @@ imports:
   - nodetypes/igs.nodes.docker/IGSDockerEngine/NodeType.tosca
   - nodetypes/igs.nodes.abstract/IGSOSInstance/NodeType.tosca
   - relationshiptypes/igs.relationships/ConnectsToManager/RelationshipType.tosca
+  - policytypes/igs.policies.validate.SwarmManager/PolicyType.tosca
+  - policytypes/igs.policies.validate.SwarmWorker/PolicyType.tosca
 topology_template:
 
   inputs:
@@ -55,7 +57,7 @@ topology_template:
     swarm-worker-1: # for backend
       type: igs.nodes.Swarm.Worker
       properties:
-        node_lables: {test: test}
+        node_lables: {tile: backend, isNfsClient: "false"}
       requirements:
         - manager:
             node: swarm-manager
@@ -88,6 +90,12 @@ topology_template:
           port: 2377
           commu_method: httpAPI
 
-
+  policies:
+    - validate-SwarmManager:
+        type: igs.policies.validate.SwarmManager
+        targets: [ swarm-manager ]
+    - validate-SwarmWorker:
+        type: igs.policies.validate.SwarmWorker
+        targets: [swarm-worker-1 ]
 
     

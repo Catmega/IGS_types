@@ -3,8 +3,11 @@ tosca_definitions_version: tosca_simple_yaml_1_3
 imports:
   - nodetypes/igs.nodes.NFS/NFSServer/NodeType.tosca
   - nodetypes/igs.nodes.NFS/NFSClient/NodeType.tosca
+  - nodetypes/igs.nodes.NFS/NFSVolume/NodeType.tosca
   - nodetypes/igs.nodes.abstract/IGSOSInstance/NodeType.tosca
   - relationshiptypes/igs.relationshipsn.NFS/ConnectsToNFSServer/RelationshipType.tosca
+  - policytypes/igs.policies.validate.NFSServer/PolicyType.tosca
+  - policytypes/igs.policies.validate.NFSClient/PolicyType.tosca
 topology_template:
   relationship_templates:
     connectToNFSServer_relationship_1:
@@ -32,15 +35,15 @@ topology_template:
         tier: frontend
         host_name: ubu22vm03
 
-    workstation-2: # for backend
-      type: igs.nodes.abstract.OSInstance
-      attributes:
-        private_address: 129.69.209.200
-        public_address: 129.69.209.200
-        username: jingyue
-        name: remote_host
-        tier: backend
-        host_name: pcss22task2vm4
+    # workstation-2: # for backend
+    #   type: igs.nodes.abstract.OSInstance
+    #   attributes:
+    #     private_address: 129.69.209.200
+    #     public_address: 129.69.209.200
+    #     username: jingyue
+    #     name: remote_host
+    #     tier: backend
+    #     host_name: pcss22task2vm4
 
 
     workstation-3: # for nfs
@@ -64,8 +67,8 @@ topology_template:
 
     nfs-server: #/home/ubuntu/mntnfs #/mnt/nfsdir
       type: igs.nodes.NFS.NFSServer
-      attributes: # should decrepted !!!
-        clients_ips: [192.168.221.163, 129.69.209.200]
+      # attributes: # should decrepted !!!
+      #   clients_ips: [192.168.221.163, 129.69.209.200]
       properties:
         server_mnt_path: /home/ubuntu/mntnfs #/var/share 
       requirements:
@@ -82,13 +85,28 @@ topology_template:
             relationship: connectToNFSServer_relationship_1
         - host: workstation-1
 
-    nfs-client-2: # this machine not able to access through port 2049 yet
-    # this machine not able to access through port 2049 yet, configure it later
-      type: igs.nodes.NFS.NFSClient
-      attributes:
-        client_mnt_path: /mount/nfsshare
+    igs-postgres-volume:
+      type: igs.nodes.NFS.Volume
+      properties:
+        name: igs-postgresdata-volume
       requirements:
-        - storageServer:
-            node: nfs-server
-            relationship: connectToNFSServer_relationship_2
-        - host: workstation-2   
+        - host: workstation-1
+        - storageClient: nfs-client-1
+    # nfs-client-2: # this machine not able to access through port 2049 yet
+    # # this machine not able to access through port 2049 yet, configure it later
+    #   type: igs.nodes.NFS.NFSClient
+    #   attributes:
+    #     client_mnt_path: /mount/nfsshare
+    #   requirements:
+    #     - storageServer:
+    #         node: nfs-server
+    #         relationship: connectToNFSServer_relationship_2
+    #     - host: workstation-2   
+
+  policies:
+    - validate-NFSServer:
+        type: igs.policies.validate.NFSServer
+        targets: [nfs-server]  
+    - validate-NFSClient:
+        type: igs.policies.validate.NFSClient
+        targets: [nfs-client-1]

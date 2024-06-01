@@ -48,7 +48,7 @@ relationship_types:
             type: string
             required: true
             default: { get_attribute: [ TARGET, public_address ] }
-          COMM:
+          CHANNEL:
             type: string
             required: true
             default: { get_property: [ SELF, channel] }
@@ -57,10 +57,10 @@ relationship_types:
             required: true
             default: { get_attribute: [ TARGET, join_token ] }
 
-        # operations:
-        #   pre_configure_source:
-        #     implementation:
-        #       primary: files/join-cluster/join-cluster.yaml
+        operations:
+          pre_configure_source:
+            implementation:
+              primary: files/join-cluster/join-cluster.yaml
     #### Xopera cannot recognize relationshipType's artifact####
     # artifacts:
     #   join-cluster:

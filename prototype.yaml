@@ -1,0 +1,468 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+imports:
+  - nodetypes/igs.nodes.Swarm/igs.nodes.Swarm.Manager/NodeType.yaml
+  - nodetypes/igs.nodes.Swarm/igs.nodes.Swarm.Worker/NodeType.yaml
+  - nodetypes/igs.nodes.docker/IGSDockerEngine/NodeType.tosca
+  - nodetypes/igs.nodes.NFS/NFSServer/NodeType.tosca
+  - nodetypes/igs.nodes.NFS/NFSVolume/NodeType.tosca
+  - nodetypes/igs.nodes.NFS/NFSClient/NodeType.tosca
+  - nodetypes/igs.nodes.Component/IGSRepository/NodeType.tosca
+  - nodetypes/igs.nodes.Component/IGSFTSearch/NodeType.tosca
+  - nodetypes/igs.nodes.postgres/PostgresDatabase/NodeType.tosca
+  - nodetypes/igs.nodes.postgres/PostgresDBMS/NodeType.tosca
+  - nodetypes/igs.nodes.postgres/PostgresCatalog/NodeType.tosca
+  - nodetypes/igs.nodes.postgres/PostgresObjectCatalog/NodeType.tosca
+  - nodetypes/igs.nodes.postgres/PostgresRecordsCatalog/NodeType.tosca
+  - nodetypes/igs.nodes.Component/IGSProxyService/NodeType.tosca
+  - nodetypes/igs.nodes.Component/IGSPortalService/NodeType.tosca
+  - nodetypes/igs.nodes.abstract/IGSOSInstance/NodeType.tosca
+  - nodetypes/igs.nodes.ContainerApplication/igs.nodes.ContainerApplication.Postgres/NodeType.tosca
+  - nodetypes/igs.nodes.ContainerApplication/igs.nodes.ContainerApplication.Nginx/NodeType.tosca
+  - nodetypes/igs.nodes.Tomcat/NodeType.tosca
+  - nodetypes/igs.nodes.Java.OpenJRE/NodeType.tosca
+  - nodetypes/igs.nodes.ContainerApplication/igs.nodes.container.OS/igs.nodes.container.OS.Ubuntu/NodeType.tosca
+  - policytypes/igs.policies.validate.SwarmManager/PolicyType.tosca
+  - policytypes/igs.policies.validate.SwarmWorker/PolicyType.tosca
+  - policytypes/igs.policies.validate.DockerEngine/PolicyType.tosca
+  - policytypes/igs.policies.validate.Postgres/PolicyType.tosca
+  - policytypes/igs.policies.validate.Solr/PolicyType.tosca
+  - policytypes/igs.policies.validate.NFSServer/PolicyType.tosca
+  - policytypes/igs.policies.validate.NFSClient/PolicyType.tosca
+  - relationshiptypes/igs.relationshipsn.NFS/ConnectsToNFSServer/RelationshipType.tosca
+  - artifacttypes/igs.artifacts/DockerCompose/ArtifactType.tosca
+  - artifacttypes/igs.artifacts/Html/ArtifactType.tosca
+  - artifacttypes/igs.artifacts/Jar/ArtifactType.tosca
+  - nodetypes/igs.nodes.docker/IGSDockerTempararyVolume/NodeType.tosca
+  - nodetypes/igs.nodes.docker/IGSDockerAutoOverlayNetwork/NodeType.tosca
+  - nodetypes/igs.nodes.VM/igs.nodes.VM.Openstack/NodeType.tosca
+  - nodetypes/igs.nodes.Solr.DocutmentSchema/NodeType.tosca
+  - nodetypes/igs.nodes.Solr.Custom/NodeType.tosca
+  - nodetypes/igs.nodes.ContainerApplication/igs.nodes.ContainerApplication.Solr/NodeType.tosca
+  - nodetypes/igs.nodes.Component/IGSFTSearch/NodeType.tosca
+  - nodetypes/igs.nodes.Component/IGSStorageService/NodeType.tosca
+  - nodetypes/igs.nodes.Python.slim/NodeType.tosca
+
+  - nodetypes/igs.nodes.Gunicorn/NodeType.tosca
+  - artifacttypes/igs.artifacts/txt/ArtifactType.tosca
+  - artifacttypes/igs.artifacts/Python/ArtifactType.tosca
+  - nodetypes/igs.nodes.ContainerApplication.CustomizableWebApp/igs.nodes.ContainerApplication.CustomizableWebApp.GunicornApp/NodeType.tosca
+  - nodetypes/igs.nodes.ContainerApplication.CustomizableWebApp/igs.nodes.ContainerApplication.CustomizableWebApp.TomcatApp/NodeType.tosca
+topology_template:
+
+  node_templates:
+
+    workstation-1: 
+      type: igs.nodes.VM.Openstack
+      attributes:
+        private_address: localhost
+        public_address: 192.168.221.163
+        os: Ubuntu22.04.3LTS
+        username: ubuntu
+        name: localhost
+        host_name: ubu22vm03
+
+    workstation-2: 
+      type: igs.nodes.VM.Openstack
+      attributes:
+        private_address: 129.69.209.200
+        public_address: 129.69.209.200
+        os: Ubuntu22.04.4LTS
+        username: jingyue
+        name: remote_host
+        host_name: pcss22task2vm4
+
+    swarm-manager: 
+      type: igs.nodes.Swarm.Manager
+      properties:
+        node_lables: {applicationTile: backend, isNfsClient: "true"}
+      requirements:
+        - runtimeHost: docker-engine-1
+        - host: workstation-1
+    swarm-worker-1: 
+      type: igs.nodes.Swarm.Worker
+      properties:
+        node_lables: {applicationTile: frontend, isNfsClient: "false"}
+      requirements:
+        - manager:
+            node: swarm-manager
+            relationship: connectToManager_relationship
+        - runtimeHost: docker-engine-2
+        - host: workstation-2
+    workstation-3: 
+      type: igs.nodes.VM.Openstack
+      attributes:
+        private_address: 192.168.221.133 #192.168.221.234
+        public_address: 192.168.221.133 #192.168.221.234
+        os: Ubuntu20.04.6LTS
+        username: ubuntu
+        name: remote_host
+        host_name: igrepositopry
+
+
+
+    docker-engine-1:
+      type: igs.nodes.docker.DockerEngine
+      requirements:
+        - host: workstation-1
+    docker-engine-2:
+      type: igs.nodes.docker.DockerEngine
+      requirements:
+        - host: workstation-2
+    nfs-server: 
+      type: igs.nodes.NFS.NFSServer
+      properties:
+        server_mnt_path: /home/ubuntu/mntnfs 
+      requirements:
+        - host: workstation-3
+
+    nfs-client-1:
+      type: igs.nodes.NFS.NFSClient
+      attributes:
+        client_mnt_path: /mount/nfs 
+      requirements:
+        - storageServer:
+            node: nfs-server
+            relationship: connectToNFSServer_relationship
+        - host: workstation-1
+
+
+##############components part#############################
+
+    FT-Search-Service:
+      type: igs.nodes.Component.FTSearchService
+      properties:
+        stack_name: igsstack
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        labels: node.labels.applicationTile==backend
+      artifacts:
+        docker_compose_file:
+          type: igs.artifacts.Ansible.DockerCompose
+          file: artifacts/ft-searh-stack.yaml
+      requirements:
+        - FTSearchEngine: Solr-Search-Engine
+        - containerApplication: FTSearch-Container
+
+
+    Solr-Search-Engine:
+      type: igs.nodes.Solr.Custom
+      properties:
+        stack_name: igsstack
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        labels: node.labels.applicationTile==backend
+        document_schema_file_loc: { get_property: [SELF, docSchema, absolute_loc_schema_file ] }
+        core_name: IGS
+        port: 8085
+      artifacts:
+        docker_compose_file:
+          type: igs.artifacts.Ansible.DockerCompose
+          file: artifacts/solr-stack.yaml
+      requirements:
+        - containerApplication: Solr-Container
+        - docSchema: Solr-Schema
+
+
+
+    Solr-Schema:
+      type: igs.nodes.Solr.DocumentSchema
+      properties:
+        absolute_loc_schema_file: /home/ubuntu/opera-root/git-project/IGS_types/artifacts/doc_schema.json
+
+    Repository:
+      type: igs.nodes.Component.Repository
+      properties:
+        stack_name: igsstack
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        labels: node.labels.applicationTile==backend
+      artifacts:
+        docker_compose_file:
+          type: igs.artifacts.Ansible.DockerCompose
+          file: artifacts/repository-stack.yaml
+      requirements:
+        - catalog: Catalog     
+        - objectCatalog: Object-Catalog
+        - recordsCatalog: Records-Catalog
+        - containerApplication: Repository-Container
+        
+    docker-temp-volume:
+      type: igs.nodes.docker.TempararyVolume
+
+    docker-stack-autogenerated-network:   
+      type: igs.nodes.docker.AutoOverlayNetwork
+      requirements:
+        - host: swarm-manager
+
+
+    postgres-volume:
+      type: igs.nodes.NFS.Volume
+      properties:
+        name: igs-postgresdata-volume
+      requirements:
+        - host: workstation-1
+        - storageClient: nfs-client-1
+
+    Catalog:
+      type: igs.nodes.postgres.PostgresCatalog
+      requirements:
+        - endpoint: Postgres-Database
+    Object-Catalog:
+      type: igs.nodes.postgres.PostgresObjectCatalog
+      requirements:
+        - endpoint: Postgres-Database
+    Records-Catalog:
+      type: igs.nodes.postgres.PostgresRecordsCatalog
+      requirements:
+        - endpoint: Postgres-Database
+    Postgres-Database:
+      type: igs.nodes.postgres.PostgresDatabase
+      properties:
+        username: igs
+        password: igs
+        db_name: igsdatabase
+        name: postgres-database
+      requirements:
+        - host: Postgres-DBMS
+    Postgres-DBMS:
+      type: igs.nodes.postgres.PostgresDBMS
+      properties:
+        stack_name: igsstack
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        labels: node.labels.applicationTile==backend
+      artifacts:
+        docker_compose_file:
+          type: igs.artifacts.Ansible.DockerCompose
+          file: artifacts/postgres-stack.yaml
+      requirements:
+        - containerApplication: Postgres-Container
+
+    Proxy-Service:
+      type: igs.nodes.Component.ProxyService
+      properties:
+        stack_name: igsstack
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        labels: node.labels.applicationTile==frontend
+      artifacts:
+        docker_compose_file:
+          type: igs.artifacts.Ansible.DockerCompose
+          file: artifacts/proxy-stack.yaml
+      requirements:
+        - containerApplication: Nginx-Container
+        - portalService: Portal-Service
+    
+    Portal-Service:
+      type: igs.nodes.Component.PortalService
+      properties:
+        stack_name: igsstack
+        service_launcher_def_loc: { get_artifact: [ SELF, docker_compose_file ] }
+        labels: node.labels.applicationTile==frontend
+      artifacts:
+        docker_compose_file:
+          type: igs.artifacts.Ansible.DockerCompose
+          file: artifacts/portal-stack.yaml
+      requirements:
+        - repository: Repository
+        - containerApplication: Portal-Container
+    
+
+
+############containers###################################
+    Mock-OS-Base-for-FTSearch:
+      type: igs.nodes.abstract.ContainerBaseOS
+      properties:
+        os_version: mock
+        os_name: mock
+    Python-Runtime-for-FTSearch:
+      type: igs.nodes.Python.slim
+      properties:
+        runtime_version: 3.8-slim
+        image_namespace: docker.io
+      requirements:
+        - host: Mock-OS-Base-for-FTSearch
+    Gunicorn-AppServer-for-FTSearch:
+      type: igs.nodes.Gunicorn
+      properties:
+        webapp_server_version: 20.1.0
+        image_namespace: igsrepo
+      requirements:
+        - host: Python-Runtime-for-FTSearch
+
+    FTSearch-Container:
+      type: igs.nodes.ContainerApplication.CustomizableWebApp.GunicornApp
+      properties:
+        image_namespace: igsrepo
+        image_name: search-service
+        image_version: test3
+        start_command: gunicorn -b 0.0.0.0:8080 app:app
+        server_app_loc: /app/app.py
+        app_file_loc: { get_artifact: [ SELF, ftsearch_app_file ] }
+        requirements_file_loc: { get_artifact: [ SELF, requirements_file ] }
+      artifacts:
+        ftsearch_app_file:
+          type: igs.artifacts.Python
+          file: artifacts/search_service_app.py
+        requirements_file:
+          type: igs.artifacts.txt
+          file: artifacts/requirements.txt
+      requirements:
+        - host: swarm-manager
+        - network: docker-stack-autogenerated-network
+        - storage: docker-temp-volume
+        - webAppServer: Gunicorn-AppServer-for-FTSearch
+    Postgres-Container:
+      type: igs.nodes.ContainerApplication.Postgres
+      properties:
+        image_namespace: docker.io
+        image_name: postgres
+        image_version: 14.4
+        container_data_dir: /var/lib/postgresql/data
+      requirements:
+        - host: swarm-manager
+        - network: docker-stack-autogenerated-network
+        - storage: postgres-volume
+
+    Ubuntu-OS-Base-for-Portal:
+      type: igs.nodes.container.OS.Ubuntu
+      properties:
+        os_version: latest
+        os_name: ubuntu
+    Java-Runtime-for-Portal:
+      type: igs.nodes.Java.OpenJRE
+      properties:
+        runtime_version: 8
+        image_namespace: igsrepo
+      requirements:
+        - host: Ubuntu-OS-Base-for-Portal
+    Tomcat-AppServer-for-Portal:
+      type: igs.nodes.Tomcat
+      properties:
+        webapp_server_version: 9
+        image_namespace: igsrepo
+      requirements:
+        - host: Java-Runtime-for-Portal
+
+    Portal-Container:
+      type: igs.nodes.ContainerApplication.CustomizableWebApp.TomcatApp 
+      properties:
+        image_namespace: igsrepo
+        image_name: portal
+        image_version: test3
+        start_command: /usr/local/bin/start-tomcat.sh
+        server_app_loc: /var/lib/tomcat9/webapps/ROOT/index.html
+        app_file_loc: { get_artifact: [ SELF, portal_UI_app_file ] }
+      artifacts:
+        portal_UI_app_file:
+          type: igs.artifacts.Html
+          file: artifacts/portal-ui.html
+      requirements:
+        - host: swarm-manager
+        - network: docker-stack-autogenerated-network
+        - storage: docker-temp-volume
+        - webAppServer: Tomcat-AppServer-for-Portal
+
+    Ubuntu-OS-Base-for-Repository:
+      type: igs.nodes.container.OS.Ubuntu
+      properties:
+        os_version: latest
+        os_name: ubuntu
+    Java-Runtime-for-Repository:
+      type: igs.nodes.Java.OpenJRE
+      properties:
+        runtime_version: 8
+        image_namespace: igsrepo
+      requirements:
+        - host: Ubuntu-OS-Base-for-Repository
+    Tomcat-AppServer-for-Repository:
+      type: igs.nodes.Tomcat
+      properties:
+        webapp_server_version: 9
+        image_namespace: igsrepo
+      requirements:
+        - host: Java-Runtime-for-Repository
+
+    Repository-Container:
+      type: igs.nodes.ContainerApplication.CustomizableWebApp.TomcatApp 
+      properties:
+        image_namespace: igsrepo
+        image_name: repository
+        image_version: test3
+        start_command: java -jar $CATALINA_BASE/webapps/app.jar
+        server_app_loc: /var/lib/tomcat9/webapps/app.jar
+        app_file_loc: { get_artifact: [ SELF, repository_app_file ] }
+        
+      artifacts:
+        repository_app_file:
+          type: igs.artifacts.JAR
+          file: artifacts/igsRepository.jar
+      requirements:
+        - host: swarm-manager
+        - network: docker-stack-autogenerated-network
+        - storage: docker-temp-volume
+        - webAppServer: Tomcat-AppServer-for-Repository
+
+    Nginx-Container:
+      type: igs.nodes.ContainerApplication.Nginx
+      properties:
+        image_name: nginx
+        image_namespace: igsrepo
+        image_version: latest
+      requirements:
+        - host: swarm-manager
+        - network: docker-stack-autogenerated-network
+        - storage: docker-temp-volume
+
+
+
+
+    Solr-Container:
+      type: igs.nodes.ContainerApplication.Solr
+      properties:
+        image_name: solr
+        image_namespace: docker.io
+        image_version: latest
+      requirements:
+        - host: swarm-manager
+        - network: docker-stack-autogenerated-network
+        - storage: docker-temp-volume
+
+
+
+
+  relationship_templates:
+    connectToManager_relationship:
+      type: igs.relationships.ConnectsToManager
+      properties:
+        channel:
+          port: 2377
+          commu_method: httpAPI
+
+    connectToNFSServer_relationship:
+      type: igs.relationships.NFS.ConnectsToNFSServer
+      properties:
+        channel:
+          port: 2049
+          commu_method: tcp
+  policies:
+    - validate-SwarmManager:
+        type: igs.policies.validate.SwarmManager
+        targets: [ swarm-manager ]
+    - validate-DockerEngine-1:
+        type: igs.policies.validate.DockerEngine
+        targets: [docker-engine-1] 
+    - validate-DockerEngine-2:
+        type: igs.policies.validate.DockerEngine
+        targets: [docker-engine-2]
+    - validate-SwarmWorker:
+        type: igs.policies.validate.SwarmWorker
+        targets: [swarm-worker-1 ]
+    - validate-Postgres:
+        type: igs.policies.validate.Postgres
+        targets: [Postgres-Container]
+    - validate-SolrEnginee:
+        type: igs.policies.validate.Solr
+        targets: [ Solr-Search-Engine ] 
+    - validate-NFSServer:
+        type: igs.policies.validate.NFSServer
+        targets: [nfs-server]  
+    - validate-NFSClient:
+        type: igs.policies.validate.NFSClient
+        targets: [nfs-client-1] 

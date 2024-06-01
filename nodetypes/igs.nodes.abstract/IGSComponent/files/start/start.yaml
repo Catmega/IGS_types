@@ -1,0 +1,30 @@
+- name: Run Tomcat Docker Container with igs repostiory Web application
+  hosts: all
+  gather_facts: no
+
+  vars:
+    given_file: "{{SERVICE_LAUNCHER_DEF_LOC}}"
+
+  tasks:
+
+    - name: Skip the rest of the tasks if image is found
+      meta: end_play
+      when: given_file == "notGiven"
+
+    - name: Dynamically include tasks based on a variable
+      include_tasks: "{{ file_path }}"
+      vars:
+        file_path: "{{SERVICE_LAUNCHER_DEF_LOC}}"    
+        image_namespace: "{{IMAGE_NAMESPACE}}"
+        image_name: "{{IMAGE_NAME}}"
+        image_version: "{{IMAGE_VERSION}}" #'{{ REPOSITORY_VERSION }}'
+        stack_name: "{{STACK_NAME}}"
+        service_name: "{{SERVICE_NAME}}"
+        labels: "{{LABELS}}" #'{{ LABELS }}'
+        client_mnt_path: "{{ CLIENT_MNT_DIR | default('undefined') }}"
+        volume_dir: "{{ VOLUME_DIR | default('undefined') }}"
+        container_data_dir: "{{ CONTAINER_DATA_DIR | default('undefined') }}"
+        replica_num: "{{ REPLICA_NUM }}"
+
+  
+# - import_playbook: '{{t}}'

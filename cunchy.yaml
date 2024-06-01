@@ -1,0 +1,74 @@
+---
+version: '3.3'
+
+services:
+  postgres:
+    hostname: 'primary'
+    image: crunchydata/crunchy-postgres:centos7-12.5-4.4.2 # crunchydata/crunchy-postgres:centos7-10.11-4.2.0
+    environment:
+      - PGHOST=/tmp
+      - MAX_CONNECTIONS=10
+      - MAX_WAL_SENDERS=5
+      - PG_MODE=primary
+      - PG_PRIMARY_USER=igs
+      - PG_PRIMARY_PASSWORD=igs
+      - PG_DATABASE=igsdatabase
+      - PG_USER=igs
+      - PG_PASSWORD=igs
+      - PG_ROOT_PASSWORD=igs
+      - PG_PRIMARY_PORT=5432
+    # volumes:
+    #   - pg-primary-vol:/pgdata
+    # ports:
+    #   - "5432:5432"
+
+    deploy:
+      placement:
+        constraints:
+        # - node.labels.DBtype == primary
+        - node.role == manager
+
+
+  replica:
+    image: crunchydata/crunchy-postgres:centos7-12.5-4.4.2 # crunchydata/crunchy-postgres:centos7-10.11-4.2.0
+    environment:
+      - PGHOST=/tmp
+      - MAX_CONNECTIONS=10
+      - MAX_WAL_SENDERS=5
+      - PG_MODE=replica
+      - PG_PRIMARY_HOST=primary
+      - PG_PRIMARY_PORT=5432
+      - PG_PRIMARY_USER=igs
+      - PG_PRIMARY_PASSWORD=igs
+      - PG_DATABASE=igsdatabase
+      - PG_USER=igs
+      - PG_PASSWORD=igs
+      - PG_ROOT_PASSWORD=igs
+    # volumes:
+    #   - pg-replica-vol:/pgdata
+    # ports:
+    #   - "5431:5432"
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+        # - node.labels.DBtype != primary
+        - node.role == worker
+
+  igsrepository:
+    image: igsrepo/repository:1 # igs-repository-spring:latest
+    ports:
+      - "8080:8080"
+    deploy:
+      placement:
+        constraints:
+          - node.labels.applicationTile==backend
+# volumes:
+#   pg-primary-vol:
+#   pg-replica-vol:
+
+
+# wrong
+# crunchydata/crunchy-postgres:centos8-13.5-4.7.4

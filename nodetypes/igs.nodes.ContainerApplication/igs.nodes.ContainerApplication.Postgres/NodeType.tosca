@@ -1,0 +1,42 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../../igs.nodes.docker/IGSDockerApplication/NodeType.tosca
+  - ../../../interfacetypes/igs.interfaces.node.lifecycle/Validation/InterfaceType.tosca
+node_types:
+  igs.nodes.ContainerApplication.Postgres:
+    derived_from: igs.nodes.abstract.ContainerApplication
+    metadata:
+      targetNamespace: "igs.nodes.ContainerApplication"
+      abstract: "false"
+      final: "false"
+    properties:
+      # client_mnt_path:
+      #   type: string
+      #   required: false
+      #   default: undefined
+      # volume_dir:
+      #   type: string
+      #   required: false
+      #   default: undefined
+      container_data_dir:
+        type: string
+        required: false
+        default: /var/lib/postgresql/data
+    interfaces:
+      # Standard:
+      #   type: tosca.interfaces.node.lifecycle.Standard
+      #   operations:
+      #     start:
+      #       inputs:
+      #         LABELS:
+      #           type: string
+      #           required: true
+      #           default: { get_property: [ SELF, labels] }
+      #       implementation:
+      #         primary: files/start/start.yaml 
+      #         # deploy in a docker stack
+
+      Validation:
+        type: igs.interfaces.node.lifecycle.Validation 
+        operations:
+          validate: files/validate/validate.yaml 

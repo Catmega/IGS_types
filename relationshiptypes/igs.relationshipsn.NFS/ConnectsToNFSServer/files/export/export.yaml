@@ -4,7 +4,20 @@
   gather_facts: false
 
   tasks:  
-      - name: Add new Lines in export file
+
+    - name: Check if specific line exists in the file
+      lineinfile:
+        path: /etc/exports
+        line: "{{ SERVER_MNT_PATH }} {{ CLIENT_IP }}(rw,sync,no_subtree_check,no_root_squash)"
+        state: present
+      check_mode: true
+      register: configuration_exsitence
+
+    - name: Skip all other tasks the export configuration is already done
+      meta: end_play
+      when: configuration_exsitence.failed == false
+
+    - name: Add new Lines in export file
       ansible.builtin.lineinfile:
         state: present
         dest: /etc/exports

@@ -1,0 +1,76 @@
+services:
+  zookeeper:
+    image: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      - ZOO_4LW_COMMANDS_WHITELIST=mntr,conf,ruok
+    deploy:
+      placement:
+        constraints:
+        # - node.labels.DBtype != primary
+        - node.role == worker
+  solr:
+    image: solr
+    command: bash -c '/opt/solr/bin/solr start -f -z zookeeper:2181'
+    ports:
+      - "8086:8983"
+    depends_on:
+          - zookeeper
+    deploy:
+      replicas: 2
+      placement:
+        constraints:
+        # - node.labels.DBtype == primary
+        - node.role == worker
+#################################
+  # solr:
+  #   image: solr
+  #   container_name: solr    
+  #   ports:
+  #    - "9983:9983"
+  #    - "8086:8983"
+
+  #   entrypoint:
+  #     - docker-entrypoint.sh
+  #     - solr
+  #     - start
+  #     - -c
+  #     - -f
+  #################################
+  # zookeeper:
+  #   image: zookeeper:3.6
+
+  #   deploy:
+  #     replicas: 3
+  #     restart_policy:
+  #       condition: on-failure
+  #     placement:
+  #       constraints:
+  #       # - node.labels.DBtype != primary
+  #       - node.role == worker
+  #   environment:
+  #     ZOO_MY_ID: 1
+  #     ZOO_SERVERS: server.1=zookeeper:2888:3888 server.2=zookeeper:2888:3888 server.3=zookeeper:2888:3888
+
+  # solr:
+  #   image: solr
+  #   ports:
+  #     - 8086:8983
+  #   deploy:
+  #     replicas: 3
+  #     restart_policy:
+  #       condition: on-failure
+  #     placement:
+  #       constraints:
+  #       # - node.labels.DBtype == primary
+  #       - node.role == manager
+  #   environment:
+  #     - ZK_HOST=zookeeper:2181
+
+
+  #   # command:
+  #   #   - solr-fg
+  #   #   - zkHost=zookeeper:2181
+  #   #   - -cloud
+

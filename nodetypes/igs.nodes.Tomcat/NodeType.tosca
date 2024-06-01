@@ -1,39 +1,71 @@
 tosca_definitions_version: tosca_simple_yaml_1_3
-
+imports:
+  - ../igs.nodes.abstract/IGSWebAppServer/NodeType.tosca
+  - ../../capabilitytypes/igs.capabilities/JavaRuntime /CapabilityType.tosca
+  - ../igs.nodes.abstract/IGSRuntime/NodeType.tosca
 node_types:
   igs.nodes.Tomcat:
-    derived_from: tosca.nodes.WebServer
+    derived_from: igs.nodes.abstract.WebAppServer
     metadata:
-      targetNamespace: "igs.nodes.Tomcat"
+      targetNamespace: "igs.nodes"
       abstract: "false"
       final: "false"
     properties:
-      base_java_version:
-        type: version
-        required: true
-        default: { get_property: [SELF, host, java_version ] }
-      tomcat_version:
-        type: version
-        required: true
+      ###### inherited from igs.nodes.abstract.WebAppServer ##########
+      # base_runtime_version:
+      #   type: version
+      #   required: true
+      #   default: { get_property: [SELF, host, runtime_version ] }
+      # base_runtime_name:
+      #   type: version
+      #   required: true
+      #   default: { get_property: [SELF, host, runtime_name ] }
+      # webapp_server_version:
+      #   type: version
+      #   required: true
+      #############################################################
 
+      ###### overwrite igs.nodes.abstract.WebAppServer ##########
+      webapp_server_name:
+        type: string
+        required: true
+        default: tomcat
+      #############################################################
+      image_namespace:
+        type: string
+        required: true
     requirements:
+      ###### overwrite igs.nodes.abstract.WebAppServer ##########
       - host:  
-          capability: tosca.capabilities.Compute
-          node: igs.nodes.Java
+          capability: igs.capabilities.Runtime.Java
+          node: igs.nodes.abstract.Runtime
           relationship: tosca.relationships.HostedOn
+      #############################################################
     interfaces:
       Standard:
         type: tosca.interfaces.node.lifecycle.Standard
         operations:
           create:
             inputs:
-              BASE_JAVA_VERSION:
+              BASE_RUNTIME_VERSION:
                 type: string
                 required: true
-                default: { get_property: [SELF, base_java_version ] }
+                default: { get_property: [SELF, base_runtime_version ] }
+              BASE_RUNTIME_NAME:
+                type: string
+                required: true
+                default: { get_property: [SELF, base_runtime_name ] }
               TOMCAT_VERSION:
                 type: string
                 required: true
-                default: { get_property: [SELF, tomcat_version ] }
+                default: { get_property: [SELF, webapp_server_version ] }
+              IMAGE_NAME:
+                type: string
+                required: true
+                default: { get_property: [SELF, webapp_server_name ] }
+              IMAGE_NAMESPACE:
+                type: string
+                required: false
+                default: { get_property: [ SELF, image_namespace] }
             implementation:
               primary: files/create/create.yaml 

@@ -1,0 +1,56 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../../igs.nodes.docker/IGSDockerApplication/NodeType.tosca
+node_types:
+  igs.nodes.ContainerApplication.Nginx:
+    derived_from: igs.nodes.abstract.ContainerApplication
+    metadata:
+      targetNamespace: "igs.nodes.ContainerApplication"
+      abstract: "false"
+      final: "false"
+    properties:
+      client_mnt_path:
+        type: string
+        required: false
+        default: undefined
+      volume_dir:
+        type: string
+        required: false
+        default: undefined
+      image_version:
+        type: version
+        required: true
+    interfaces:
+      Standard:
+        type: tosca.interfaces.node.lifecycle.Standard
+        operations:
+          create:
+            inputs:
+              IMAGE_VERSION:
+                type: string
+                required: true
+                default: { get_property: [SELF, image_version ] }
+              IMAGE_NAMESPACE:
+                type: string
+                required: false
+                default: { get_property: [ SELF, image_namespace] }
+              IMAGE_NAME:
+                type: string
+                required: false
+                default: { get_property: [ SELF, image_name] }
+            implementation:
+              primary: files/create/create.yaml 
+          # start:
+          #   inputs:
+          #     LABELS:
+          #       type: string
+          #       required: true
+          #       default: { get_property: [ SELF, labels] }
+          #     NGINX_VERSION:
+          #       type: string
+          #       required: true
+          #       default: { get_property: [SELF, image_version ] }
+          #   implementation:
+          #     primary: files/start/start.yaml 
+              # create the image, then deploy in a docker stack
+

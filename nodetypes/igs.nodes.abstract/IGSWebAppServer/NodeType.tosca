@@ -1,0 +1,31 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+imports:
+  - ../../../capabilitytypes/igs.capabilities/Runtime/CapabilityType.tosca
+node_types:
+  igs.nodes.abstract.WebAppServer:
+    derived_from: tosca.nodes.WebServer
+    metadata:
+      targetNamespace: "igs.nodes.abstract"
+      abstract: "false"
+      final: "false"
+    properties:
+      base_runtime_version:
+        type: version
+        required: true
+        default: { get_property: [SELF, host, runtime_version ] }
+      base_runtime_name:
+        type: version
+        required: true
+        default: { get_property: [SELF, host, runtime_name ] }
+      webapp_server_version:
+        type: version
+        required: true
+      webapp_server_name:
+        type: string
+        required: true
+    requirements:
+      - host:  
+          capability: igs.capabilities.Runtime
+          node: igs.nodes.abstract.Runtime
+          relationship: tosca.relationships.HostedOn
+

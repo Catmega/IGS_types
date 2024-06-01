@@ -10,9 +10,9 @@ node_types:
       targetNamespace: "igs.nodes.docker"
       abstract: "false"
       final: "false"
-    requirements:
-      - runtime: #host
-          capability: igs.capabilities.container.DockerRuntime
-          node: igs.nodes.docker.DockerEngine
-          relationship: tosca.relationships.HostedOn
-          occurrences: [ 1, 1 ]
+    # requirements:
+    #   - runtime: #host
+    #       capability: igs.capabilities.container.DockerRuntime
+    #       node: igs.nodes.docker.DockerEngine
+    #       relationship: tosca.relationships.HostedOn
+    #       occurrences: [ 1, 1 ]
